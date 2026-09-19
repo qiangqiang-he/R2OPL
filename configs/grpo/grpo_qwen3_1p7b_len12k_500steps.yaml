@@ -40,8 +40,8 @@ rlvr_generation:
 
 trainer:
   total_training_steps: 500
-  val_before_train: true
-  test_freq: 20
-  save_freq: 20
+  val_before_train: false
+  test_freq: 100
+  save_freq: 100
   experiment_name: ${run_name}
   default_local_dir: ./outputs/${run_name}

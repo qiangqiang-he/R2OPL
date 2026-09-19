@@ -73,8 +73,10 @@ actor_rollout_ref:
       lr_scheduler_type: cosine
       clip_grad: 1.0
     fsdp_config:
-      param_offload: true
-      optimizer_offload: true
+      # The target 8 x H100 server keeps these Student models resident on GPU.
+      # Larger future models may opt into CPU offload in their own config.
+      param_offload: false
+      optimizer_offload: false
 
   rollout:
     name: vllm
