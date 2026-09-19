@@ -1,0 +1,47 @@
+# @package _global_
+
+# GSPO: Qwen3-4B Student, 12K training rollouts.
+
+defaults:
+  - /gspo
+  - _self_
+
+run_name: gspo_qwen3_4b_len12k_500steps
+run_name_prefix: gspo_qwen3_4b_len12k_500steps
+student_model_family: qwen3
+
+data:
+  max_prompt_length: 2048
+  max_response_length: 20480
+
+actor_rollout_ref:
+  model:
+    path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
+  actor:
+    ppo_max_token_len_per_gpu: 14337
+    optim:
+      lr: 1.0e-6
+  rollout:
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    max_model_len: 22528
+    max_num_batched_tokens: 22528
+    log_prob_max_token_len_per_gpu: 14337
+    val_kwargs:
+      temperature: 0.6
+      top_p: 0.95
+      top_k: -1
+      do_sample: true
+
+rlvr_generation:
+  train_max_new_tokens: 12288
+  val_max_new_tokens: 20480
+
+trainer:
+  total_training_steps: 500
+  val_before_train: false
+  test_freq: 100
+  save_freq: 100
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}

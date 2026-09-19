@@ -1,0 +1,53 @@
+# KL-free GSPO base configuration using all eight GPUs for the Student.
+# GSPO (https://arxiv.org/abs/2507.18071) keeps GRPO's group-relative
+# advantage but clips the sequence-level importance ratio at [0.8, 1.2].
+
+defaults:
+  - /base
+  - _self_
+
+run_name: gspo_qwen3
+run_name_prefix: gspo_qwen3
+group_name: GSPO
+
+algorithm:
+  name: gspo
+  adv_estimator: grpo
+  norm_adv_by_std_in_grpo: true
+  use_kl_in_reward: false
+
+actor_rollout_ref:
+  actor:
+    clip_ratio: 0.2
+    clip_ratio_low: 0.2
+    clip_ratio_high: 0.2
+    loss_agg_mode: seq-mean-token-mean
+    use_kl_loss: false
+    kl_loss_coef: 0.0
+    policy_loss:
+      loss_mode: gspo
+
+distillation:
+  enabled: false
+
+# GSPO is RL-only, so ERSR retains correct validation trajectories and
+# estimates only the Student action advantage. The final step is ineligible.
+ersr:
+  enabled: true
+  datasets:
+    - AMC23
+    - AIME24
+    - SciBench
+    - LogicBench
+  max_steps_per_dataset: 500
+  mc_k: 2
+  max_teacher_step_tokens: 2048
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  seed: 42
+
+trainer:
+  n_gpus_per_node: 8
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}

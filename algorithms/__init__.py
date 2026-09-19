@@ -11,6 +11,12 @@ from algorithms.grpo import (
     configure_grpo_defaults,
     validate_grpo_config,
 )
+from algorithms.gspo import (
+    GSPOTrainer,
+    configure_gspo_batch,
+    configure_gspo_defaults,
+    validate_gspo_config,
+)
 from algorithms.pg_opd import PGOPDTrainer, validate_pg_opd_config
 from utils.opd_runtime import configure_pg_opd_batch, configure_pg_opd_defaults
 
@@ -38,6 +44,13 @@ ALGORITHM_REGISTRY = {
         validate=validate_grpo_config,
         configure_defaults=configure_grpo_defaults,
         configure_batch=configure_grpo_batch,
+    ),
+    "gspo": AlgorithmSpec(
+        name="gspo",
+        trainer_class=GSPOTrainer,
+        validate=validate_gspo_config,
+        configure_defaults=configure_gspo_defaults,
+        configure_batch=configure_gspo_batch,
     ),
 }
 
