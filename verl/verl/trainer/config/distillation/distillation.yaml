@@ -1,0 +1,153 @@
+# Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
+_target_: verl.workers.config.DistillationConfig
+
+# specify the default per-component configs
+defaults:
+
+  # <folder_name>@<field_name>.<field_name>: <yaml_file_name>
+
+  # load the default config, then apply the fields in the current yaml
+  # self config override anything above
+  - _self_
+
+# Whether to enable distillation.
+enabled: false
+
+# distillation loss config
+distillation_loss:
+
+  # # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
+  _target_: verl.workers.config.DistillationLossConfig
+
+
+  # OPD uses sampled-token reverse KL.
+  loss_mode: reverse_kl
+
+  # Reverse-KL OPD does not materialize a top-k teacher distribution.
+  topk: null
+
+  # Number of teacher/student logits retained for convergence diagnostics only.
+  diagnostic_topk: 16
+
+  # EOPD Teacher entropy gate threshold (tau).
+  eopd_entropy_threshold: 0.8
+
+  # EOPD gated Forward KL coefficient (alpha).
+  eopd_alpha: 1.0
+
+  # Per-token teacher log-probability sensitivity threshold used by PS-OPD.
+  sensitivity_threshold: 0.05
+
+  # PS-OPD weights for tokens sensitive and stable to false feedback, respectively.
+  w_sens: 0.25
+  w_stable: 1.0
+
+  # Fraction of eligible sampled tokens retained by GKD-OPD and PG-OPD.
+  selection_ratio: 1.0
+
+  # Token selection method: random, topgap, or bottomgap.
+  selection_method: random
+
+  # OA-OPD step intervention threshold and exponential strength.
+  oa_opd_tau: 0.0
+  oa_opd_beta: 1.0
+
+  # Bound concurrent boundary probes for one rollout to control memory/padding.
+  oa_opd_probe_batch_size: 8
+
+  # Multiplier applied to Teacher self-deviation on both sides of Cal-OPD.
+  cal_lambda: 1.0
+
+  # Teacher coefficient in the ExOPD token-level advantage.
+  exopd_lambda: 1.25
+
+  # Whether to include task rewards alongside distillation loss.
+  use_task_rewards: false
+
+
+  # The coef of the distillation loss when use_task_rewards is true
+  distillation_loss_coef: 1.0
+
+  # Optional max clamp value for distillation loss. If null, no clamping is applied.
+  loss_max_clamp: 10.0
+
+  # Optional min clamp value for log probabilities for stability, e.g., log q - log p where p or q are very close to zero.
+  log_prob_min_clamp: -10.0
+
+  # Reverse-KL estimates are consumed as policy-gradient advantages.
+  use_policy_gradient: true
+
+  # Name of the policy loss to use when use_policy_gradient is true.
+  policy_loss_mode: "vanilla"
+
+  # PPO clipping ratio for policy loss.
+  clip_ratio: 0.2
+
+  # Lower bound for PPO clipping ratio.
+  clip_ratio_low: 0.2 
+
+  # Upper bound for PPO clipping ratio.
+  clip_ratio_high: 0.2
+
+
+# Number of GPUs per node in the distillation teacher resource pool
+n_gpus_per_node: 8
+
+# Number of nodes in the distillation teacher resource pool
+nnodes: 0
+
+# multi-teacher configs
+teacher_models:
+
+  # Single-teacher config. This entry is popped when other teacher entries are added, so
+  # using `teacher_model` as one of several keys silently drops it. For
+  # example, the following CLI overrides result in ONLY `teacher_model2` being used:
+  #
+  # distillation.teacher_models.teacher_model.key=openai/gsm8k
+  # distillation.teacher_models.teacher_model.model_path=Qwen/Qwen3-4B
+  # +distillation.teacher_models.teacher_model2.key=hiyouga/geometry3k
+  # +distillation.teacher_models.teacher_model2.model_path=Qwen/Qwen3-VL-4B-Instruct
+  #
+  # Instead, give the first teacher a different name:
+  #
+  # +distillation.teacher_models.teacher_model1.key=openai/gsm8k
+  # +distillation.teacher_models.teacher_model1.model_path=Qwen/Qwen3-4B
+  # +distillation.teacher_models.teacher_model2.key=hiyouga/geometry3k
+  # +distillation.teacher_models.teacher_model2.model_path=Qwen/Qwen3-VL-4B-Instruct
+  teacher_model:
+    _target_: verl.workers.config.DistillationTeacherModelConfig
+    key: null
+    model_path: null
+    num_replicas: 0
+    inference:
+      _target_: verl.workers.config.RolloutConfig
+      name: ${oc.select:actor_rollout_ref.rollout.name}
+      dtype: ${oc.select:actor_rollout_ref.rollout.dtype}
+      gpu_memory_utilization: 0.5
+      enforce_eager: true
+      cudagraph_capture_sizes: null
+      free_cache_engine: false
+      data_parallel_size: 1
+      expert_parallel_size: 1
+      tensor_model_parallel_size: 1
+      max_num_batched_tokens: 8192
+      max_model_len: null
+      max_num_seqs: 1024
+      load_format: auto
+      engine_kwargs: {}
+      limit_images: null
+      enable_chunked_prefill: true
+      enable_prefix_caching: true
+      disable_log_stats: true
+      skip_tokenizer_init: true
+      prompt_length: ${oc.select:actor_rollout_ref.rollout.prompt_length}
+      response_length: ${oc.select:actor_rollout_ref.rollout.response_length}
+      temperature: ${oc.select:actor_rollout_ref.rollout.temperature}
+
+# Key to route examples to the appropriate teacher model in multi-teacher setups. Should correspond to a field in the data proto, e.g., task.
+teacher_key: data_source
+
+# Bound vocabulary projections independently on the trainable student and the
+# frozen teacher. Teacher chunking is applied through vLLM chunked prefill.
+student_chunk_size: 1024
+teacher_chunk_size: 1024
