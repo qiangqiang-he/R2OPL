@@ -1,0 +1,19 @@
+# Local runs and test-only code
+/output/
+/outputs/
+/tests/
+/wandb/
+
+# Keep only the two approved datasets in data/.
+/data/*
+!/data/Math–Science–Logic-32K.json
+!/data/MSL_Eval.json
+
+# Python caches and local tooling artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Editor and operating-system metadata
+.DS_Store
+Thumbs.db
