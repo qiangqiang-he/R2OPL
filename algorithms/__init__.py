@@ -5,6 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Type
 
+from algorithms.eopd import (
+    EOPDTrainer,
+    configure_eopd_batch,
+    configure_eopd_defaults,
+    validate_eopd_config,
+)
 from algorithms.grpo import (
     GRPOTrainer,
     configure_grpo_batch,
@@ -51,6 +57,13 @@ ALGORITHM_REGISTRY = {
         validate=validate_gspo_config,
         configure_defaults=configure_gspo_defaults,
         configure_batch=configure_gspo_batch,
+    ),
+    "eopd": AlgorithmSpec(
+        name="eopd",
+        trainer_class=EOPDTrainer,
+        validate=validate_eopd_config,
+        configure_defaults=configure_eopd_defaults,
+        configure_batch=configure_eopd_batch,
     ),
 }
 
