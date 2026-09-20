@@ -213,6 +213,7 @@ pip install -i https://pypi.org/simple --no-deps TransferQueue==0.1.7
 
 | 现象 | 原因 / 处理 |
 | --- | --- |
+| `r2opl_base` gemma 训练阶段 OOM（单块 ~4.4GB logits 分配失败但显存名义有空） | CUDA 分配器碎片化 → 运行前 `export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`（已实测修复，全矩阵通过） |
 | `RuntimeError: UVA is not available` | WSL 上用了 V2 runner → 确认 activate.d 里的 `VLLM_USE_V2_MODEL_RUNNER=0` 生效（或临时 export） |
 | `FileNotFoundError: 'ninja'` | PATH 缺环境 bin 目录（FlashInfer JIT）→ 见上节 PATH 说明 |
 | pip 解析出 transformers ≠ 5.10.x | 手动钉过其它版本 → `pip install -i https://pypi.org/simple "transformers>=5.10.4,<5.11"` |
