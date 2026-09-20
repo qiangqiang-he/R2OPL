@@ -25,6 +25,8 @@ actor_rollout_ref:
     temperature: 1.0
     top_p: 1.0
     top_k: -1
+    # Gemini4 Student uses 0.10 more VRAM than the Qwen3-1.7B baseline (0.40).
+    gpu_memory_utilization: 0.50
     max_model_len: 22528
     max_num_batched_tokens: 22528
     log_prob_max_token_len_per_gpu: 14337
