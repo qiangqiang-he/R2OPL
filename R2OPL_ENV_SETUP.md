@@ -170,6 +170,38 @@ pip install -U pip
 > 注意：Ubuntu 22.04 系统自带 Python 3.10，不满足 verl/tensordict 的版本要求；
 > 机器上没有 3.12 时请用方式一或方式二。
 
+## 驱动要求与旧驱动服务器（如 535 / CUDA 12.2）
+
+两套环境对应两种驱动代际，**先看 `nvidia-smi` 右上角 CUDA Version 再选**：
+
+| 环境 | 组合 | 驱动要求 | 模型家族 | 验证状态 |
+| --- | --- | --- | --- | --- |
+| `r2opl`（默认） | vllm 0.29.0 + torch 2.13.0+cu130 | **≥ 580（CUDA 13）** | Qwen3 / Qwen3.5 / Qwen3.6 / **gemma-4** 全支持 | 本地 4 家族 + 6 算法 smoke 通过 |
+| `r2opl-cu12`（旧驱动变体） | **vllm 0.19.1** + torch 2.11.0+cu128 | ≥ 525（CUDA 12.x，含 535） | 仅 Qwen3 系；**无 gemma-4 / Qwen3.5 / Qwen3.6** | Qwen3 rollout 已验证（vLLM 引擎，409 tok/s） |
+
+**实测边界（2026-09-20，逐版验证 `_C` 扩展链接的 CUDA 运行库）**：
+- vllm **0.19.1 是最后一个 cu12 构建**；0.20.2 起 `vllm._C` 链接 `libcudart.so.13`（0.20.2/0.21.0 均实测 ImportError），0.22.0+ 依赖里直接声明 cu13 内核包；
+- gemma-4 原生支持从 **0.22.0** 开始 ⇒ **cu12 构建与 gemma-4 支持没有交集**。旧驱动不改，vLLM 无法加载 gemma-4，没有任何版本组合可绕过。
+
+**旧驱动服务器想跑 gemma-4 / Qwen3.5 / Qwen3.6，只有两条路**：
+1. 升级驱动到 ≥ 580（H100 装 NVIDIA datacenter 驱动，一次性，最干净）——之后 `r2opl` 环境原样可用；
+2. H100（数据中心卡）上尝试 NVIDIA **cuda-compat 前向兼容包**（`cuda-compat-13-x`）：
+   ```bash
+   # NVIDIA repo 安装后，让旧驱动加载 CUDA 13 用户态驱动
+   export LD_LIBRARY_PATH=/usr/local/cuda-13/compat:$LD_LIBRARY_PATH
+   ```
+   官方仅对数据中心卡提供此机制，不保证成功，值得先于升驱动花 10 分钟试。
+
+`r2opl-cu12` 变体安装（服务器 535 驱动可跑 Qwen3 时使用）：
+
+```bash
+conda create -n r2opl-cu12 python=3.12 -y && conda activate r2opl-cu12
+pip install -i https://download.pytorch.org/whl/cu128 torch==2.11.0+cu128
+pip install -i https://pypi.org/simple vllm==0.19.1 "transformers>=5.5.3,!=5.6.0,<5.11"
+pip install -i https://pypi.org/simple -e ./verl
+pip install -i https://pypi.org/simple --no-deps TransferQueue==0.1.7
+```
+
 ## 常见问题
 
 | 现象 | 原因 / 处理 |
