@@ -903,7 +903,7 @@ class vLLMHttpServer:
         )
 
     async def wake_up(self, tags: list[str] | None = None):
-        if self.node_rank != 0:
+        if self.node_rank != 0 or not self.config.free_cache_engine:
             return
 
         if self.rollout_mode == RolloutMode.HYBRID:

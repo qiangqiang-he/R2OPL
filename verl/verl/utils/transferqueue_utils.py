@@ -290,7 +290,7 @@ def _postprocess_common(output, put_data, need_collect):
     from verl.protocol import DataProto
 
     if put_data and not need_collect:
-        return BatchMeta()
+        return BatchMeta(global_indexes=[], partition_ids=[])
     elif not put_data and not need_collect and isinstance(output, DataProto):
         return DataProto()
     elif not put_data and not need_collect and isinstance(output, TensorDict):

@@ -1,0 +1,30 @@
+# @package _global_
+teacher_model_family: qwen3
+distillation:
+  colocate_with_actor: true
+  n_gpus_per_node: 1
+  nnodes: 1
+  student_chunk_size: 128
+  teacher_chunk_size: 128
+  teacher_models:
+    teacher_model:
+      model_path: ./models/Qwen3-0.6B
+      inference:
+        tensor_model_parallel_size: 1
+        data_parallel_size: 1
+        pipeline_model_parallel_size: 1
+        prompt_length: 256
+        response_length: 768
+        max_model_len: 1025
+        max_num_seqs: 8
+        gpu_memory_utilization: 0.14
+        enforce_eager: true
+        enable_prefix_caching: false
+        engine_kwargs:
+          vllm:
+            kv_cache_memory_bytes: 1073741824
+            compilation_config:
+              mode: 0
+              cudagraph_mode: NONE
+ersr:
+  enabled: false

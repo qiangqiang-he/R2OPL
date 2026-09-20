@@ -133,6 +133,20 @@ def monkey_patch_compute_logits(model, vocab_size: int, banned_token_ids: Option
     model.compute_logits = MethodType(compute_logits, model)
 
 
+def drop_tied_weight_aliases(model, weights):
+    """Keep canonical parameters when a full weight update arrives in buckets.
+
+    vLLM's loader checks tied aliases per load_weights call. A later bucket
+    containing lm_head.weight alone would fail although the shared embedding
+    was already loaded by an earlier bucket. The canonical tensor is enough
+    to update every alias of that exact Parameter object.
+    """
+    canonical = {id(parameter): name for name, parameter in model.named_parameters()}
+    aliases = {name for name, parameter in model.named_parameters(remove_duplicate=False)
+               if canonical[id(parameter)] != name}
+    return [(name, tensor) for name, tensor in weights if name not in aliases]
+
+
 def enable_eopd_entropy_gather(sampler, topk: int) -> None:
     """Add full-vocabulary entropy to vLLM's bounded prompt-logprob output.
 
@@ -780,7 +794,9 @@ class vLLMColocateWorkerExtension:
                 if param_updates:
                     for model in self._iter_all_models():
                         if peft_config is None:
-                            model.load_weights(param_updates)
+                            canonical_updates = drop_tied_weight_aliases(model, param_updates)
+                            if canonical_updates:
+                                model.load_weights(canonical_updates)
                         else:
                             names = {n for n, _ in model.named_parameters(remove_duplicate=False)}
                             names.update(n for n, _ in model.named_buffers())

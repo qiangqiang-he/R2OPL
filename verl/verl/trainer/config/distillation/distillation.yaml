@@ -13,6 +13,9 @@ defaults:
 # Whether to enable distillation.
 enabled: false
 
+# Share actor GPUs only when explicitly requested (for small local runs).
+colocate_with_actor: false
+
 # distillation loss config
 distillation_loss:
 

@@ -1,0 +1,91 @@
+# @package _global_
+# Real start_train.sh / Ray / FSDP / vLLM loop, one GPU, two updates.
+student_model_family: qwen3
+data:
+  train_files: [./data/gsm8k_train.json]
+  val_files: [./data/gsm8k_test.json]
+  val_datasets: [gsm8k_test]
+  train_max_samples: 4
+  val_max_samples: 2
+  train_batch_size: 2
+  gen_batch_size: 2
+  val_batch_size: 2
+  max_prompt_length: 256
+  max_response_length: 768
+  shuffle: false
+  dataloader_num_workers: 0
+actor_rollout_ref:
+  model:
+    path: ./models/Qwen3-0.6B
+    # WSL r2opl has SDPA; dense one-sample microbatches avoid FlashAttention.
+    use_remove_padding: false
+  actor:
+    ppo_mini_batch_size: 2
+    ppo_micro_batch_size_per_gpu: 1
+    use_dynamic_bsz: false
+    ppo_max_token_len_per_gpu: 1025
+    optim:
+      lr: 1.0e-7
+    checkpoint:
+      save_contents: [model, extra]
+  rollout:
+    n: 4
+    data_parallel_size: 1
+    tensor_model_parallel_size: 1
+    max_model_len: 1024
+    max_num_batched_tokens: 1024
+    max_num_seqs: 8
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    gpu_memory_utilization: 0.18
+    enforce_eager: true
+    weight_transfer_use_shm: true
+    checkpoint_engine:
+      update_weights_bucket_megabytes: 768
+    agent:
+      num_workers: 1
+    log_prob_use_dynamic_bsz: false
+    log_prob_micro_batch_size_per_gpu: 1
+    log_prob_max_token_len_per_gpu: 1025
+    engine_kwargs:
+      vllm:
+        kv_cache_memory_bytes: 1073741824
+        compilation_config:
+          mode: 0
+          cudagraph_mode: NONE
+    val_kwargs:
+      n: 4
+      temperature: 1.0
+      top_p: 1.0
+      top_k: -1
+      do_sample: true
+  ref:
+    log_prob_use_dynamic_bsz: false
+    log_prob_micro_batch_size_per_gpu: 1
+    log_prob_max_token_len_per_gpu: 1025
+rlvr_generation:
+  train_max_new_tokens: 768
+  val_max_new_tokens: 768
+reward:
+  num_workers: 1
+transfer_queue:
+  backend:
+    SimpleStorage:
+      num_data_storage_units: 1
+      total_storage_size: 128
+trainer:
+  n_gpus_per_node: 1
+  nnodes: 1
+  total_training_steps: 2
+  total_epochs: 1
+  resume_mode: disable
+  val_before_train: false
+  test_freq: 2
+  save_freq: 2
+  max_actor_ckpt_to_keep: 1
+  logger: [console]
+  experiment_name: ${run_name}
+  default_local_dir: ./tests/artifacts/gsm8k/${run_name}/checkpoints
+  rollout_data_dir: ./tests/artifacts/gsm8k/${run_name}/rollouts
+  validation_data_dir: ./tests/artifacts/gsm8k/${run_name}/validation

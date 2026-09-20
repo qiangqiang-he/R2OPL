@@ -1811,7 +1811,6 @@ class AgentLoopWorker:
                 audio_data=output.multi_modal_data.get("audios") if output.multi_modal_data else None,
                 mm_processor_kwargs=output.mm_processor_kwargs,
                 mm_processor_output=getattr(output, "mm_processor_output", None),
-                routing_key=routing_key,
             )
             student_topk_ids = torch.tensor(student_output.extra_fields["prompt_ids"], dtype=torch.int32)
             student_topk_logprobs = torch.tensor(student_output.extra_fields["prompt_logprobs"])

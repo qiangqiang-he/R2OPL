@@ -407,6 +407,8 @@ class DistillationConfig(BaseConfig):
     _mutable_fields = BaseConfig._mutable_fields | {"teacher_models", "n_gpus_per_node", "nnodes"}
 
     enabled: bool = False
+    # Opt in to sharing the actor placement group for small local runs.
+    colocate_with_actor: bool = False
     n_gpus_per_node: int = 0
     nnodes: int = 0
     teacher_models: dict[str, DistillationTeacherModelConfig] = field(default_factory=dict)

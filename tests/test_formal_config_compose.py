@@ -56,7 +56,7 @@ def formal_experiment_configs() -> list[str]:
 
 def compose_formal(config_name: str):
     """Mirror start_train.sh's formal branch exactly."""
-    search_path = "hydra.searchpath=[file://{},pkg://verl.trainer.config]".format(
+    search_path = "hydra.searchpath=['file://{}','pkg://verl.trainer.config']".format(
         CONFIG_ROOT
     )
     with initialize_config_dir(version_base=None, config_dir=str(CONFIG_ROOT)):

@@ -18,6 +18,7 @@ Not recommended depending on vllm for this file.
 """
 
 import logging
+import json
 import os
 from multiprocessing import shared_memory
 from typing import Callable, TypedDict
@@ -133,7 +134,7 @@ class BucketedWeightSender:
                 if offset + weight.nbytes > self.bucket_size and len(bucket_meta) > 0:
                     get_torch_device().synchronize()
                     self.socket.send_pyobj({"bucket_meta": bucket_meta, "is_last": False})
-                    self.socket.recv()
+                    self._receive_ack()
                     bucket_meta = {}
                     offset = 0
 
@@ -161,7 +162,7 @@ class BucketedWeightSender:
             name = weight = None
             get_torch_device().synchronize()
             self.socket.send_pyobj({"bucket_meta": bucket_meta, "is_last": True})
-            self.socket.recv()
+            self._receive_ack()
         finally:
             self._cleanup()
 
@@ -194,9 +195,15 @@ class BucketedWeightSender:
             comm_metadata = {"name": shm_name, "size": self.bucket_size}
             self.socket.send_pyobj(comm_metadata)
 
-        self.socket.recv()
         self.buffer = buffer
         self.shm = shm
+        self._receive_ack()
+
+    def _receive_ack(self):
+        message = self.socket.recv()
+        if message:
+            error = json.loads(message.decode("utf-8"))
+            raise RuntimeError(f"vLLM weight receiver failed: {error['error']}")
 
     def _cleanup(self):
         """clean up"""
@@ -216,7 +223,7 @@ class BucketedWeightSender:
             self.shm.unlink()
             del self.shm
             self.shm = None
-        if is_support_ipc():
+        if not self.use_shm and is_support_ipc():
             get_torch_device().ipc_collect()
         get_torch_device().empty_cache()
 
@@ -234,7 +241,7 @@ class BucketedWeightSender:
             "handle": handle,
         }
         self.socket.send_pyobj({"bucket_meta": bucket_meta, "is_last": False})
-        self.socket.recv()
+        self._receive_ack()
 
 
 class BucketedWeightReceiver:
@@ -284,6 +291,7 @@ class BucketedWeightReceiver:
             # receive bucket and update weights
             while True:
                 metadata = self.socket.recv_pyobj()
+                self._ack_pending = True
                 weights, tensor = [], None
                 for name, meta in metadata["bucket_meta"].items():
                     shape, dtype, offset, handle = meta["shape"], meta["dtype"], meta["offset"], meta["handle"]
@@ -294,7 +302,9 @@ class BucketedWeightReceiver:
                     size = dtype.itemsize * shape.numel()
                     tensor = self.buffer[offset : offset + size].view(dtype=dtype).view(shape)
                     if self.use_shm:
-                        tensor = tensor.to(self.device)
+                        # Never let a callback (including its exception traceback)
+                        # retain a view into the shared-memory transport buffer.
+                        tensor = tensor.to(self.device, copy=True)
                     weights.append((name, tensor))
                 is_last = metadata["is_last"]
                 on_bucket_received(weights, is_last)
@@ -302,9 +312,15 @@ class BucketedWeightReceiver:
                 del weights, tensor
                 if not is_last:
                     self.socket.send(b"")
+                    self._ack_pending = False
                 else:
                     self._ack_pending = True
                     break
+        except Exception as error:
+            if self._ack_pending:
+                self.socket.send_json({"error": f"{type(error).__name__}: {error}"})
+                self._ack_pending = False
+            raise
         finally:
             self._cleanup()
 
@@ -316,6 +332,7 @@ class BucketedWeightReceiver:
     def _init_buffer(self):
         """Receive and rebuild communication buffer from sender."""
         comm_metadata = self.socket.recv_pyobj()
+        self._ack_pending = True
         buffer, shm = None, None
         if not self.use_shm:
             handle = comm_metadata
@@ -326,6 +343,7 @@ class BucketedWeightReceiver:
             shm_size = comm_metadata["size"]
             buffer, shm = rebuild_shared_memory(shm_name, shm_size, dtype=torch.uint8)
         self.socket.send(b"")
+        self._ack_pending = False
         self.buffer = buffer
         self.shm = shm
 
@@ -333,14 +351,15 @@ class BucketedWeightReceiver:
         """clean up"""
         # Synchronize before releasing the buffer to ensure all async ops
         # referencing it (e.g. clone, .to()) have completed.
-        get_torch_device().synchronize()
+        if self.buffer is not None:
+            get_torch_device().synchronize()
         del self.buffer
         self.buffer = None
         if self.shm is not None:
             self.shm.close()
             del self.shm
             self.shm = None
-        if is_support_ipc():
+        if not self.use_shm and is_support_ipc():
             get_torch_device().ipc_collect()
         get_torch_device().empty_cache()
         # Ack last, after the buffer is released: the sender reclaims its bucket

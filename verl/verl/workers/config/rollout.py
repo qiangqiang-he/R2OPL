@@ -272,6 +272,10 @@ class RolloutConfig(BaseConfig):
 
     enable_sleep_mode: bool = False
 
+    # Explicit fallback for drivers whose CUDA IPC handles cannot be imported
+    # by a separate vLLM worker process (including some WSL stacks).
+    weight_transfer_use_shm: bool = False
+
     mtp: MtpConfig = field(default_factory=MtpConfig)
 
     qat: Optional[dict] = None

@@ -268,6 +268,7 @@ class ReplayBuffer:
         self.poll_interval = poll_interval
         self.lock = threading.Lock()
         self._stop_event = threading.Event()
+        self._poll_error: Exception | None = None
         self.poll_thread = threading.Thread(target=self._poll_from_transfer_queue, daemon=True)
         self.poll_thread.start()
 
@@ -282,8 +283,8 @@ class ReplayBuffer:
                 self._stop_event.wait(self.poll_interval)
         except Exception as e:
             if not self._stop_event.is_set():
-                logger.error(f"Error in _poll_from_transfer_queue: {e}")
-                os._exit(1)
+                self._poll_error = e
+                logger.exception("Error in _poll_from_transfer_queue")
 
     def close(self):
         """Stop the background polling thread."""
@@ -338,22 +339,35 @@ class ReplayBuffer:
         )
 
         while True:
+            if self._poll_error is not None:
+                raise RuntimeError("TransferQueue metadata polling failed") from self._poll_error
+            if self._stop_event.is_set():
+                raise RuntimeError("ReplayBuffer was closed while waiting for rollouts")
             time.sleep(self.poll_interval)
             with self.lock:
                 keys, tags = [], []
                 should_wait = False
                 partition = self.partitions[partition_id]
                 for key, tag in partition.items():
-                    if tag["global_steps"] == global_steps:
+                    if tag.get("global_steps") == global_steps:
                         if tag["status"] == "running":
                             should_wait = True
-                            break
+                        elif tag["status"] == "failure":
+                            raise RuntimeError(
+                                f"Rollout failed for {partition_id} prompt {key} at step {global_steps}: "
+                                f"{tag.get('error', 'see AgentLoopWorkerTQ logs for the original exception')}"
+                            )
                         elif tag["status"] == "success":
                             keys.append(key)
                             tags.append(tag)
                         else:
                             logger.debug(f"Unknown status {tag['status']} for key {key}")
                 if not should_wait:
+                    if not keys:
+                        raise RuntimeError(
+                            f"No successful rollouts for {partition_id} at step {global_steps}; "
+                            "refusing to pass an empty batch to data-parallel workers"
+                        )
                     return KVBatchMeta(partition_id=partition_id, keys=keys, tags=tags)
 
 
@@ -498,6 +512,7 @@ class AgentLoopWorkerTQ(AgentLoopWorker):
     async def _run_prompt(self, prompt: dict, sampling_params: dict, trajectory: dict, trace: bool = False) -> None:
         """Spawn multiple agent loops in parallel according to rollout.n or rollout.val_kwargs.n."""
         uid, partition_id = prompt["uid"], "train" if not trajectory["validate"] else "val"
+        tasks = []
         try:
             # NOTE: user can dynamically adjust n for each sample here, e.g according to task difficulty.
             config = self.config.actor_rollout_ref.rollout
@@ -516,11 +531,22 @@ class AgentLoopWorkerTQ(AgentLoopWorker):
                     )
                 )
                 tasks.append(task)
-            await asyncio.gather(*tasks)
+            # A failed sibling must not publish terminal status while other
+            # sessions are still writing trajectories into TransferQueue.
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            errors = [result for result in results if isinstance(result, BaseException)]
+            if errors:
+                raise RuntimeError("; ".join(f"{type(error).__name__}: {error}" for error in errors)) from errors[0]
             await tq.async_kv_put(key=uid, partition_id=partition_id, tag={"status": "finished"})
+            logger.info("Rollout group completed: partition=%s uid=%s sessions=%s", partition_id, uid, n)
         except Exception as e:
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
             logger.exception(f"Error in _run_prompt: {e}")
-            await tq.async_kv_put(key=uid, partition_id=partition_id, tag={"status": "failure"})
+            await tq.async_kv_put(
+                key=uid, partition_id=partition_id,
+                tag={"status": "failure", "error": f"{type(e).__name__}: {e}"},
+            )
 
     async def _agent_loop_postprocess(
         self, output: AgentLoopOutput | list[AgentLoopOutput], validate, **kwargs
@@ -641,6 +667,7 @@ class AgentLoopManagerTQ(AgentLoopManager):
         partition_id = "train" if "validate" not in prompts else "val"
         items = {uid: {"global_steps": global_steps, "status": "running"} for uid in prompts["uid"]}
         self.replay_buffer.add(partition_id, items)
+        logger.info("Rollout batch submitted: partition=%s prompts=%s step=%s", partition_id, len(items), global_steps)
 
         chunkes = prompts.chunk(len(self.agent_loop_workers))
         ray.get(
@@ -1489,7 +1516,7 @@ class PPOTrainer:
             if self.use_critic:
                 self.critic_wg.stop_profile()
 
-    def _compute_reward_colocate(self, batch: KVBatchMeta, metrics: dict) -> KVBatchMeta:
+    def _compute_reward_colocate(self, batch: KVBatchMeta, metrics: dict | None = None) -> KVBatchMeta:
         """Compute the reward with colocate reward model."""
         # TODO: add reward model
         raise NotImplementedError
@@ -1598,7 +1625,7 @@ class PPOTrainer:
             )
             data["old_log_probs"] = data.pop("rollout_log_probs")
             tq.kv_batch_put(keys=batch.keys, partition_id=batch.partition_id, fields=data)
-            return
+            return batch
 
         # 1. compute log probs
         batch.extra_info.update(
@@ -2197,8 +2224,13 @@ class TaskRunner:
                 raise ValueError("config.distillation.nnodes must be greater than 0")
 
             teacher_pool = [distillation_config.n_gpus_per_node] * distillation_config.nnodes
-            resource_pool_spec["teacher_pool"] = teacher_pool
-            self.mapping[Role.TeacherModel] = "teacher_pool"
+            if distillation_config.get("colocate_with_actor", False):
+                if teacher_pool != resource_pool_spec[global_pool_id]:
+                    raise ValueError("Colocated Teacher and actor must use the same GPU/node layout")
+                self.mapping[Role.TeacherModel] = global_pool_id
+            else:
+                resource_pool_spec["teacher_pool"] = teacher_pool
+                self.mapping[Role.TeacherModel] = "teacher_pool"
 
         self.resource_pool_manager = ResourcePoolManager(resource_pool_spec=resource_pool_spec, mapping=self.mapping)
 

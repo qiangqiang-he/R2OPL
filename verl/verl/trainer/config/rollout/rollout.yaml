@@ -273,6 +273,8 @@ agent:
     name: null
 
 # Checkpoint Engine config for update weights from trainer to rollout
+weight_transfer_use_shm: false
+
 checkpoint_engine:
 
   # Target class for checkpoint engine config

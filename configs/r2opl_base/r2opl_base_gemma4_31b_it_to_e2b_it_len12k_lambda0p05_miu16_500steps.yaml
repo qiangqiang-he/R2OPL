@@ -58,7 +58,9 @@ distillation:
         enable_sleep_mode: false
         free_cache_engine: false
         response_length: 12288
-        tensor_model_parallel_size: 1
+        # One 31B BF16 Teacher sharded over its dedicated four-GPU pool.
+        tensor_model_parallel_size: 4
+        gpu_memory_utilization: 0.85
         max_model_len: 22528
         engine_kwargs:
           vllm:
