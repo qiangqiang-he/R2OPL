@@ -1,0 +1,48 @@
+# =============================================================================
+# R²OPL `r2opl-cu12` 环境 —— 顶层依赖清单（NVIDIA 535 / CUDA 12.2 驱动降级栈）
+# Python 3.12 / Linux x86_64；说明文档见 R2OPL_ENV_SETUP.md「旧驱动服务器」章节
+# 完整逐包快照见 requirements-cu12-freeze.txt
+# =============================================================================
+
+# ⚠ 版本边界（2026-09-20 逐版 wheel ELF 验证）：vllm 0.19.1 是最后一个
+# CUDA-12 构建；0.20.0 起官方 wheel 全部链接 libcudart.so.13（需驱动 ≥580）。
+# 勿升级到 0.20+，除非服务器驱动已升级。
+vllm==0.19.1
+
+# torch 2.10.0：PyPI 默认构建即 cu128（CUDA 12.8 运行库 wheel 自动带入，
+# 兼容 ≥525 的所有 12.x 驱动）。勿装 2.11+（PyPI 默认已切 cu13）。
+torch==2.10.0
+
+# transformers 5.9.0：沿用仓库 legacy gemma-4 组合（uv 缓存同版本）；
+# 满足 verl 的 >=5.5.3,<5.11 窗口。
+transformers==5.9.0
+
+ray[default]>=2.41.0
+tensordict>=0.8.0,<=0.10.0,!=0.9.0
+hydra-core
+omegaconf
+accelerate
+datasets
+peft
+wandb
+tensorboard
+torchdata
+codetiming
+pybind11
+pylatexenc
+pyarrow>=19.0.0
+numpy>=2.0.0
+pandas
+
+math-verify
+py-spy
+
+# -----------------------------------------------------------------------------
+# ⚠ 以下与主环境相同，需单独执行（不能写进上面的列表）：
+#   pip install -e ./verl                      # vendored verl（editable）
+#   pip install --no-deps TransferQueue==0.1.7 # 避开 numpy<2 假冲突
+#   pip install --no-deps torchvision          # 与 torch 2.10 配套（0.25.x）
+#
+# WSL2 需：export VLLM_USE_V2_MODEL_RUNNER=0（该版本无 V2 runner，仅作兼容保留）
+# r2opl_base gemma 训练建议：export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+# -----------------------------------------------------------------------------
