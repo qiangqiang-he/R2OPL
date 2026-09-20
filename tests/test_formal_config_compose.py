@@ -40,7 +40,7 @@ from algorithms import resolve_algorithm  # noqa: E402
 from utils.training_entrypoint import configure_vllm_no_sleep  # noqa: E402
 
 CONFIG_ROOT = (PROJECT_ROOT / "configs").resolve()
-ALGORITHM_DIRS = ("pg_opd", "eopd", "grpo", "gspo", "r2opl_base")
+ALGORITHM_DIRS = ("pg_opd", "eopd", "grpo", "gspo", "r2opl_base", "opdvr")
 APPROVED_VAL_DATASETS = ["AMC23", "SciBench", "LogicBench"]
 
 

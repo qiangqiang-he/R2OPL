@@ -1,0 +1,73 @@
+# @package _global_
+
+# OPDVR: Gemma-4-31B-it Teacher -> Gemma-4-E2B-it Student, 200 steps.
+
+defaults:
+  - /opdvr
+  - _self_
+
+run_name: opdvr_gemma4_31b_it_to_e2b_it_len8k_200steps
+run_name_prefix: opdvr_gemma4_31b_it_to_e2b_it_len8k_200steps
+
+student_model_family: gemini4
+teacher_model_family: gemini4
+
+data:
+  max_prompt_length: 2048
+  max_response_length: 20480
+
+actor_rollout_ref:
+  model:
+    path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-E2B-it
+  actor:
+    ppo_max_token_len_per_gpu: 10241
+    optim:
+      lr: 1.0e-6
+  rollout:
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    max_model_len: 22528
+    max_num_batched_tokens: 22528
+    log_prob_max_token_len_per_gpu: 10241
+    val_kwargs:
+      temperature: 0.6
+      top_p: 0.95
+      top_k: -1
+      do_sample: true
+  ref:
+    log_prob_max_token_len_per_gpu: 10241
+
+rlvr_generation:
+  train_max_new_tokens: 8192
+  val_max_new_tokens: 20480
+
+distillation:
+  teacher_chunk_size: 128
+  teacher_models:
+    teacher_model:
+      model_path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-31B
+      inference:
+        enable_sleep_mode: false
+        free_cache_engine: false
+        response_length: 8192
+        tensor_model_parallel_size: 1
+        max_model_len: 22528
+        engine_kwargs:
+          vllm:
+            max_logprobs: 16
+  distillation_loss:
+    loss_mode: opdvr
+    selection_ratio: 1.0
+    selection_method: random
+    loss_max_clamp: 20.0
+    log_prob_min_clamp: null
+    policy_loss_mode: reinforce
+
+trainer:
+  experiment_name: ${run_name}
+  total_training_steps: 200
+  default_local_dir: ./outputs/${run_name}
+  val_before_train: true
+  test_freq: 20
+  save_freq: 20

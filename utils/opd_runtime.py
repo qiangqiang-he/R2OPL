@@ -279,8 +279,12 @@ def validate_r2opl_runtime_config(config) -> None:
         raise ValueError("R2OPL currently requires Ulysses sequence parallelism 1")
 
 
-def validate_pg_opd_runtime_config(config) -> None:
-    """Validate the PG-OPD runtime and 4+4 resource contract."""
+def validate_pg_opd_runtime_config(config, expected_loss_mode: str = "reverse_kl") -> None:
+    """Validate the PG-OPD-style runtime and 4+4 resource contract.
+
+    ``expected_loss_mode`` lets OPD-style variants (e.g. OPDVR's ``opdvr``)
+    reuse every shared contract while requiring their own loss kernel.
+    """
 
     validate_verl_pg_opd_support()
     validate_r2opl_runtime_config(config)
@@ -293,8 +297,10 @@ def validate_pg_opd_runtime_config(config) -> None:
 
     ersr_config = config.get("ersr")
     loss = config.distillation.distillation_loss
-    if str(loss.loss_mode) != "reverse_kl":
-        raise ValueError("PG-OPD requires loss_mode=reverse_kl")
+    if str(loss.loss_mode) != expected_loss_mode:
+        raise ValueError(
+            f"Expected loss_mode={expected_loss_mode}, got {loss.loss_mode!r}"
+        )
     if loss.topk is not None:
         raise ValueError("Sampled-token reverse KL requires topk=null")
     if int(loss.diagnostic_topk) != 16:

@@ -23,6 +23,10 @@ from algorithms.gspo import (
     configure_gspo_defaults,
     validate_gspo_config,
 )
+from algorithms.opdvr import (
+    OPDVRTrainer,
+    validate_opdvr_config,
+)
 from algorithms.pg_opd import PGOPDTrainer, validate_pg_opd_config
 from algorithms.r2opl_base import (
     R2OPLBaseTrainer,
@@ -77,6 +81,13 @@ ALGORITHM_REGISTRY = {
         validate=validate_r2opl_base_config,
         configure_defaults=configure_r2opl_base_defaults,
         configure_batch=configure_r2opl_base_batch,
+    ),
+    "opdvr": AlgorithmSpec(
+        name="opdvr",
+        trainer_class=OPDVRTrainer,
+        validate=validate_opdvr_config,
+        configure_defaults=configure_pg_opd_defaults,
+        configure_batch=configure_pg_opd_batch,
     ),
 }
 

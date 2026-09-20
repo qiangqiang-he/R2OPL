@@ -17,7 +17,7 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from uuid import uuid4
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Sequence
 
 import torch
 from tensordict import TensorDict
@@ -1081,6 +1081,170 @@ def compute_sampled_token_reverse_kl(
             )
         )
     return selected_reverse_kl, metrics
+
+
+def opdvr_correctness_gate(
+    sampled_reverse_kl: torch.Tensor,
+    correct_mask: torch.Tensor,
+    response_mask: torch.Tensor | None = None,
+) -> torch.Tensor:
+    """ReLU-gate sampled-token reverse KL by trajectory correctness (OPDVR).
+
+    ``sampled_reverse_kl`` is the per-token ``log pi_student - log pi_teacher``
+    signal.  The returned value is the **negated distillation loss** (i.e. the
+    REINFORCE advantage after the wrapper's ``advantages = -losses.detach()``):
+
+    - correct trajectories:  ``relu(log pi_T - log pi_S)``  (non-negative)
+    - incorrect trajectories: ``-relu(log pi_S - log pi_T)`` (non-positive)
+
+    Tokens whose learning direction conflicts with the verifier are masked to
+    zero, exactly as in the paper (arXiv:2608.24696).
+    """
+
+    if sampled_reverse_kl.shape != correct_mask.shape:
+        raise ValueError(
+            "OPDVR correctness mask must match the per-token signal shape"
+        )
+    gated_correct = torch.clamp(-sampled_reverse_kl, min=0.0)
+    gated_incorrect = -torch.clamp(sampled_reverse_kl, min=0.0)
+    gated = torch.where(
+        correct_mask.to(dtype=torch.bool),
+        gated_correct,
+        gated_incorrect,
+    )
+    if response_mask is not None:
+        if response_mask.shape != gated.shape:
+            raise ValueError("OPDVR response_mask must match the signal shape")
+        gated = gated * response_mask.to(dtype=gated.dtype)
+    return gated
+
+
+def opdvr_group_relative_advantage(
+    verifier_rewards: torch.Tensor,
+    group_ids: Sequence[str],
+) -> torch.Tensor:
+    """Dr.GRPO-style advantage: reward minus prompt-group mean, no std."""
+
+    rewards = verifier_rewards.reshape(-1).to(dtype=torch.float32)
+    if len(group_ids) != rewards.numel():
+        raise ValueError("OPDVR group ids must match the trajectory count")
+    sums: dict[str, float] = {}
+    counts: dict[str, int] = {}
+    for group_id, value in zip(group_ids, rewards.tolist(), strict=True):
+        key = str(group_id)
+        sums[key] = sums.get(key, 0.0) + float(value)
+        counts[key] = counts.get(key, 0) + 1
+    return torch.stack(
+        [
+            rewards[i] - sums[str(group_ids[i])] / counts[str(group_ids[i])]
+            for i in range(rewards.numel())
+        ]
+    ).to(dtype=verifier_rewards.dtype, device=verifier_rewards.device)
+
+
+@register_distillation_loss(
+    DistillationLossSettings(names=["opdvr"], use_estimator=True)
+)  # type: ignore[arg-type]
+def compute_opdvr_gated_sampled_token_reverse_kl(
+    config: ActorConfig,
+    distillation_config: DistillationConfig,
+    model_output: dict,
+    data: TensorDict,
+) -> tuple[torch.Tensor, dict[str, Any]]:
+    """OPDVR: correctness-gated sampled-token reverse KL.
+
+    The per-token distillation loss returned here is the negation of the
+    gated reward, so the shared ``distillation_loss`` wrapper's
+    ``advantages = -losses.detach()`` yields the paper's reward:
+
+    - verifier-correct trajectories only receive non-negative advantages,
+    - verifier-incorrect trajectories only receive non-positive advantages,
+    - conflicting tokens (sign disagreement between the teacher ratio and
+      the verifier) are zeroed by the ReLU gate.
+
+    With ``opdvr_grpd: true`` the gated reward is additionally scaled by a
+    Dr.GRPO-style group-relative advantage over each prompt group (GRPD).
+    """
+
+    student_log_probs = no_padding_2_padding(model_output["log_probs"], data)
+    teacher_log_probs = no_padding_2_padding(data["teacher_logprobs"], data).squeeze(-1)
+    if data["response_mask"].is_nested:
+        response_mask = data["response_mask"].bool().to_padded_tensor(False)
+    else:
+        response_mask = data["response_mask"].bool()
+    assert teacher_log_probs.shape == student_log_probs.shape == response_mask.shape
+
+    if "rm_scores" not in data:
+        raise RuntimeError(
+            "OPDVR requires verifier scores (rm_scores) in the actor batch"
+        )
+    rm_scores = data["rm_scores"]
+    if rm_scores.is_nested:
+        rm_scores = rm_scores.to_padded_tensor(0.0)
+    verifier_rewards = rm_scores.reshape(-1)
+    if verifier_rewards.numel() != response_mask.shape[0]:
+        raise RuntimeError(
+            "OPDVR expected one verifier score per trajectory; got "
+            f"{verifier_rewards.numel()} scores for {response_mask.shape[0]} "
+            "trajectories"
+        )
+    correct_mask = verifier_rewards > 0.5
+
+    sampled_reverse_kl = student_log_probs - teacher_log_probs
+    loss_config = distillation_config.distillation_loss
+    base_signal = sampled_reverse_kl
+    if loss_config.loss_max_clamp is not None:
+        base_signal = base_signal.clamp(
+            min=-loss_config.loss_max_clamp,
+            max=loss_config.loss_max_clamp,
+        )
+    gated = opdvr_correctness_gate(base_signal, correct_mask, response_mask)
+
+    grpd_scaling = None
+    if bool(getattr(loss_config, "opdvr_grpd", False)):
+        group_ids = list(tu.get_non_tensor_data(data, "uid"))
+        grpd_scaling = opdvr_group_relative_advantage(verifier_rewards, group_ids)
+        gated = gated * grpd_scaling.reshape(-1, 1).to(dtype=gated.dtype)
+
+    distillation_losses = -gated
+
+    valid = response_mask
+    gated_valid = gated[valid].float()
+    correct_valid = correct_mask.reshape(-1).unsqueeze(-1).expand_as(gated)[valid]
+    metrics = {
+        "distillation/reverse_kl_estimate": Metric(
+            AggregationType.MEAN, sampled_reverse_kl[valid].mean()
+        ),
+        "distillation/opdvr_gated_reward_mean": Metric(
+            AggregationType.MEAN,
+            gated_valid.mean() if gated_valid.numel() else gated.new_zeros(()),
+        ),
+        "distillation/opdvr_correct_reward_mean": Metric(
+            AggregationType.MEAN,
+            gated_valid[correct_valid].mean()
+            if gated_valid[correct_valid].numel()
+            else gated.new_zeros(()),
+        ),
+        "distillation/opdvr_incorrect_reward_mean": Metric(
+            AggregationType.MEAN,
+            gated_valid[~correct_valid].mean()
+            if gated_valid[~correct_valid].numel()
+            else gated.new_zeros(()),
+        ),
+        "distillation/opdvr_conflicting_token_ratio": Metric(
+            AggregationType.MEAN,
+            ((sampled_reverse_kl[valid] > 0) == correct_valid).to(
+                dtype=gated.dtype
+            ).mean()
+            if gated_valid.numel()
+            else gated.new_zeros(()),
+        ),
+    }
+    if grpd_scaling is not None:
+        metrics["distillation/opdvr_grpd_advantage_mean"] = Metric(
+            AggregationType.MEAN, grpd_scaling.float().mean()
+        )
+    return distillation_losses, metrics
 
 
 @register_distillation_loss(

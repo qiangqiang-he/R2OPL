@@ -83,6 +83,10 @@ class DistillationLossConfig(BaseConfig):
     cal_lambda: float = 1.0
     # Teacher coefficient in A_ExOPD = lambda * (logT - logRef) - (logS - logRef).
     exopd_lambda: float = 1.25
+    # OPDVR: multiply the correctness-gated sampled-token reward by a
+    # Dr.GRPO-style group-relative advantage (reward minus prompt-group mean,
+    # no std division). Groups are trajectories sharing one uid.
+    opdvr_grpd: bool = False
     # Statistics-only dead zone for classifying standard OPD advantages as
     # positive or negative. It never changes the training signal.
     opd_statistics_threshold: float = 1.0e-4

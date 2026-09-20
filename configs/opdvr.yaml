@@ -1,0 +1,82 @@
+# OPDVR: On-policy Distillation with Verifiable Reward (arXiv:2608.24696).
+# ReLU-gated sampled-token reverse KL keyed by verifier outcome, 4 Student +
+# 4 Teacher GPUs.
+
+defaults:
+  - /base
+  - _self_
+
+run_name: opdvr_qwen3
+run_name_prefix: opdvr_qwen3
+group_name: OPDVR
+teacher_model_family: qwen3
+
+actor_rollout_ref:
+  rollout:
+    data_parallel_size: 4
+
+algorithm:
+  name: opdvr
+
+distillation:
+  enabled: true
+  student_chunk_size: 1024
+  teacher_chunk_size: 128
+  n_gpus_per_node: 4
+  nnodes: 1
+  teacher_models:
+    teacher_model:
+      model_path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
+      inference:
+        name: vllm
+        dtype: bfloat16
+        enable_sleep_mode: false
+        free_cache_engine: false
+        tensor_model_parallel_size: 1
+        data_parallel_size: 1
+        pipeline_model_parallel_size: 1
+        gpu_memory_utilization: 0.55
+        prompt_length: 2048
+        response_length: 8192
+        # ERSR reuses this Teacher server for validation prefixes as long as
+        # the Student's complete validation context.
+        max_model_len: 18432
+        max_num_seqs: 8
+        max_num_batched_tokens: ${distillation.teacher_chunk_size}
+        enable_chunked_prefill: true
+        enable_prefix_caching: true
+        engine_kwargs:
+          vllm:
+            max_logprobs: 16
+  distillation_loss:
+    loss_mode: opdvr
+    topk: null
+    diagnostic_topk: 16
+    selection_ratio: 1.0
+    selection_method: random
+    use_task_rewards: false
+    loss_max_clamp: 20.0
+    log_prob_min_clamp: null
+    use_policy_gradient: true
+    policy_loss_mode: reinforce
+    # GRPD variant (multiply gated reward by Dr.GRPO group advantage).
+    opdvr_grpd: false
+
+ersr:
+  enabled: false
+  datasets:
+    - AMC23
+    - SciBench
+    - LogicBench
+  max_steps_per_dataset: 500
+  mc_k: 2
+  max_teacher_step_tokens: 2048
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  seed: 42
+
+trainer:
+  n_gpus_per_node: 4
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}
