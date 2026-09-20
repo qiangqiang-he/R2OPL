@@ -62,6 +62,7 @@ from verl.utils.skip import SkipManager
 from verl.utils.tokenizer import (
     build_multimodal_processor_inputs,
     get_processor_token_id,
+    normalize_token_ids,
 )
 from verl.utils.tokenizer.continuous_token_wiring import create_continuous_token_builder
 from verl.workers.config import (

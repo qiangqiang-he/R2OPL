@@ -387,6 +387,7 @@ class AsyncTeacherLLMServerManager:
         response_length: int,
         multi_modal_data: Optional[dict[str, Any]] = None,
         mm_processor_kwargs: Optional[dict[str, Any]] = None,
+        mm_processor_output: Optional[list[dict[str, Any]]] = None,
         routing_key: Optional[str] = None,
         sampled_only: bool = False,
     ) -> tuple[
