@@ -1,11 +1,13 @@
 """Run the real training entrypoint and enforce the local desktop VRAM reserve."""
 import argparse
+from importlib.metadata import version
 import json
 import os
 from pathlib import Path
 import re
 import signal
 import subprocess
+import sys
 import time
 
 import psutil
@@ -13,6 +15,10 @@ import psutil
 parser = argparse.ArgumentParser()
 parser.add_argument('algorithm', choices=['r2opl_base', 'pg_opd', 'eopd', 'opdvr', 'grpo', 'gspo'])
 args = parser.parse_args()
+runtime = {'conda_env': Path(sys.prefix).name, 'python': sys.version.split()[0],
+           **{name: version(name) for name in ('torch', 'vllm', 'transformers', 'ray', 'TransferQueue')}}
+if runtime['conda_env'] != 'r2opl-cu12' or runtime['vllm'] != '0.19.1':
+    raise SystemExit('Local training tests require conda activate r2opl-cu12 with vLLM 0.19.1')
 root = Path(__file__).resolve().parents[1]
 out = root / 'tests/artifacts/gsm8k' / f'{args.algorithm}_gsm8k_2steps'
 out.mkdir(parents=True, exist_ok=True)
@@ -34,6 +40,7 @@ last_progress = None
 last_step = 0
 last_notice = start
 seen_rollout_events = 0
+seen_outputs = set()
 with log_path.open('w') as log, (out / 'gpu_memory.jsonl').open('w') as telemetry:
     process = subprocess.Popen(['bash', 'scripts/start_train.sh', f'tests/configs/gsm8k/{args.algorithm}.yaml'],
                                cwd=root, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
@@ -68,13 +75,12 @@ with log_path.open('w') as log, (out / 'gpu_memory.jsonl').open('w') as telemetr
             completed = max(steps, default=0)
             if completed > last_step:
                 last_progress, last_step = now, completed
-            submissions = list(re.finditer(r'Rollout batch submitted: partition=\w+ prompts=(\d+)', text))
-            pending_rollout = False
-            if submissions:
-                last_submission = submissions[-1]
-                expected = int(last_submission.group(1))
-                finished = text[last_submission.end():].count('Rollout group completed:')
-                pending_rollout = finished < expected
+            # Persisted generations also prove progress before the optimizer
+            # and console metric line finish, even when Ray suppresses INFO.
+            outputs = set(out.glob('rollouts/*.jsonl')) | set(out.glob('validation/*.jsonl'))
+            if outputs - seen_outputs:
+                last_progress = now
+                seen_outputs.update(outputs)
             if last_progress is not None and now - last_progress > 180:
                 reason = 'No completed training/rollout progress for 180 seconds; investigate before retrying'
                 break
@@ -103,7 +109,7 @@ with log_path.open('w') as log, (out / 'gpu_memory.jsonl').open('w') as telemetr
                 pass
         process.wait()
 result = {'algorithm': args.algorithm, 'exit_code': process.returncode, 'stop_reason': reason,
-          'minimum_free_mib': minimum_free, 'elapsed_s': round(time.monotonic()-start, 1)}
+          'minimum_free_mib': minimum_free, 'elapsed_s': round(time.monotonic()-start, 1), 'runtime': runtime}
 if process.returncode == 0 and reason is None:
     try:
         rows = {}

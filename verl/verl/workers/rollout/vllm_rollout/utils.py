@@ -554,6 +554,11 @@ class vLLMColocateWorkerExtension:
                 yield self._get_drafter_model(), draft_cfg
 
     def monkey_patch_model(self, vocab_size: int, banned_token_ids: Optional[list[int]] = None):
+        from verl.workers.rollout.vllm_rollout.prompt_logprobs import enable_chunked_prompt_logprobs
+
+        # Student diagnostic prompt scores need the same bounded projection
+        # memory as Teacher scoring, independently of the prefill batch size.
+        enable_chunked_prompt_logprobs(self.model_runner)
         for model in self._iter_all_models():
             # patch compute_logits to avoid sampling OOV and other illegal tokens
             monkey_patch_compute_logits(model, vocab_size, banned_token_ids)
