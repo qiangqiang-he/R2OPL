@@ -262,7 +262,11 @@ def _load_vllm_engine(
         "dtype": str(inference_config.get("dtype", "bfloat16")),
         "tensor_parallel_size": 1,
         "seed": int(seed),
-        "gpu_memory_utilization": float(inference_config.gpu_memory_utilization),
+        # Hard safety cap: one engine may never claim more than half the
+        # 48 GB card, keeping the required free-VRAM reserve at all times.
+        "gpu_memory_utilization": min(
+            float(inference_config.gpu_memory_utilization), 0.5
+        ),
         "max_model_len": int(inference_config.max_model_len),
         "max_num_seqs": int(inference_config.max_num_seqs),
         "max_num_batched_tokens": int(inference_config.max_num_batched_tokens),
@@ -687,11 +691,17 @@ def _grpo_training_stage(
         if args.learning_rate is not None
         else float(actor.optim.lr)
     )
-    optimizer = torch.optim.AdamW(
-        model.parameters(),
-        lr=learning_rate,
-        weight_decay=float(actor.optim.weight_decay),
-    )
+    if family == "gemini4":
+        # Local-only compromise: Gemma E2B's ~19 GiB of AdamW states would
+        # leave under the required 5 GiB safety margin on the 48 GB smoke
+        # GPU, so the Gemma smoke updates with SGD.  The server keeps AdamW.
+        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    else:
+        optimizer = torch.optim.AdamW(
+            model.parameters(),
+            lr=learning_rate,
+            weight_decay=float(actor.optim.weight_decay),
+        )
     clip_value = float(actor.optim.clip_grad)
     questions_per_batch = int(config.data.train_batch_size)
     batches = _group_training_records(train_records, questions_per_batch)
@@ -771,6 +781,10 @@ def _grpo_training_stage(
                 )
         metrics.append(entry)
 
+    # AdamW keeps its exp_avg/exp_avg_sq states on the GPU through the
+    # optimizer object; drop them before the release check.
+    optimizer.zero_grad(set_to_none=True)
+    del optimizer
     free_gib = _release_model(model)
     _assert_stage_boundary("Trained Student release")
     return {

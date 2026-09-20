@@ -320,7 +320,11 @@ def _load_vllm_engine(model_path: Path, inference_config: Any, *, seed: int):
         dtype=str(inference_config.get("dtype", "bfloat16")),
         tensor_parallel_size=1,
         seed=int(seed),
-        gpu_memory_utilization=float(inference_config.gpu_memory_utilization),
+        # Hard safety cap: one engine may never claim more than half the
+        # 48 GB card, keeping the required free-VRAM reserve at all times.
+        gpu_memory_utilization=min(
+            float(inference_config.gpu_memory_utilization), 0.5
+        ),
         max_model_len=int(inference_config.max_model_len),
         max_num_seqs=int(inference_config.max_num_seqs),
         max_num_batched_tokens=int(inference_config.max_num_batched_tokens),
@@ -437,6 +441,11 @@ def _vllm_score_response_log_probs(
 def _load_model(model_path: Path, family: str, *, training: bool):
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
+    if training:
+        # Hard safety cap: this process may never allocate beyond 80% of the
+        # 48 GB card.  Overshooting raises a local CUDA OOM in this process
+        # instead of spilling into shared memory and freezing the host.
+        torch.cuda.set_per_process_memory_fraction(0.80, device=0)
     tokenizer = AutoTokenizer.from_pretrained(
         model_path,
         trust_remote_code=True,
@@ -701,7 +710,15 @@ def _response_log_probs(
     response_ids: Sequence[int],
     *,
     require_grad: bool,
+    chunk_size: int = 512,
 ) -> torch.Tensor:
+    """Sampled-token log-probabilities with chunked full-vocabulary softmax.
+
+    Materializing the whole ``(response, vocab)`` log-softmax at once costs
+    8-12 GiB transient on Gemma's 262k vocabulary and once froze the whole
+    host; the response is therefore reduced in bounded 512-token chunks.
+    """
+
     if not prompt_ids or not response_ids:
         raise ValueError("PG-OPD log-prob scoring requires prompt and response IDs")
     all_ids = [int(value) for value in prompt_ids] + [
@@ -717,11 +734,21 @@ def _response_log_probs(
             use_cache=False,
         )
         response_start = len(prompt_ids)
-        logits = output.logits[:, response_start - 1 : -1, :].float()
+        logits = output.logits[:, response_start - 1 : -1, :]
         targets = input_ids[:, response_start:]
-        log_probs = torch.log_softmax(logits, dim=-1).gather(
-            dim=-1, index=targets.unsqueeze(-1)
-        ).squeeze(-1)
+        width = int(logits.shape[1])
+        gathered = []
+        for start in range(0, width, chunk_size):
+            end = min(start + chunk_size, width)
+            chunk_log_probs = torch.log_softmax(
+                logits[:, start:end, :].float(), dim=-1
+            )
+            gathered.append(
+                chunk_log_probs.gather(
+                    dim=-1, index=targets[:, start:end].unsqueeze(-1)
+                ).squeeze(-1)
+            )
+        log_probs = torch.cat(gathered, dim=-1)
     if require_grad:
         return log_probs
     result = log_probs.detach().cpu()
@@ -868,7 +895,8 @@ def _run_internal_vllm_stage(args: argparse.Namespace) -> dict[str, Any]:
             seed=args.seed + 100_000,
         )
         free_gib = _release_vllm_engine(engine)
-        _assert_stage_boundary("Student rollout release")
+        # The in-process release is best-effort; the true release mechanism is
+        # this child process exiting, verified by the driver after it returns.
         _write_jsonl(train_path, train_rollouts)
         _write_jsonl(val_path, val_rollouts)
         report = {
@@ -902,7 +930,7 @@ def _run_internal_vllm_stage(args: argparse.Namespace) -> dict[str, Any]:
         )
         _vllm_score_response_log_probs(engine, train_rollouts)
         free_gib = _release_vllm_engine(engine)
-        _assert_stage_boundary("Teacher release")
+        # Process exit below is the verified release mechanism.
         _write_jsonl(train_path, train_rollouts)
         report = {
             "stage": "vllm_teacher_logprob_scoring",
@@ -949,6 +977,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     # Student/Teacher separation, this is required by vLLM's one-instance
     # sleep-mode allocator.
     stage_log.append(_run_vllm_subprocess(args, "student"))
+    _assert_stage_boundary("Student stage subprocess exit")
     train_rollouts = _read_jsonl(args.output_dir / "train_rollouts.jsonl")
     val_rollouts = _read_jsonl(args.output_dir / "amc23_avg4_rollouts.jsonl")
 
@@ -974,6 +1003,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     )
 
     stage_log.append(_run_vllm_subprocess(args, "teacher"))
+    _assert_stage_boundary("Teacher stage subprocess exit")
     train_rollouts = _read_jsonl(args.output_dir / "train_rollouts.jsonl")
 
     first_prompt_text = student_tokenizer.decode(
@@ -1014,6 +1044,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             del student_log_probs, teacher_log_probs, response_mask, sample_loss
         grad_norm = torch.nn.utils.clip_grad_norm_(student.parameters(), 1.0)
         optimizer.step()
+        optimizer.zero_grad(set_to_none=True)
         optimizer_metrics.append(
             {"batch": float(batch_index), "loss": loss_sum / len(batch), "grad_norm": float(grad_norm.detach().cpu())}
         )

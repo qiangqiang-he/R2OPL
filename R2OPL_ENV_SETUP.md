@@ -177,13 +177,19 @@ pip install -U pip
 | 环境 | 组合 | 驱动要求 | 模型家族 | 验证状态 |
 | --- | --- | --- | --- | --- |
 | `r2opl`（默认） | vllm 0.29.0 + torch 2.13.0+cu130 | **≥ 580（CUDA 13）** | Qwen3 / Qwen3.5 / Qwen3.6 / **gemma-4** 全支持 | 本地 4 家族 + 6 算法 smoke 通过 |
-| `r2opl-cu12`（旧驱动变体） | **vllm 0.19.1** + torch 2.11.0+cu128 | ≥ 525（CUDA 12.x，含 535） | 仅 Qwen3 系；**无 gemma-4 / Qwen3.5 / Qwen3.6** | Qwen3 rollout 已验证（vLLM 引擎，409 tok/s） |
+| `r2opl-cu12`（旧驱动变体） | **vllm 0.19.1 + torch 2.10.0+cu128 + transformers 5.9.0** | ≥ 525（CUDA 12.x，含 535） | Qwen3 ✅、**gemma-4 ✅**；Qwen3.5 ✗、Qwen3.6 未测 | 本地 4090 实测通过（见下） |
 
 **实测边界（2026-09-20，逐版验证 `_C` 扩展链接的 CUDA 运行库）**：
-- vllm **0.19.1 是最后一个 cu12 构建**；0.20.2 起 `vllm._C` 链接 `libcudart.so.13`（0.20.2/0.21.0 均实测 ImportError），0.22.0+ 依赖里直接声明 cu13 内核包；
-- gemma-4 原生支持从 **0.22.0** 开始 ⇒ **cu12 构建与 gemma-4 支持没有交集**。旧驱动不改，vLLM 无法加载 gemma-4，没有任何版本组合可绕过。
+- vllm **0.19.1 是最后一个 cu12 构建**；0.20.0 起 `vllm._C` 链接 `libcudart.so.13`（0.20.2/0.21.0 实测 ImportError），0.22.0+ 依赖直接声明 cu13 内核包。
+- **gemma-4 在 cu12 栈上可用（已实测）**：vllm 0.19.1 原生认识 `Gemma4ForConditionalGeneration`
+  （早于官方博客宣称的 0.22），本地 2题×4rollout 单次 generate 通过，~248 tok/s
+  （TRITON_ATTN，0.42 显存上限下）；测试脚本 `tests/verify_gemma4_vllm019_fallback.py`，
+  报告 `tests/artifacts/vllm_family_checks/gemma4_vllm021_fallback.json`。
+- Qwen3-0.6B 同栈实测 ~455 tok/s（FLASH_ATTN），脚本 `tests/verify_qwen3_vllm019.py`。
+- Qwen3.5-2B 在 0.19.1 失败：vllm 的 speculator-config 路径把本地路径当 HF repo id
+  （`HFValidationError`），属旧栈兼容 bug，非架构缺失；Qwen3.6 未测。
 
-**旧驱动服务器想跑 gemma-4 / Qwen3.5 / Qwen3.6，只有两条路**：
+**要全家族（Qwen3.5/3.6）+ 满血性能，仍推荐**：
 1. 升级驱动到 ≥ 580（H100 装 NVIDIA datacenter 驱动，一次性，最干净）——之后 `r2opl` 环境原样可用；
 2. H100（数据中心卡）上尝试 NVIDIA **cuda-compat 前向兼容包**（`cuda-compat-13-x`）：
    ```bash
@@ -192,12 +198,13 @@ pip install -U pip
    ```
    官方仅对数据中心卡提供此机制，不保证成功，值得先于升驱动花 10 分钟试。
 
-`r2opl-cu12` 变体安装（服务器 535 驱动可跑 Qwen3 时使用）：
+`r2opl-cu12` 变体安装（535 驱动服务器；注意 0.19.1 与 torch 2.10 配对）：
 
 ```bash
 conda create -n r2opl-cu12 python=3.12 -y && conda activate r2opl-cu12
-pip install -i https://download.pytorch.org/whl/cu128 torch==2.11.0+cu128
-pip install -i https://pypi.org/simple vllm==0.19.1 "transformers>=5.5.3,!=5.6.0,<5.11"
+pip install -i https://pypi.org/simple "torch==2.10.0"          # PyPI 默认即 cu128 构建
+pip install -i https://pypi.org/simple "vllm==0.19.1"           # 勿装 0.20+（cu13 重编译）
+pip install -i https://pypi.org/simple "transformers==5.9.0"
 pip install -i https://pypi.org/simple -e ./verl
 pip install -i https://pypi.org/simple --no-deps TransferQueue==0.1.7
 ```

@@ -202,6 +202,98 @@ def _find_vllm_sampler(engine: Any) -> tuple[str, Any]:
     raise RuntimeError("Could not locate the vLLM sampler for the EOPD patch")
 
 
+def _enable_eopd_entropy_gather(engine: Any, topk: int) -> int:
+    """Attach EOPD's entropy carrier to the active vLLM sampler pipeline.
+
+    vLLM >= 0.29 moved the bounded Top-k logprob assembly into the free
+    function ``compute_topk_scores``.  Several modules import that name, and
+    the prompt-logprobs path may resolve it through any of them, so the
+    wrapper is installed on the defining module and re-bound in EVERY loaded
+    module that holds the original object.  Returns the number of rebound
+    modules.  Older vLLM keeps VERL's instance-level patch.
+    """
+
+    topk = int(topk)
+    if topk <= 0:
+        raise ValueError(f"EOPD Top-k must be positive, got {topk}.")
+    try:
+        from vllm.v1.worker.gpu.sample import logprob as logprob_module
+    except ImportError:
+        logprob_module = None
+
+    if logprob_module is not None and hasattr(
+        logprob_module, "compute_topk_scores"
+    ):
+        marker = getattr(logprob_module, "_verl_eopd_entropy_topk", None)
+        if marker == topk:
+            return int(getattr(logprob_module, "_verl_eopd_rebound_modules", 0))
+        original = logprob_module.compute_topk_scores
+        requested = topk + 1
+
+        def compute_topk_scores(logits, num_logprobs, sampled_token_ids, *args, **kwargs):
+            max_per_req = kwargs.get("max_per_req_token_ids", 0)
+            if max_per_req is None and len(args) > 6:
+                max_per_req = args[6]
+            if int(num_logprobs) != requested or max_per_req:
+                return original(
+                    logits, num_logprobs, sampled_token_ids, *args, **kwargs
+                )
+            # Ask the original gather for one candidate beyond the retained
+            # Top-k: at least one cannot equal the sampled token and is
+            # therefore a collision-free, tokenizer-valid carrier id.
+            gathered = original(
+                logits, num_logprobs + 1, sampled_token_ids, *args, **kwargs
+            )
+            ids = gathered.logprob_token_ids
+            scores = gathered.logprobs
+            first_carrier = ids[:, topk + 1]
+            second_carrier = ids[:, topk + 2]
+            carrier_ids = torch.where(
+                first_carrier == ids[:, 0], second_carrier, first_carrier
+            ).unsqueeze(-1)
+            # The exact full-vocabulary entropy is computed from the already
+            # materialized distribution before the bounded Top-k truncation.
+            log_probs = torch.log_softmax(logits.float(), dim=-1)
+            entropy = torch.special.entr(log_probs.exp()).sum(
+                dim=-1, keepdim=True
+            )
+            retained_ids = torch.cat((ids[:, : topk + 1], carrier_ids), dim=-1)
+            retained_scores = torch.cat(
+                (scores[:, : topk + 1], entropy.to(scores.dtype)), dim=-1
+            )
+            # Keep the sampled slot outside the retained rank range so only
+            # the final slot is interpreted as the entropy carrier.
+            sampled_ranks = torch.full_like(
+                gathered.selected_token_ranks, requested + 1
+            )
+            return gathered._replace(
+                logprob_token_ids=retained_ids,
+                logprobs=retained_scores,
+                selected_token_ranks=sampled_ranks,
+            )
+
+        logprob_module.compute_topk_scores = compute_topk_scores
+        rebound = 1
+        for module in list(sys.modules.values()):
+            if module is None or module is logprob_module:
+                continue
+            try:
+                if getattr(module, "compute_topk_scores", None) is original:
+                    module.compute_topk_scores = compute_topk_scores
+                    rebound += 1
+            except Exception:
+                continue
+        logprob_module._verl_eopd_entropy_topk = topk
+        logprob_module._verl_eopd_rebound_modules = rebound
+        return rebound
+
+    from verl.workers.rollout.vllm_rollout.utils import enable_eopd_entropy_gather
+
+    _path, sampler = _find_vllm_sampler(engine)
+    enable_eopd_entropy_gather(sampler, topk)
+    return 0
+
+
 def _load_eopd_vllm_engine(
     model_path: Path,
     inference_config: Any,
@@ -223,7 +315,11 @@ def _load_eopd_vllm_engine(
         "dtype": str(inference_config.get("dtype", "bfloat16")),
         "tensor_parallel_size": 1,
         "seed": int(seed),
-        "gpu_memory_utilization": float(inference_config.gpu_memory_utilization),
+        # Hard safety cap: one engine may never claim more than half the
+        # 48 GB card, keeping the required free-VRAM reserve at all times.
+        "gpu_memory_utilization": min(
+            float(inference_config.gpu_memory_utilization), 0.5
+        ),
         "max_model_len": int(inference_config.max_model_len),
         "max_num_seqs": int(inference_config.max_num_seqs),
         "max_num_batched_tokens": int(inference_config.max_num_batched_tokens),
@@ -238,10 +334,7 @@ def _load_eopd_vllm_engine(
     engine = LLM(**kwargs)
 
     if eopd_entropy_topk is not None:
-        from verl.workers.rollout.vllm_rollout.utils import enable_eopd_entropy_gather
-
-        _path, sampler = _find_vllm_sampler(engine)
-        enable_eopd_entropy_gather(sampler, int(eopd_entropy_topk))
+        _enable_eopd_entropy_gather(engine, int(eopd_entropy_topk))
     return engine
 
 
@@ -490,11 +583,19 @@ def _eopd_training_stage(
     actor = config.actor_rollout_ref.actor
     model, _tokenizer = _load_model(student_path, family, training=True)
 
-    optimizer = torch.optim.AdamW(
-        model.parameters(),
-        lr=float(args.learning_rate),
-        weight_decay=float(actor.optim.weight_decay),
-    )
+    if family == "gemini4":
+        # Local-only compromise: Gemma E2B's ~19 GiB of AdamW states would
+        # leave under the required 5 GiB safety margin on the 48 GB smoke
+        # GPU, so the Gemma smoke updates with SGD.  The server keeps AdamW.
+        optimizer = torch.optim.SGD(
+            model.parameters(), lr=float(args.learning_rate)
+        )
+    else:
+        optimizer = torch.optim.AdamW(
+            model.parameters(),
+            lr=float(args.learning_rate),
+            weight_decay=float(actor.optim.weight_decay),
+        )
     clip_value = float(actor.optim.clip_grad)
     questions_per_batch = int(config.data.train_batch_size)
     batches = _group_training_records(train_records, questions_per_batch)

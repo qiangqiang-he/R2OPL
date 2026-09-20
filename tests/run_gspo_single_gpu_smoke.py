@@ -226,11 +226,17 @@ def _gspo_training_stage(
         if args.learning_rate is not None
         else float(actor.optim.lr)
     )
-    optimizer = torch.optim.AdamW(
-        model.parameters(),
-        lr=learning_rate,
-        weight_decay=float(actor.optim.weight_decay),
-    )
+    if family == "gemini4":
+        # Local-only compromise: Gemma E2B's ~19 GiB of AdamW states would
+        # leave under the required 5 GiB safety margin on the 48 GB smoke
+        # GPU, so the Gemma smoke updates with SGD.  The server keeps AdamW.
+        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    else:
+        optimizer = torch.optim.AdamW(
+            model.parameters(),
+            lr=learning_rate,
+            weight_decay=float(actor.optim.weight_decay),
+        )
     clip_value = float(actor.optim.clip_grad)
     questions_per_batch = int(config.data.train_batch_size)
     batches = _group_training_records(train_records, questions_per_batch)
@@ -308,6 +314,10 @@ def _gspo_training_stage(
                 )
         metrics.append(entry)
 
+    # AdamW keeps its exp_avg/exp_avg_sq states on the GPU through the
+    # optimizer object; drop them before the release check.
+    optimizer.zero_grad(set_to_none=True)
+    del optimizer
     free_gib = _release_model(model)
     _assert_stage_boundary("Trained Student release")
     return {
