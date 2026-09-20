@@ -737,9 +737,14 @@ class PPOTrainer:
             max_samples=self.config.data.get("val_max_samples", -1),
         )
 
+        # Upstream's merged config schema defaults gen_batch_size to null
+        # (meaning "fall back to train_batch_size"); dict.get() returns that
+        # stored None instead of the fallback, which StatefulDataLoader rejects
+        # together with drop_last=True.  Treat null exactly like unset.
+        gen_batch_size = self.config.data.get("gen_batch_size", None)
         self.train_dataloader = StatefulDataLoader(
             dataset=self.train_dataset,
-            batch_size=self.config.data.get("gen_batch_size", self.config.data.train_batch_size),
+            batch_size=gen_batch_size or self.config.data.train_batch_size,
             num_workers=self.config.data["dataloader_num_workers"],
             drop_last=True,
             collate_fn=collate_fn,
