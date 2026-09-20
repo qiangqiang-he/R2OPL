@@ -178,6 +178,7 @@ pip install -U pip
 | --- | --- | --- | --- | --- |
 | `r2opl`（默认） | vllm 0.29.0 + torch 2.13.0+cu130 | **≥ 580（CUDA 13）** | Qwen3 / Qwen3.5 / Qwen3.6 / **gemma-4** 全支持 | 本地 4 家族 + 6 算法 smoke 通过 |
 | `r2opl-cu12`（旧驱动变体） | **vllm 0.19.1 + torch 2.10.0+cu128 + transformers 5.9.0** | ≥ 525（CUDA 12.x，含 535） | Qwen3 ✅、**gemma-4 ✅**；Qwen3.5 ✗、Qwen3.6 未测 | 本地 4090 实测通过（见下） |
+| `r2opl-sgl`（旧驱动 SGLang 备选） | **sglang 0.5.11 + sglang-kernel 0.4.1 + torch 2.9.1+cu128** | ≥ 525（CUDA 12.x，含 535） | **gemma-4 ✅**（SGLang 引擎备选路径） | 本地 4090 实测通过（见下） |
 
 **实测边界（2026-09-20，逐版验证 `_C` 扩展链接的 CUDA 运行库）**：
 - vllm **0.19.1 是最后一个 cu12 构建**；0.20.0 起 `vllm._C` 链接 `libcudart.so.13`（0.20.2/0.21.0 实测 ImportError），0.22.0+ 依赖直接声明 cu13 内核包。
@@ -208,6 +209,49 @@ pip install -i https://pypi.org/simple "transformers==5.9.0"
 pip install -i https://pypi.org/simple -e ./verl
 pip install -i https://pypi.org/simple --no-deps TransferQueue==0.1.7
 ```
+
+## `r2opl-sgl`：旧驱动上 Gemma 4 的 SGLang 备选路径（已实测通过）
+
+若想要 SGLang 引擎（verl 同样支持 sglang rollout），gemma-4 在 cu12 上也可行：
+sglang 0.5.11（2026-05-05，Gemma 4 首个支持版）的 Python 层不绑定 CUDA 大版本，CUDA 内核
+在独立包 sglang-kernel 中——**0.4.1 是最后一个 cu12 构建**（0.4.2+ 链接
+`libnvrtc.so.13`，实测 ImportError）。本地实测 gemma-4-E2B：2题×4rollout 单次
+generate，1934 tokens / 2.49s（~776 tok/s，FLASH_ATTN 后端）；验证脚本
+`tests/verify_sglang_gemma4.py`，报告 `tests/artifacts/vllm_family_checks/gemma4_sglang_cu12.json`。
+
+```bash
+conda create -n r2opl-sgl python=3.12 -y && conda activate r2opl-sgl
+# 1) 先装 0.5.10 拉入全套 cu12 依赖（torch 2.9.1+cu128、sglang-kernel 0.4.1）
+pip install -i https://pypi.org/simple sglang==0.5.10
+# 2) Python 层升到带 Gemma 4 的 0.5.11（--no-deps 保住 cu12 依赖集）
+pip install -i https://pypi.org/simple --no-deps sglang==0.5.11
+# 3) Gemma 4 config 需要 transformers 5.6.0
+pip install -i https://pypi.org/simple transformers==5.6.0
+# 4) 把 sglang-kernel>=0.4.2 硬断言降级为警告（实测 0.4.1 对 Gemma 4 不缺算子）
+python - <<'EOF'
+import pathlib
+import sglang.srt.utils.common as common
+path = pathlib.Path(common.__file__)
+src = path.read_text(encoding="utf-8")
+if "[r2opl-cu12-patch]" in src:
+    print("already patched")
+else:
+    old = """        if pkg_version.parse(installed_version) < pkg_version.parse(min_version):
+            raise Exception("""
+    new = """        if pkg_version.parse(installed_version) < pkg_version.parse(min_version):
+            print(f"[r2opl-cu12-patch] {pkg} {installed_version} < {min_version}; continuing with cu12 kernel fallback")
+            return
+            raise Exception("""
+    assert old in src
+    path.write_text(src.replace(old, new, 1), encoding="utf-8")
+    print(f"patched {path}")
+EOF
+# 自检：python tests/verify_sglang_gemma4.py
+```
+
+SGLang 注意事项：SamplingParams 无 vLLM 式 `n`——一个 question 的 n 条 rollout 通过
+**重复 prompt n 次拼进同一次 `generate`** 实现（verl 的 sglang rollout 同款）；入口脚本
+必须带 `if __name__ == "__main__":` 保护（spawn 子进程 re-import 主文件）。
 
 ## 常见问题
 
