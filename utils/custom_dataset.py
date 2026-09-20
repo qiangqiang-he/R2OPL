@@ -261,6 +261,7 @@ class CustomDataset(RLHFDataset):
                 # family so the sampled response token IDs keep their meaning.
                 "prompt": prompt,
                 "teacher_prompt_text": prompt,
+                "oa_ground_truth_answer": answer,
                 "data_source": str(example["data_source"]),
                 "reward_model": {"style": "rule", "ground_truth": answer},
                 "extra_info": {

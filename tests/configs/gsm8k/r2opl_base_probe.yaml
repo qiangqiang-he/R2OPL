@@ -1,0 +1,11 @@
+# @package _global_
+defaults:
+  - /gsm8k/r2opl_base
+  - _self_
+
+# Additional branch coverage: deliberately truncate reasoning, then execute
+# the real Student head/tail probe and train on its actual verdict.
+run_name: r2opl_base_probe_gsm8k_2steps
+run_name_prefix: r2opl_base_probe_gsm8k_2steps
+rlvr_generation:
+  train_max_new_tokens: 96

@@ -9,12 +9,11 @@ branches:
 * incorrect trajectories follow the Teacher through the sampled-token OPD
   advantage ``difficulty * lambda * (log pi_T - log pi_S)``.
 
-Truncated rollouts that the verifier cannot grade are optionally rescued by
-an answer probe: when ``probe_correct_mask`` marks them, they are
-reclassified as correct with reward 1 and join the self-reinforcement branch.
-In production the probe fields are produced by VERL's agent loop for the
-``r2opl_base_v2`` algorithm name; under ``r2opl_base`` they default to zero
-and the rescue stays inactive until that infrastructure is enabled.
+Truncated rollouts are checked by the OPD_Forge v2 head/tail answer probe.
+If the Student's gold-answer probability improves by more than 0.3 after
+the truncated reasoning prefix, they are reclassified as correct with
+reward 1 and join the self-reinforcement branch. Probe metadata is required
+from the agent loop; missing fields must never silently disable rescue.
 
 Everything algorithm-specific lives in this module: the complete-batch group
 controller kernel, the runtime configuration/validation, and the trainer.
@@ -298,6 +297,9 @@ def compute_r2opl_base_batch(
             (~correctness[genuine_trajectory_mask]).float().mean().item()
         ),
         "r2opl_base/train/truncated_trajectory_count": float(truncated_count),
+        "r2opl_base/train/response_truncated_ratio": float(
+            truncated_count / int(genuine_trajectory_mask.sum().item())
+        ),
         "r2opl_base/train/probe_rescued_trajectory_count": float(probe_rescued.sum().item()),
         "r2opl_base/train/probe_rescued_ratio": float(
             probe_rescued[genuine_trajectory_mask].float().mean().item()
@@ -885,15 +887,13 @@ class R2OPLBaseTrainer(verl_sync.PPOTrainer):
             )
 
     @staticmethod
-    def _optional_scalar_field(
-        data: TensorDict, name: str, batch_size: int, *, default: float
+    def _scalar_field(
+        data: TensorDict, name: str, batch_size: int
     ) -> torch.Tensor:
-        """Read an optional per-trajectory probe field produced by the agent loop."""
+        """Read a required per-trajectory probe field produced by the agent loop."""
 
         if name not in data.keys():
-            return torch.full(
-                (batch_size,), float(default), dtype=torch.float32
-            )
+            raise RuntimeError(f"R2OPL-base controller input is missing the {name!r} field.")
         value = data[name]
         if value.is_nested:
             value = value.to_padded_tensor(0.0)
@@ -915,6 +915,9 @@ class R2OPLBaseTrainer(verl_sync.PPOTrainer):
             "rm_scores",
             "teacher_logprobs",
             "old_log_probs",
+            "r2opl_v2_truncated",
+            "r2opl_v2_probe_correct",
+            "r2opl_v2_probe_attempted",
         ]
         data = verl_sync.tq.kv_batch_get(
             keys=batch.keys,
@@ -946,14 +949,11 @@ class R2OPLBaseTrainer(verl_sync.PPOTrainer):
             dtype=torch.bool,
             device=response_mask.device,
         )
-        # The v2 answer probe writes these fields only for the
-        # ``r2opl_base_v2`` algorithm name; under ``r2opl_base`` they stay at
-        # their zero defaults and the rescue branch is inactive.
-        truncated_mask = self._optional_scalar_field(
-            data, "r2opl_v2_truncated", len(batch), default=0.0
+        truncated_mask = self._scalar_field(
+            data, "r2opl_v2_truncated", len(batch)
         ).gt(0.5).to(device=response_mask.device)
-        probe_correct_mask = self._optional_scalar_field(
-            data, "r2opl_v2_probe_correct", len(batch), default=0.0
+        probe_correct_mask = self._scalar_field(
+            data, "r2opl_v2_probe_correct", len(batch)
         ).gt(0.5).to(device=response_mask.device)
 
         result = compute_r2opl_base_batch(
@@ -1003,6 +1003,13 @@ class R2OPLBaseTrainer(verl_sync.PPOTrainer):
             fields=output,
         )
         metrics.update(result.metrics)
+        metrics["r2opl_base/train/probe_attempted_trajectory_count"] = float(
+            self._scalar_field(data, "r2opl_v2_probe_attempted", len(batch))[genuine_mask].sum().item()
+        )
+        metrics["r2opl_base/train/verifier_correct_trajectory_count"] = float(
+            verifier_rewards.sum(dim=-1).eq(1.0)[genuine_mask].sum().item()
+            if verifier_rewards.ndim == 2 else verifier_rewards.eq(1.0)[genuine_mask].sum().item()
+        )
         return batch
 
     def _compute_metrics(self, batch, metrics, timing_raw, global_steps, epoch):
@@ -1012,9 +1019,6 @@ class R2OPLBaseTrainer(verl_sync.PPOTrainer):
             "actor/grad_norm": "r2opl_base/train/total_grad_norm",
             "response_length/mean": "r2opl_base/train/response_length_mean",
             "response_length/max": "r2opl_base/train/response_length_max",
-            "response_length/clip_ratio": (
-                "r2opl_base/train/response_truncated_ratio"
-            ),
             "perf/throughput": "r2opl_base/perf/tokens_per_second_per_gpu",
             "perf/time_per_step": "r2opl_base/perf/time_per_step",
             "actor/r2opl_base/correct_grad_norm": (

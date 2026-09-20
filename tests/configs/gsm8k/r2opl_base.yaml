@@ -7,3 +7,9 @@ defaults:
 
 run_name: r2opl_base_gsm8k_2steps
 run_name_prefix: r2opl_base_gsm8k_2steps
+
+# Reserve space for Student self-probes. Actual generation still caps at
+# prompt 256 + response 768; the Teacher needs no appended probe capacity.
+actor_rollout_ref:
+  rollout:
+    max_model_len: 1152

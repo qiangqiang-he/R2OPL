@@ -14,13 +14,17 @@ import psutil
 
 parser = argparse.ArgumentParser()
 parser.add_argument('algorithm', choices=['r2opl_base', 'pg_opd', 'eopd', 'opdvr', 'grpo', 'gspo'])
+parser.add_argument('--probe', action='store_true', help='Force short R2OPL rollouts to exercise truncation probes')
 args = parser.parse_args()
+if args.probe and args.algorithm != 'r2opl_base':
+    parser.error('--probe is only supported for r2opl_base')
+config_name = args.algorithm + ('_probe' if args.probe else '')
 runtime = {'conda_env': Path(sys.prefix).name, 'python': sys.version.split()[0],
            **{name: version(name) for name in ('torch', 'vllm', 'transformers', 'ray', 'TransferQueue')}}
 if runtime['conda_env'] != 'r2opl-cu12' or runtime['vllm'] != '0.19.1':
     raise SystemExit('Local training tests require conda activate r2opl-cu12 with vLLM 0.19.1')
 root = Path(__file__).resolve().parents[1]
-out = root / 'tests/artifacts/gsm8k' / f'{args.algorithm}_gsm8k_2steps'
+out = root / 'tests/artifacts/gsm8k' / f'{config_name}_gsm8k_2steps'
 out.mkdir(parents=True, exist_ok=True)
 env = dict(os.environ, CUDA_VISIBLE_DEVICES='0', PYTHONUNBUFFERED='1', RAY_DEDUP_LOGS='0',
            VERL_LOGGING_LEVEL='INFO', OMP_NUM_THREADS='2', TOKENIZERS_PARALLELISM='false')
@@ -42,7 +46,7 @@ last_notice = start
 seen_rollout_events = 0
 seen_outputs = set()
 with log_path.open('w') as log, (out / 'gpu_memory.jsonl').open('w') as telemetry:
-    process = subprocess.Popen(['bash', 'scripts/start_train.sh', f'tests/configs/gsm8k/{args.algorithm}.yaml'],
+    process = subprocess.Popen(['bash', 'scripts/start_train.sh', f'tests/configs/gsm8k/{config_name}.yaml'],
                                cwd=root, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
     print(f'Started {args.algorithm}: PID {process.pid}, log {log_path}', flush=True)
     try:
@@ -126,5 +130,12 @@ if process.returncode == 0 and reason is None:
     except (AssertionError, OSError, ValueError) as error:
         reason = result['stop_reason'] = f'Output verification failed: {error}'
 (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
+if process.returncode == 0 and reason is None:
+    from summarize_gsm8k_formal import summarize
+    verification = summarize(args.algorithm, directory=out)
+    result['semantic_verification'] = {key: verification[key] for key in ('status', 'outcomes') if key in verification}
+    if verification['status'] != 'passed':
+        reason = result['stop_reason'] = verification.get('verification_error', verification['status'])
+    (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
 print(json.dumps(result), flush=True)
 raise SystemExit(1 if reason else process.returncode)

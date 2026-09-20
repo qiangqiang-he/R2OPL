@@ -315,6 +315,7 @@ class AgentLoopOutput(BaseModel):
         for field_name in (
             "r2opl_v2_truncated",
             "r2opl_v2_probe_correct",
+            "r2opl_v2_probe_attempted",
         ):
             value = output["extra_fields"].pop(field_name, None)
             if value is not None:
@@ -1364,6 +1365,19 @@ class AgentLoopWorker:
                 final_output.extra_fields["reward_extra_info"] = result["reward_extra_info"]
             final_output.metrics.compute_score = timing["compute_score"]
 
+    async def _compute_student_answer_probe_mean_logprob(
+        self, *, sequence_ids, answer_token_positions, routing_key=None
+    ):
+        """Probe the same Student weights used to generate this rollout."""
+        from utils.answer_probe import score_answer_probe
+
+        return await score_answer_probe(
+            client=self.llm_client,
+            sequence_ids=sequence_ids,
+            answer_token_positions=answer_token_positions,
+            max_model_len=self.config.actor_rollout_ref.rollout.max_model_len,
+        )
+
     async def _compute_teacher_logprobs(
         self,
         output: AgentLoopOutput,
@@ -1392,7 +1406,7 @@ class AgentLoopWorker:
             is_cal_opd = algorithm_name == "cal_opd"
             is_oa_opd = algorithm_name == "oa_opd"
             is_fast_oa_opd = algorithm_name == "fast_oa_opd"
-            is_r2opl_v2 = algorithm_name == "r2opl_base_v2"
+            is_r2opl_v2 = algorithm_name in {"r2opl_base", "r2opl_base_v2"}
 
             sol_unprivileged_teacher_prompt_ids = None
             if is_sol_opd:
@@ -1585,7 +1599,7 @@ class AgentLoopWorker:
             if is_r2opl_v2:
                 # Only truncated training trajectories are probed.  A passing
                 # head/tail answer probe rescues the rollout into the
-                # self-reinforcement branch; failures keep the verifier verdict.
+                # self-reinforcement branch. Infrastructure failures must surface.
                 if sample_kwargs is None:
                     raise RuntimeError("R²OPL-base v2 requires rollout answer metadata.")
 
@@ -1597,18 +1611,15 @@ class AgentLoopWorker:
                 )
                 if teacher_prompt_ids != prompt_ids:
                     raise RuntimeError(
-                        "R²OPL-base v2 requires identical no-thinking Student/Teacher "
+                        "R²OPL-base requires identical Student/Teacher "
                         "prompt token IDs so every probe preserves the original rollout prefix."
                     )
-                probe_result = None
-                try:
-                    from utils.r2opl_v2 import compute_r2opl_v2_probe
+                from utils.r2opl_v2 import compute_r2opl_v2_probe
 
+                with simple_timer("r2opl_answer_probe_s", timing):
                     probe_result = await compute_r2opl_v2_probe(
                         tokenizer=self.tokenizer,
-                        teacher_probe=(
-                            self.teacher_server_manager.compute_answer_probe_mean_logprob_single
-                        ),
+                        student_probe=self._compute_student_answer_probe_mean_logprob,
                         prompt_ids=prompt_ids,
                         response_ids=response_ids,
                         answer=answer,
@@ -1617,21 +1628,12 @@ class AgentLoopWorker:
                         ),
                         routing_key=routing_key,
                     )
-                except Exception as exc:
-                    logger.warning(
-                        "R²OPL-base v2 answer probe failed; keeping verifier verdict: %s",
-                        exc,
-                    )
-                if probe_result is None:
-                    output.extra_fields["r2opl_v2_truncated"] = 1.0
-                    output.extra_fields["r2opl_v2_probe_correct"] = 0.0
-                else:
-                    output.extra_fields["r2opl_v2_truncated"] = float(
-                        probe_result.truncated
-                    )
-                    output.extra_fields["r2opl_v2_probe_correct"] = float(
-                        probe_result.probe_correct
-                    )
+                output.extra_fields["r2opl_v2_truncated"] = float(probe_result.truncated)
+                output.extra_fields["r2opl_v2_probe_correct"] = float(probe_result.probe_correct)
+                output.extra_fields["r2opl_v2_probe_attempted"] = float(
+                    probe_result.head_mean_logprob is not None
+                )
+                output.extra_fields["r2opl_answer_probe_s"] = timing["r2opl_answer_probe_s"]
             if is_ps_opd:
                 if sample_kwargs is None:
                     raise RuntimeError("PS-OPD requires rollout question and answer metadata.")

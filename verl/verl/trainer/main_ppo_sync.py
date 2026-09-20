@@ -116,8 +116,9 @@ def should_track_opd_reward_metrics(config) -> bool:
     """Enable training grading when an OPD algorithm consumes outcomes.
 
     Standard OPD uses training rewards only for no-thinking diagnostics.
-    Uni-OPD requires binary verifier outcomes in both prompt modes because
-    correctness balancing and margin calibration are part of its objective.
+    R2OPL-base and OPDVR require verifier outcomes for their objective's
+    correct/incorrect branches, regardless of the prompt template. Uni-OPD
+    likewise requires outcomes for correctness balancing and calibration.
     """
 
     if config is None:
@@ -133,7 +134,7 @@ def should_track_opd_reward_metrics(config) -> bool:
         if hasattr(algorithm, "get")
         else getattr(algorithm, "name", "")
     )
-    if str(algorithm_name) == "uni_opd":
+    if str(algorithm_name) in {"r2opl_base", "opdvr", "uni_opd"}:
         return True
     return (
         str(get_value("student_prompt", "")) == "qwen3_no_thinking_prompt"
@@ -558,9 +559,9 @@ class AgentLoopWorkerTQ(AgentLoopWorker):
             logger.warning(f"Empty output for prompt {uid}_{session_id}")
             return
 
-        # Validation always requires task scores. During OPD training, grading
-        # and outcome diagnostics are intentionally restricted to runs where
-        # both student and teacher use the no-thinking prompt.
+        # Always grade validation and objectives that use verifier outcomes.
+        # For other OPD objectives, grading remains an optional no-thinking
+        # diagnostic; those objectives can use placeholder training scores.
         is_opd_training = self.distillation_enabled and not validate
         track_training_reward = should_track_opd_reward_metrics(self.config)
         if not is_opd_training or track_training_reward:
@@ -1411,6 +1412,10 @@ class PPOTrainer:
         """Fetch rollout data from TransferQueue and dump sorted by uid."""
         with marked_timer("dump_rollout_generations", timing_raw, color="green"):
             fields = ["uid", "prompts", "responses", "rm_scores", "reward_model"]
+            probe_fields = []
+            if str(self.config.algorithm.get("name", "")) == "r2opl_base":
+                probe_fields = ["r2opl_v2_truncated", "r2opl_v2_probe_correct", "r2opl_v2_probe_attempted"]
+                fields.extend(probe_fields)
             data = tq.kv_batch_get(keys=batch.keys, partition_id=batch.partition_id, select_fields=fields)
             data["prompts"] = data["prompts"].to_padded_tensor(padding=self.tokenizer.pad_token_id)
             data["responses"] = data["responses"].to_padded_tensor(padding=self.tokenizer.pad_token_id)
@@ -1442,6 +1447,9 @@ class PPOTrainer:
             scores = [scores[i] for i in sorted_indices]
 
             reward_extra_infos_dict = {"uid": [batch.keys[i] for i in sorted_indices]}
+            for field in probe_fields:
+                values = data[field].reshape(-1).tolist()
+                reward_extra_infos_dict[field] = [values[i] for i in sorted_indices]
 
             self._dump_generations(
                 inputs=inputs,

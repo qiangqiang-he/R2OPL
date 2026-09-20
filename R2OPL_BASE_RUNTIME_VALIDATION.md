@@ -1,5 +1,30 @@
 # R²OPL-base 合并后正式入口验证（2026-09-20）
 
+## 正误分流与答案探针迁移纠正
+
+后续逐条核验发现，下文早期两步运行只证明流程完成，不能证明算法正确：`explicit_step_prompt` 下训练判题被跳过，`rm_scores` 被填为 0，正确答案也进入错误 OPD 分支。早期“通过”的算法语义结论撤回；长序列分块的独立数值和显存验证仍有效。
+
+本次以用户指定的 `OPD_Forge/algorithms/r2opl_base.py` 为算法依据（其内部实现名为 v2），连同 `utils/r2opl_v2.py` 和原答案探针构造代码迁移。目标公式保持不变：正确轨迹优势为 `difficulty * miu`，错误轨迹为 `difficulty * lambda * stop_gradient(log pi_T - log pi_S)`，其中 `difficulty = 1 - group_success`。全对组难度为 0，因此该组正确梯度为 0 是正常的；混合正误组必须产生正确分支梯度。
+
+修复三个断点：依赖正误的训练强制判题；当前 `r2opl_base` 实际运行答案探针并携带 gold answer；控制器从 TransferQueue 显式读取探针结果，缺失时报错。探针沿用原始 token 前缀和最后句子边界，比较 `exp(tail_mean_logprob) - exp(head_mean_logprob) > 0.3`。根据用户确认，打分必须使用生成轨迹的 Student 当前权重；旧 OPD_Forge 辅助代码调用 Teacher 的部分已经改正，Teacher 仅提供 OPD 信号。通过的截断轨迹按 reward 1 计入 RL 分支和组难度；没有句子边界或未通过则保留 verifier 判定。新增 RPC/非有限值/上下文容量错误会终止并报告，避免静默失效。轨迹文件同时保存原判题分数及探针标记，可独立复核两者。
+
+基础回归：移植原实现的目标函数、梯度、探针、agent loop、控制器测试，结合现有运行回归与判题、失败处理、因果位置及容量检查共 62 passed。使用 Student 自身探针后已重跑全部 62 项，agent loop 测试明确断言 Teacher 不得被用于截断探针。
+
+真实 `start_train.sh` 验收均使用 `r2opl-cu12 / vLLM 0.19.1`：
+
+| 场景 | 第 1 步 RL / OPD 轨迹 | 第 2 步 RL / OPD 轨迹 | 关键证据 | 总耗时 / 最低空闲显存 |
+| --- | --- | --- | --- | --- |
+| 标准 1024 长度、2 题 × 4 rollout | 8 / 0 | 5 / 3 | 第 2 步 reward=0.625，正确梯度 28.0186、错误梯度 0.0070003 | 196.9 秒 / 25395 MiB |
+| 额外截断测试：生成上限 96 | 5 / 3 | 4 / 4 | 每步 8 条 Student 自探针；分别救援 5、4 条；正确梯度 39.6013 / 46.1192 | 190.4 秒 / 25145 MiB |
+
+标准测试完成 2 步训练、更新权重、8 条评测和 checkpoint；生成结果逐条重判，与原 verifier 分数一致。第 1 步全对，难度为 0，因此正确梯度为 0 符合原算法。标准测试未触发截断，不能替代 Student 自探针验证。先前调用 Teacher 的截断测试记录仅作为排错历史，不计入最终验收。
+
+最终 Student 自探针测试也完成全部两步、权重更新、8 条评测和 checkpoint。16 条训练轨迹的原 verifier 分数均为 0；Student 自探针分别把 5、4 条计入 RL，有效奖励均值为 0.625 / 0.5，错误分支梯度 0.0085663 / 0.0205884。逐条产物与控制器统计一致，两步混合正误组的正确梯度均非零。此结果来自真实 Student 引擎，未伪造探针分数。
+
+梯度指标为整个分支完成 batch 累积、分布式同步后的全模型 L2 范数，已包含每轨迹 token 平均、全 batch 平均及 difficulty/miu/lambda 权重，记录于裁剪前；没有再按分支轨迹数单独平均。优化器使用两分支梯度的向量和。
+
+额外截断复现：`python tests/run_gsm8k_formal.py r2opl_base --probe`，实际调用 `tests/configs/gsm8k/r2opl_base_probe.yaml`。Student 标准生成仍限制为 prompt 256 + response 768，本地 Student 引擎容量 1152 为额外自探针保留空间；服务器正式配置的 Student 引擎覆盖更长的评测上下文，已有训练自探针余量，无需改变启动命令。
+
 ## 后续修复：Student 长序列诊断的显存峰值
 
 服务器 Qwen3-4B → Qwen3-1.7B 在第二步 `compute_old_log_prob` 的 attention 中申请 294 MiB 失败；日志显示另一进程占用 87.34 GiB，但未提供足以确定该进程身份的记录。不能据此认定 attention、共享内存或模型权重本身是根因。
