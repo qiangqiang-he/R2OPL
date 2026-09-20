@@ -1,0 +1,63 @@
+# @package _global_
+
+# One-GPU vLLM smoke test for the formal Qwen3-1.7B GRPO experiment.
+
+defaults:
+  - /grpo/grpo_qwen3_1p7b_len12k_500steps
+  - _self_
+
+run_name: grpo_qwen3_1p7b_single_gpu_smoke
+run_name_prefix: grpo_qwen3_1p7b_single_gpu_smoke
+
+data:
+  train_batch_size: 2
+  val_datasets: [AMC23]
+  val_max_samples: 2
+  max_response_length: 4096
+
+actor_rollout_ref:
+  model:
+    path: ./models/Qwen3-1.7B
+  actor:
+    ppo_mini_batch_size: 2
+    ppo_max_token_len_per_gpu: 6145
+    # Qwen3-1.7B fits beside its vLLM engine on the 48 GB smoke-test GPU.
+    # Avoid the FSDP1 CPU-offload transition, which is unreliable on this host.
+    fsdp_config:
+      param_offload: false
+      optimizer_offload: false
+  rollout:
+    n: 4
+    data_parallel_size: 1
+    max_model_len: 6145
+    max_num_batched_tokens: 6145
+    max_num_seqs: 8
+    log_prob_max_token_len_per_gpu: 6145
+    val_kwargs:
+      n: 4
+
+rlvr_generation:
+  train_max_new_tokens: 4096
+  val_max_new_tokens: 4096
+
+ersr:
+  datasets: [AMC23]
+  max_steps_per_dataset: 1
+  mc_k: 1
+  max_teacher_step_tokens: 1
+
+trainer:
+  n_gpus_per_node: 1
+  total_training_steps: 2
+  total_epochs: 2
+  # One final validation covers AMC23 Avg@4 and Student-action ERSR.
+  val_before_train: false
+  test_freq: 2
+  save_freq: -1
+  logger: [console]
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}
+
+local_smoke:
+  training_batches: 2
+  validation_questions: 2

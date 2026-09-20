@@ -52,6 +52,8 @@ from verl.trainer.ppo.reward import extract_reward
 from verl.trainer.ppo.utils import (
     Role,
     WorkerType,
+    create_rl_dataset,
+    create_rl_sampler,
     need_critic,
     need_reference_policy,
     need_reward_model,
@@ -64,8 +66,8 @@ from verl.utils.debug import marked_timer
 from verl.utils.import_utils import deprecated, load_class_from_fqn
 from verl.utils.metric import reduce_metrics
 from verl.utils.py_functional import rename_dict
-from verl.utils.rollout_skip import RolloutSkip
 from verl.utils.seqlen_balancing import calculate_workload, get_seqlen_balanced_partitions, log_seqlen_unbalance
+from verl.utils.skip.skip_manager import SkipManager
 from verl.utils.torch_functional import masked_mean
 from verl.utils.tracking import ValidationGenerationsLogger
 from verl.workers.config import DistillationConfig, EngineConfig
@@ -280,9 +282,7 @@ def compute_advantage(
     return data
 
 
-@deprecated(
-    "main_ppo.py is deprecated, and wil be replaced by main_ppo_sync.py in v0.8.0, please use main_ppo_sync.py instead."
-)
+@deprecated("Legacy trainer is deprecated, and wil be removed in v0.9.0. Please use `trainer.use_v1=True` instead.")
 class RayPPOTrainer:
     """Distributed PPO trainer using Ray for scalable reinforcement learning.
 
@@ -375,9 +375,6 @@ class RayPPOTrainer:
         """
         Creates the train and validation dataloaders.
         """
-        # TODO: we have to make sure the batch size is divisible by the dp size
-        from verl.trainer.main_ppo import create_rl_dataset, create_rl_sampler
-
         if train_dataset is None:
             train_dataset = create_rl_dataset(
                 self.config.data.train_files,
@@ -407,7 +404,7 @@ class RayPPOTrainer:
 
         self.train_dataloader = StatefulDataLoader(
             dataset=self.train_dataset,
-            batch_size=self.config.data.get("gen_batch_size", self.config.data.train_batch_size),
+            batch_size=self.config.data.get("gen_batch_size", None) or self.config.data.train_batch_size,
             num_workers=num_workers,
             drop_last=True,
             collate_fn=collate_fn,
@@ -813,12 +810,24 @@ class RayPPOTrainer:
             engine_config.infer_max_token_len_per_gpu = critic_cfg.ppo_infer_max_token_len_per_gpu
             engine_config.max_token_len_per_gpu = critic_cfg.ppo_max_token_len_per_gpu
 
+            # Build the critic profiler config via the hydra path (same as the actor / ref / SFT),
+            # so its tool_config entries are real dataclass instances the torch/nsys/npu backends can
+            # read. The critic is a standalone TrainingWorker (no outer ActorRolloutRefWorker wrapper),
+            # and the trainer drives start_profile()/stop_profile() and train_batch annotation directly
+            # on it; without a profiler_config its DistProfiler silently degrades to a no-op, so the
+            # critic (update_critic / compute_values) was never profiled by any backend.
+            critic_omega_profiler_config = self.config.critic.get("profiler", {})
+            critic_profiler_config = (
+                omega_conf_to_dataclass(critic_omega_profiler_config) if critic_omega_profiler_config else None
+            )
+
             critic_cfg = TrainingWorkerConfig(
                 model_type="value_model",
                 model_config=orig_critic_cfg.model,
                 engine_config=engine_config,
                 optimizer_config=orig_critic_cfg.optim,
                 checkpoint_config=orig_critic_cfg.checkpoint,
+                profiler_config=critic_profiler_config,
                 extra_context=getattr(self, "_critic_extra_context", {}),
             )
 
@@ -964,7 +973,7 @@ class RayPPOTrainer:
             from verl.checkpoint_engine import CheckpointEngineManager
         self.checkpoint_manager = CheckpointEngineManager(
             config=checkpoint_engine_config,
-            trainer=self.actor_rollout_wg,
+            actor_wg=self.actor_rollout_wg,
             replicas=self.llm_server_manager.get_replicas(),
         )
 
@@ -1109,21 +1118,46 @@ class RayPPOTrainer:
 
     def _start_profiling(self, do_profile: bool) -> None:
         """Start profiling for all worker groups if profiling is enabled."""
-        if do_profile:
-            self.actor_rollout_wg.start_profile(role="e2e", profile_step=self.global_steps)
-            if self.use_reference_policy:
-                self.ref_policy_wg.start_profile(profile_step=self.global_steps)
-            if self.use_critic:
-                self.critic_wg.start_profile(profile_step=self.global_steps)
+        if not do_profile:
+            return
+        # In the hybrid engine, actor/rollout and the (colocated) reference -- and sometimes the
+        # critic -- are the SAME worker group object, so ref_policy_wg / critic_wg can alias
+        # actor_rollout_wg. Each start_profile/stop_profile round-trips to every rank and, on stop,
+        # runs the finish hook (e.g. the user's trace-upload command). Driving the same physical
+        # workers more than once would fire that hook once per alias and upload the very same trace
+        # file multiple times. Drive each distinct worker group exactly once.
+        # "train", not "e2e": this window only holds what the training worker itself runs
+        # (log-prob forwards and the actor update). Generation happens in the rollout engines,
+        # which are profiled separately and write their own traces.
+        self.actor_rollout_wg.start_profile(role="train", profile_step=self.global_steps)
+        seen = {id(self.actor_rollout_wg)}
+        if self.use_reference_policy and id(self.ref_policy_wg) not in seen:
+            seen.add(id(self.ref_policy_wg))
+            self.ref_policy_wg.start_profile(profile_step=self.global_steps)
+        if self.use_critic and id(self.critic_wg) not in seen:
+            seen.add(id(self.critic_wg))
+            self.critic_wg.start_profile(profile_step=self.global_steps)
 
-    def _stop_profiling(self, do_profile: bool) -> None:
-        """Stop profiling for all worker groups if profiling is enabled."""
-        if do_profile:
-            self.actor_rollout_wg.stop_profile()
-            if self.use_reference_policy:
-                self.ref_policy_wg.stop_profile()
-            if self.use_critic:
-                self.critic_wg.stop_profile()
+    def _stop_profiling(self, do_profile: bool, run_command: bool = False) -> None:
+        """Stop profiling for all worker groups if profiling is enabled.
+
+        ``run_command`` is passed straight to ``stop_profile`` and is True only on the last profiled
+        step, so the finish command (e.g. a one-shot upload of the whole save_path) fires once at the
+        end rather than once per profiled step. Backend stop and artifact relocation still happen on
+        every profiled step.
+        """
+        if not do_profile:
+            return
+        # See _start_profiling: skip aliased worker groups so the finish hook (and any trace upload
+        # it triggers) fires exactly once per distinct process instead of once per role alias.
+        self.actor_rollout_wg.stop_profile(run_command=run_command)
+        seen = {id(self.actor_rollout_wg)}
+        if self.use_reference_policy and id(self.ref_policy_wg) not in seen:
+            seen.add(id(self.ref_policy_wg))
+            self.ref_policy_wg.stop_profile(run_command=run_command)
+        if self.use_critic and id(self.critic_wg) not in seen:
+            seen.add(id(self.critic_wg))
+            self.critic_wg.stop_profile(run_command=run_command)
 
     def _get_dp_size(self, worker_group, role: str) -> int:
         """Get data parallel size from worker group dispatch info.
@@ -1310,6 +1344,14 @@ class RayPPOTrainer:
         distillation_combined_topk = bool(distillation_use_topk) and (
             self.distillation_config.distillation_loss.loss_mode == "eopd"
         )
+        distillation_only = False  # distillation_only flag means we can skip policy loss and reduce mem footprint
+        if is_distillation_enabled(self.config.get("distillation")):
+            distillation_loss_cfg = self.distillation_config.distillation_loss
+            distillation_only = (
+                distillation_use_topk
+                and not distillation_loss_cfg.use_task_rewards
+                and not distillation_loss_cfg.use_policy_gradient
+            )
         ppo_mini_batch_size = self.config.actor_rollout_ref.actor.ppo_mini_batch_size
         ppo_mini_batch_size = ppo_mini_batch_size * self.config.actor_rollout_ref.rollout.n
         ppo_epochs = self.config.actor_rollout_ref.actor.ppo_epochs
@@ -1326,6 +1368,7 @@ class RayPPOTrainer:
             distillation_chunk_size=int(self.distillation_config.student_chunk_size),
             distillation_log_prob_min_clamp=self.distillation_config.distillation_loss.log_prob_min_clamp,
             eopd_entropy_threshold=self.distillation_config.distillation_loss.eopd_entropy_threshold,
+            distillation_only=distillation_only,
             global_batch_size=ppo_mini_batch_size,
             mini_batch_size=ppo_mini_batch_size,
             epochs=ppo_epochs,
@@ -1398,6 +1441,8 @@ class RayPPOTrainer:
 
         current_epoch = self.global_steps // len(self.train_dataloader)
 
+        SkipManager.init(self.config)
+
         # perform validation before training
         # currently, we only support validation using the reward_function.
         if self.config.trainer.get("val_before_train", True):
@@ -1409,10 +1454,6 @@ class RayPPOTrainer:
                 self._shutdown_dump_executor()
                 return
 
-        if self.config.actor_rollout_ref.rollout.skip.get("enable", False):
-            rollout_skip = RolloutSkip(self.config, self.async_rollout_manager)
-            rollout_skip.wrap_generate_sequences()
-
         # add tqdm
         progress_bar = tqdm(total=self.total_training_steps, initial=self.global_steps, desc="Training Progress")
 
@@ -1420,6 +1461,8 @@ class RayPPOTrainer:
         self.global_steps += 1
         last_val_metrics = None
         self.max_steps_duration = 0
+
+        SkipManager.set_step(self.global_steps)
 
         prev_step_profile = False
         curr_step_profile = (
@@ -1582,7 +1625,6 @@ class RayPPOTrainer:
                                 metrics.update(calculate_debug_metrics(batch))
 
                     assert "old_log_probs" in batch.batch, f'"old_log_prob" not in {batch.batch.keys()=}'
-
                     if self.use_reference_policy:
                         # compute reference log_prob
                         with marked_timer(str(Role.RefPolicy), timing_raw, color="olive"):
@@ -1641,7 +1683,6 @@ class RayPPOTrainer:
                             norm_adv_by_std_in_grpo=norm_adv_by_std_in_grpo,
                             config=self.config.algorithm,
                         )
-
                     # update critic
                     if self.use_critic:
                         with marked_timer("update_critic", timing_raw, color="pink"):
@@ -1708,10 +1749,21 @@ class RayPPOTrainer:
                         if self.config.global_profiler.steps is not None
                         else False
                     )
+                    # Run the finish command (e.g. the trace upload) only once, on the last profiled
+                    # step, so a command that uploads the whole save_path sends each trace once rather
+                    # than re-uploading the accumulating directory every step. "Last" is the largest
+                    # configured step, or the run's final step if it ends earlier on a profiled step.
+                    profiled_steps = self.config.global_profiler.steps
+                    run_finish_command = bool(
+                        curr_step_profile
+                        and profiled_steps
+                        and (self.global_steps == max(profiled_steps) or is_last_step)
+                    )
                     self._stop_profiling(
                         curr_step_profile and not next_step_profile
                         if self.config.global_profiler.profile_continuous_steps
-                        else curr_step_profile
+                        else curr_step_profile,
+                        run_command=run_finish_command,
                     )
                     prev_step_profile = curr_step_profile
                     curr_step_profile = next_step_profile
@@ -1761,6 +1813,7 @@ class RayPPOTrainer:
 
                 progress_bar.update(1)
                 self.global_steps += 1
+                SkipManager.set_step(self.global_steps)
 
                 if is_last_step:
                     if hasattr(self.actor_rollout_wg, "async_calls_finalize_fn_exec"):

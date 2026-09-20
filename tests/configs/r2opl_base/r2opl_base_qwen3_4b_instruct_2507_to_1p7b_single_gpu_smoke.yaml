@@ -1,0 +1,72 @@
+# @package _global_
+
+# Staged one-GPU verification of the formal Qwen R^2OPL-base experiment.  The
+# test runner loads Student and Teacher in separate phases; this file must not
+# be used as a replacement for the formal 4-Student + 4-Teacher configuration.
+
+defaults:
+  - /r2opl_base/r2opl_base_qwen3_4b_instruct_2507_to_1p7b_len12k_lambda0p05_miu16_500steps
+  - _self_
+
+run_name: r2opl_base_qwen3_4b_instruct_2507_to_1p7b_single_gpu_smoke
+run_name_prefix: r2opl_base_qwen3_4b_instruct_2507_to_1p7b_single_gpu_smoke
+
+data:
+  train_batch_size: 4
+  val_datasets: [AMC23]
+  val_max_samples: 2
+  max_response_length: 4096
+
+actor_rollout_ref:
+  model:
+    path: ./models/Qwen3-1.7B
+  actor:
+    ppo_mini_batch_size: 4
+    ppo_max_token_len_per_gpu: 6145
+  rollout:
+    n: 4
+    data_parallel_size: 1
+    max_model_len: 6145
+    max_num_batched_tokens: 6145
+    max_num_seqs: 256
+    log_prob_max_token_len_per_gpu: 6145
+    val_kwargs:
+      n: 4
+  ref:
+    log_prob_max_token_len_per_gpu: 6145
+
+rlvr_generation:
+  train_max_new_tokens: 4096
+  val_max_new_tokens: 4096
+
+distillation:
+  n_gpus_per_node: 1
+  teacher_chunk_size: 1
+  teacher_models:
+    teacher_model:
+      model_path: ./models/Qwen3-4B-Instruct-2507
+      inference:
+        prompt_length: 2048
+        response_length: 4096
+        max_model_len: 6145
+        max_num_seqs: 8
+        max_num_batched_tokens: 6145
+
+trainer:
+  n_gpus_per_node: 1
+  total_training_steps: 2
+  total_epochs: 2
+  val_before_train: false
+  test_freq: 2
+  save_freq: -1
+  logger: [console]
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}
+
+local_smoke:
+  staged_single_gpu: true
+  training_batches: 2
+  # Fixed mixed-difficulty AMC23 rows so both correct trajectories
+  # (Student-action ERSR) and incorrect ones (Teacher-replacement ERSR and
+  # the OPD branch) are available.
+  validation_indices: [6, 14]

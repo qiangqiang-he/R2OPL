@@ -1,0 +1,74 @@
+# @package _global_
+
+# Staged one-GPU verification of the formal Gemma PG-OPD experiment.  E4B is
+# intentionally used only as the local Teacher substitute for the 31B model.
+
+defaults:
+  - /pg_opd/pg_opd_gemma4_31b_it_to_e2b_it_len8k_100steps
+  - _self_
+
+run_name: pg_opd_gemma4_e4b_it_to_e2b_it_single_gpu_smoke
+run_name_prefix: pg_opd_gemma4_e4b_it_to_e2b_it_single_gpu_smoke
+
+data:
+  train_batch_size: 4
+  val_datasets: [AMC23]
+  val_max_samples: 2
+  max_response_length: 4096
+
+actor_rollout_ref:
+  model:
+    path: ./models/gemma-4-E2B-it
+  actor:
+    ppo_mini_batch_size: 4
+    ppo_max_token_len_per_gpu: 6145
+  rollout:
+    n: 4
+    data_parallel_size: 1
+    max_model_len: 6145
+    max_num_batched_tokens: 6145
+    max_num_seqs: 256
+    log_prob_max_token_len_per_gpu: 6145
+    val_kwargs:
+      n: 4
+  ref:
+    log_prob_max_token_len_per_gpu: 6145
+
+rlvr_generation:
+  train_max_new_tokens: 4096
+  val_max_new_tokens: 4096
+
+distillation:
+  n_gpus_per_node: 1
+  teacher_chunk_size: 1
+  teacher_models:
+    teacher_model:
+      model_path: ./models/gemma-4-E4B-it
+      inference:
+        prompt_length: 2048
+        response_length: 4096
+        max_model_len: 6145
+        max_num_seqs: 8
+        max_num_batched_tokens: 6145
+
+ersr:
+  datasets: [AMC23]
+  max_steps_per_dataset: 1
+  mc_k: 1
+  max_teacher_step_tokens: 512
+
+trainer:
+  n_gpus_per_node: 1
+  total_training_steps: 2
+  total_epochs: 2
+  val_before_train: true
+  test_freq: 1
+  save_freq: -1
+  logger: [console]
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}
+
+local_smoke:
+  staged_single_gpu: true
+  training_batches: 2
+  validation_indices: [6, 14]

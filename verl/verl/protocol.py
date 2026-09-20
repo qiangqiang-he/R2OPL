@@ -214,7 +214,7 @@ def fold_batch_dim(data: "DataProto", new_batch_size):
     tensor.auto_batch_size_(batch_dims=1)
 
     for key, val in non_tensor.items():
-        non_tensor[key] = np.reshape(val, newshape=(new_batch_size, -1, *val.shape[1:]))
+        non_tensor[key] = np.reshape(val, (new_batch_size, -1, *val.shape[1:]))
 
     return type(data)(batch=tensor, non_tensor_batch=non_tensor, meta_info=data.meta_info)
 
@@ -233,7 +233,7 @@ def unfold_batch_dim(data: "DataProto", batch_dims=2):
     non_tensor_new = {}
 
     for key, val in non_tensor.items():
-        non_tensor_new[key] = np.reshape(val, newshape=(batch_size, *val.shape[batch_dims:]))
+        non_tensor_new[key] = np.reshape(val, (batch_size, *val.shape[batch_dims:]))
 
     return type(data)(batch=tensor, non_tensor_batch=non_tensor_new, meta_info=data.meta_info)
 
@@ -375,25 +375,22 @@ class DataProto:
             raise TypeError(f"Indexing with {type(item)} is not supported")
 
     def __getstate__(self):
-        if version.parse(tensordict.__version__) >= version.parse("0.5.0") and self.batch is not None:
-            # Check if batch is empty to avoid torch.cat error in consolidate
-            if len(self.batch.keys()) > 0:
-                batch = self.batch.contiguous().consolidate()
-            else:
-                batch = self.batch
-        else:
-            batch = self.batch
-
         if os.getenv("VERL_DATAPROTO_SERIALIZATION_METHOD") == "numpy":
-            if batch is not None:
-                batch = serialize_tensordict(self.batch)
-
             return (
-                batch,
+                serialize_tensordict(self.batch) if self.batch is not None else None,
                 self.non_tensor_batch,
                 self.meta_info,
             )
         else:
+            if version.parse(tensordict.__version__) >= version.parse("0.5.0") and self.batch is not None:
+                # Check if batch is empty to avoid torch.cat error in consolidate
+                if len(self.batch.keys()) > 0:
+                    batch = self.batch.contiguous().consolidate()
+                else:
+                    batch = self.batch
+            else:
+                batch = self.batch
+
             import io
 
             buffer = io.BytesIO()

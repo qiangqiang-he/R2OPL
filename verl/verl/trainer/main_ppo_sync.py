@@ -69,7 +69,7 @@ from verl.single_controller.ray import (
     create_colocated_worker_cls,
 )
 from verl.trainer.distillation import is_distillation_enabled
-from verl.trainer.main_ppo import create_rl_dataset, create_rl_sampler, run_ppo
+from verl.trainer.main_ppo import run_ppo
 from verl.trainer.ppo import core_algos
 from verl.trainer.ppo.core_algos import agg_loss
 from verl.trainer.ppo.metric_utils import (
@@ -82,7 +82,7 @@ from verl.trainer.ppo.metric_utils import (
 from verl.trainer.ppo.padding_utils import upsample_batch_to_divisible_size
 from verl.trainer.ppo.ray_trainer import apply_kl_penalty, compute_advantage, compute_spec_decode_metrics
 from verl.trainer.ppo.rollout_corr_helper import compute_rollout_correction_and_add_to_batch
-from verl.trainer.ppo.utils import Role, WorkerType, need_critic, need_reference_policy, need_teacher_policy
+from verl.trainer.ppo.utils import Role, WorkerType, create_rl_dataset, create_rl_sampler, need_critic, need_reference_policy, need_teacher_policy
 from verl.utils import hf_processor, hf_tokenizer
 from verl.utils import tensordict_utils as tu
 from verl.utils.checkpoint.checkpoint_manager import find_latest_ckpt_path

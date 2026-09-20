@@ -1,0 +1,57 @@
+# =============================================================================
+# R²OPL `r2opl` 环境 —— 顶层依赖清单
+# Python 3.12 / Linux x86_64；一键方式: bash scripts/setup_r2opl_env.sh
+# 手动安装步骤与说明见 R2OPL_ENV_SETUP.md；完整逐包快照见 requirements-freeze.txt
+# =============================================================================
+
+# 核心 vLLM 栈：vllm 0.29.0 自动带入 torch==2.13.0+cu130 与 CUDA 13 运行库
+# wheel（nvidia-* / cuda-toolkit），无需单独安装 CUDA Toolkit。
+vllm==0.29.0
+
+# ray：训练调度
+ray[default]==2.58.0
+
+# transformers 版本不要手动改：vllm 0.29 要求 >=5.10.4，本仓库 verl 要求
+# >=5.5.3,<5.11，pip 在窗口内自动收敛到 5.10.4。
+tensordict>=0.8.0,<=0.10.0,!=0.9.0
+
+# verl 的基础依赖（若已 editable 安装 ./verl 则自动满足）
+hydra-core
+omegaconf
+accelerate
+datasets
+peft
+wandb
+tensorboard
+torchdata
+codetiming
+pybind11
+pylatexenc
+pyarrow>=19.0.0
+numpy>=2.0.0
+pandas
+
+# 工具
+math-verify
+pytest
+py-spy
+
+# -----------------------------------------------------------------------------
+# ⚠ 以下两项【不能】写入上面的列表，必须单独执行：
+#
+#   1) verl（editable，指向本仓库 vendored 副本）:
+#        pip install -e ./verl
+#
+#   2) TransferQueue（其 metadata 声明 numpy<2，与本环境 numpy 2.x 冲突，
+#      用 --no-deps 避开；实测共存正常，全部算法 smoke 已验证）:
+#        pip install --no-deps TransferQueue==0.1.7
+#
+#   3) torchvision（需与 vllm 带入的 torch 2.13.0 配套，避免依赖解析把
+#      torch 降级，同样 --no-deps）:
+#        pip install --no-deps torchvision
+#
+# WSL2 用户还需（裸机服务器不需要）:
+#   export VLLM_USE_V2_MODEL_RUNNER=0
+#   （vLLM 0.29 的 V2 runner 依赖 CUDA UVA，WSL 不支持；脚本会自动写入
+#     conda activate.d，详见 R2OPL_ENV_SETUP.md）
+# -----------------------------------------------------------------------------

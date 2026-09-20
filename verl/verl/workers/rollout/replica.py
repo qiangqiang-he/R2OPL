@@ -25,7 +25,7 @@ from ray.actor import ActorHandle
 
 from verl.single_controller.ray import RayClassWithInitArgs, RayResourcePool, RayWorkerGroup, ResourcePoolManager
 from verl.utils.config import omega_conf_to_dataclass
-from verl.utils.device import is_torch_npu_available
+from verl.utils.device import get_device_name
 from verl.workers.config import HFModelConfig, RolloutConfig
 
 logger = logging.getLogger(__file__)
@@ -181,7 +181,7 @@ class RolloutReplica(ABC):
             bin_pack=False,
             name_prefix=name_prefix,
             use_gpu=use_gpu,
-            device_name="cuda" if not is_torch_npu_available(check_device=False) else "npu",
+            device_name=get_device_name(),
         )
         self.workers = worker_group.workers
         await self.launch_servers()
@@ -220,7 +220,7 @@ class RolloutReplica(ABC):
             bin_pack=False,
             name_prefix=name_prefix,
             use_gpu=True,
-            device_name="cuda" if not is_torch_npu_available(check_device=False) else "npu",
+            device_name=get_device_name(),
         )
         self.workers = worker_group.workers
         await self.launch_servers()
@@ -270,9 +270,19 @@ class RolloutReplica(ABC):
         """Sleep each rollout server."""
         await asyncio.gather(*[server.sleep.remote() for server in self.servers])
 
-    async def abort_all_requests(self):
-        """Partial rollout: abort and save all unfinished requests in each rollout server."""
-        await asyncio.gather(*[server.abort_all_requests.remote() for server in self.servers])
+    async def abort_all_requests(self, reject_request: bool = False):
+        """Partial rollout: abort and save all unfinished requests in each rollout server.
+
+        Args:
+            reject_request: Fail requests that arrive while generation is blocked instead
+                of holding them until the next resume_generation(). Pass True when the
+                replica is leaving the load balancer and no resume is coming soon.
+                Backends that cannot intercept their own admission path log a warning
+                and ignore it.
+        """
+        await asyncio.gather(
+            *[server.abort_all_requests.remote(reject_request=reject_request) for server in self.servers]
+        )
 
     async def resume_generation(self):
         """Resume generation on all servers after abort_all_requests."""
@@ -383,20 +393,26 @@ RolloutReplicaRegistry.register("trtllm", _load_trtllm)
 def get_rollout_replica_class(rollout: str, disaggregation_enabled: bool = False) -> type[RolloutReplica]:
     """Resolve a replica class by backend name.
 
-    PD-disaggregated SGLang reuses the ``sglang`` backend name; the dispatch
-    here picks ``SGLangPDReplica`` only when the caller asserts
-    ``disaggregation_enabled=True`` (sourced from
+    PD-disaggregated rollouts reuse the base backend name (``sglang`` /
+    ``vllm``); the dispatch here picks the PD class only when the caller
+    asserts ``disaggregation_enabled=True`` (sourced from
     ``RolloutConfig.disaggregation.enabled``). Validation in
-    ``RolloutConfig.__post_init__`` blocks the flag for non-SGLang names, so
-    this function only has to handle the SGLang fork.
+    ``RolloutConfig.__post_init__`` rejects the flag for backends without a
+    PD class.
     """
     if disaggregation_enabled:
-        if rollout != "sglang":
-            raise NotImplementedError(f"PD disaggregation is only supported with rollout='sglang'; got {rollout!r}.")
-        # _load_sglang side-effect: installs vllm mocks needed by SGLangPDReplica's
-        # transitive imports. Cheap if already installed.
-        RolloutReplicaRegistry.get("sglang")
-        from verl.workers.rollout.sglang_rollout.sglang_pd_replica import SGLangPDReplica
+        if rollout == "sglang":
+            # _load_sglang side-effect: installs vllm mocks needed by SGLangPDReplica's
+            # transitive imports. Cheap if already installed.
+            RolloutReplicaRegistry.get("sglang")
+            from verl.workers.rollout.sglang_rollout.sglang_pd_replica import SGLangPDReplica
 
-        return SGLangPDReplica
+            return SGLangPDReplica
+        if rollout == "vllm":
+            from verl.workers.rollout.vllm_rollout.vllm_pd_replica import vLLMPDReplica
+
+            return vLLMPDReplica
+        raise NotImplementedError(
+            f"PD disaggregation is only supported with rollout in ('sglang', 'vllm'); got {rollout!r}."
+        )
     return RolloutReplicaRegistry.get(rollout)

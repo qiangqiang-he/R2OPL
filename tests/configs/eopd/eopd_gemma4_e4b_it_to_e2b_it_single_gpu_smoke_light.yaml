@@ -1,0 +1,85 @@
+# @package _global_
+
+# Light staged one-GPU verification of the formal Gemma EOPD experiment.
+# Identical pipeline to eopd_gemma4_e4b_it_to_e2b_it_single_gpu_smoke.yaml,
+# but response length is capped at 512 tokens so the E4B Teacher's
+# prompt-logprob scoring (262k-vocab logits per position on the Triton
+# attention backend) finishes in minutes instead of hours on the 48 GB 4090.
+
+defaults:
+  - /eopd/eopd_gemma4_31b_it_to_e2b_it_len8k_100steps
+  - _self_
+
+run_name: eopd_gemma4_e4b_it_to_e2b_it_single_gpu_smoke_light
+run_name_prefix: eopd_gemma4_e4b_it_to_e2b_it_single_gpu_smoke_light
+
+data:
+  train_batch_size: 4
+  val_datasets: [AMC23]
+  val_max_samples: 2
+  max_response_length: 512
+
+actor_rollout_ref:
+  model:
+    path: ./models/gemma-4-E2B-it
+  actor:
+    ppo_mini_batch_size: 4
+    ppo_max_token_len_per_gpu: 3072
+  rollout:
+    n: 4
+    data_parallel_size: 1
+    max_model_len: 3072
+    max_num_batched_tokens: 3072
+    max_num_seqs: 256
+    log_prob_max_token_len_per_gpu: 3072
+    val_kwargs:
+      n: 4
+  ref:
+    log_prob_max_token_len_per_gpu: 3072
+
+rlvr_generation:
+  train_max_new_tokens: 512
+  val_max_new_tokens: 512
+
+distillation:
+  n_gpus_per_node: 1
+  teacher_chunk_size: 1
+  teacher_models:
+    teacher_model:
+      model_path: ./models/gemma-4-E4B-it
+      inference:
+        prompt_length: 2048
+        response_length: 512
+        max_model_len: 3072
+        max_num_seqs: 8
+        max_num_batched_tokens: 3072
+        engine_kwargs:
+          vllm:
+            max_logprobs: 17
+            eopd_entropy_topk: 16
+
+ersr:
+  datasets: [AMC23]
+  max_steps_per_dataset: 1
+  mc_k: 1
+  max_teacher_step_tokens: 512
+
+trainer:
+  n_gpus_per_node: 1
+  total_training_steps: 2
+  total_epochs: 2
+  val_before_train: false
+  test_freq: 1
+  save_freq: -1
+  logger: [console]
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}
+
+local_smoke:
+  staged_single_gpu: true
+  training_batches: 2
+  validation_indices: [6, 14]
+  # The E4B Teacher cannot fully return its memory inside a still-living vLLM
+  # process; 28 GiB is ample for the E2B Student stages that follow, and the
+  # process boundary remains the real isolation mechanism.
+  min_free_gib_after_stage: 28.0
