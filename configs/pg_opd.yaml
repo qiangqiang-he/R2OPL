@@ -58,14 +58,12 @@ distillation:
     use_policy_gradient: true
     policy_loss_mode: reinforce
 
-# Expected Reasoning-Step Return is evaluated alongside ordinary validation.
-# PG-OPD is OPD-only, so only incorrect trajectories contribute Teacher
-# replacement advantages.  The final response step is never eligible.
+# Expected Reasoning-Step Return machinery stays configured for quick
+# re-enable but is disabled for the current experiment schedule.
 ersr:
-  enabled: true
+  enabled: false
   datasets:
     - AMC23
-    - AIME24
     - SciBench
     - LogicBench
   max_steps_per_dataset: 500

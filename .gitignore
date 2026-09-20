@@ -17,3 +17,6 @@ __pycache__/
 # Editor and operating-system metadata
 .DS_Store
 Thumbs.db
+
+# Local pre-merge backups of the vendored verl tree
+/verl_backup_*/

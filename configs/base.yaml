@@ -16,13 +16,8 @@ data:
   val_files: ["./data/MSL_Eval.json"]
   val_datasets:
     - AMC23
-    - AIME24
-    - AIME25
-    - MATH-500
-    - GPQA-D
     - SciBench
     - LogicBench
-    - LogiQA2.0
   max_prompt_length: 2048
   max_response_length: 16384
   # One optimization batch contains 64 questions and four independently

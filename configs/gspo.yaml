@@ -30,13 +30,12 @@ actor_rollout_ref:
 distillation:
   enabled: false
 
-# GSPO is RL-only, so ERSR retains correct validation trajectories and
-# estimates only the Student action advantage. The final step is ineligible.
+# Expected Reasoning-Step Return machinery stays configured for quick
+# re-enable but is disabled for the current experiment schedule.
 ersr:
-  enabled: true
+  enabled: false
   datasets:
     - AMC23
-    - AIME24
     - SciBench
     - LogicBench
   max_steps_per_dataset: 500

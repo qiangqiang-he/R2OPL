@@ -1,12 +1,13 @@
-# Entropy-Aware OPD base configuration with 4 Student + 4 Teacher GPUs.
+# R^2OPL-base: difficulty-aware hybrid self-reinforcement and OPD with
+# 4 Student + 4 Teacher GPUs.
 
 defaults:
   - /base
   - _self_
 
-run_name: eopd_qwen3
-run_name_prefix: eopd_qwen3
-group_name: EOPD
+run_name: r2opl_base_qwen3
+run_name_prefix: r2opl_base_qwen3
+group_name: R2OPL-Base
 teacher_model_family: qwen3
 
 actor_rollout_ref:
@@ -14,7 +15,10 @@ actor_rollout_ref:
     data_parallel_size: 4
 
 algorithm:
-  name: eopd
+  name: r2opl_base
+  r2opl_base:
+    lambda: 0.05
+    miu: 16
 
 distillation:
   enabled: true
@@ -35,24 +39,20 @@ distillation:
         pipeline_model_parallel_size: 1
         gpu_memory_utilization: 0.55
         prompt_length: 2048
-        response_length: 8192
+        response_length: 12288
         # ERSR reuses this Teacher server for validation prefixes as long as
         # the Student's complete validation context.
-        max_model_len: 18432
+        max_model_len: 22528
         max_num_seqs: 8
         max_num_batched_tokens: ${distillation.teacher_chunk_size}
         enable_chunked_prefill: true
         enable_prefix_caching: true
         engine_kwargs:
           vllm:
-            # Top-k (16) plus one entropy-carrier slot.
-            max_logprobs: 17
-            eopd_entropy_topk: 16
+            max_logprobs: 16
   distillation_loss:
-    loss_mode: eopd
-    topk: 16
-    eopd_entropy_threshold: 0.8
-    eopd_alpha: 1.0
+    loss_mode: r2opl_base
+    topk: null
     diagnostic_topk: 16
     selection_ratio: 1.0
     selection_method: random
@@ -63,7 +63,8 @@ distillation:
     policy_loss_mode: reinforce
 
 # Expected Reasoning-Step Return machinery stays configured for quick
-# re-enable but is disabled for the current experiment schedule.
+# re-enable (both Student action on correct trajectories and Teacher
+# replacement on incorrect ones) but is disabled for the current schedule.
 ersr:
   enabled: false
   datasets:

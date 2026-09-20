@@ -24,6 +24,12 @@ from algorithms.gspo import (
     validate_gspo_config,
 )
 from algorithms.pg_opd import PGOPDTrainer, validate_pg_opd_config
+from algorithms.r2opl_base import (
+    R2OPLBaseTrainer,
+    configure_r2opl_base_batch,
+    configure_r2opl_base_defaults,
+    validate_r2opl_base_config,
+)
 from utils.opd_runtime import configure_pg_opd_batch, configure_pg_opd_defaults
 
 
@@ -64,6 +70,13 @@ ALGORITHM_REGISTRY = {
         validate=validate_eopd_config,
         configure_defaults=configure_eopd_defaults,
         configure_batch=configure_eopd_batch,
+    ),
+    "r2opl_base": AlgorithmSpec(
+        name="r2opl_base",
+        trainer_class=R2OPLBaseTrainer,
+        validate=validate_r2opl_base_config,
+        configure_defaults=configure_r2opl_base_defaults,
+        configure_batch=configure_r2opl_base_batch,
     ),
 }
 
