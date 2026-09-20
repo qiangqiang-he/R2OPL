@@ -147,6 +147,9 @@ class LLMServerClient:
             priority_kwargs = (
                 {"priority": priority} if priority != 0 and self.config.actor_rollout_ref.rollout.name == "vllm" else {}
             )
+            # routing_key is a local multi-Teacher routing hint consumed by
+            # the caller; the vLLM/SGLang server does not accept it.
+            kwargs.pop("routing_key", None)
             output: TokenOutput = await server.generate.remote(
                 request_id=self._vllm_request_id(request_id),  # use new request_id for each turn
                 prompt_ids=prompt_ids,
