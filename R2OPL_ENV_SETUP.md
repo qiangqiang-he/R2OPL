@@ -120,6 +120,56 @@ pip install -i $PIP_INDEX -r requirements-freeze.txt # 完整快照（246 个 pi
 # 两种方式之后，都要补第 3 步的 verl 和第 4 步的 TransferQueue（--no-deps）。
 ```
 
+## 没有 conda 时的三种安装方式
+
+本环境只依赖 Python 3.12 + pip，conda 不是必需品。
+
+### 方式一：uv（最推荐：无需 root、无需预装 Python，速度最快）
+
+```bash
+# 1) 安装 uv（单文件，不需要 root）
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+
+# 2) 虚拟环境（uv 自动下载独立的 CPython 3.12）
+cd /path/to/R2OPL
+uv venv ~/.venvs/r2opl --python 3.12
+source ~/.venvs/r2opl/bin/activate
+
+# 3) 依赖（与手动安装第 2~4 步一致，pip 换成 uv pip）
+uv pip install -i https://pypi.org/simple vllm==0.29.0
+uv pip install -i https://pypi.org/simple "ray[default]==2.58.0"
+uv pip install -i https://pypi.org/simple -e ./verl
+uv pip install -i https://pypi.org/simple --no-deps torchvision
+uv pip install -i https://pypi.org/simple --no-deps TransferQueue==0.1.7
+uv pip install -i https://pypi.org/simple math-verify pytest py-spy
+
+# 4) 仅 WSL2：写入 venv 的 activate（等效 conda 的 activate.d）
+echo 'export VLLM_USE_V2_MODEL_RUNNER=0' >> ~/.venvs/r2opl/bin/activate
+```
+
+第 3 步等价写法：`uv pip install -r requirements.txt` 后补 `-e ./verl` 与两条 `--no-deps`。
+
+### 方式二：先装 Miniconda（两条命令），现有脚本原样可用
+
+```bash
+wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
+# 之后： bash scripts/setup_r2opl_env.sh
+```
+
+### 方式三：机器已有 Python 3.12，直接 venv
+
+```bash
+python3.12 -m venv ~/.venvs/r2opl
+source ~/.venvs/r2opl/bin/activate
+pip install -U pip
+# 之后执行"手动安装"的第 2~6 步（步骤编号不变）
+```
+
+> 注意：Ubuntu 22.04 系统自带 Python 3.10，不满足 verl/tensordict 的版本要求；
+> 机器上没有 3.12 时请用方式一或方式二。
+
 ## 常见问题
 
 | 现象 | 原因 / 处理 |
