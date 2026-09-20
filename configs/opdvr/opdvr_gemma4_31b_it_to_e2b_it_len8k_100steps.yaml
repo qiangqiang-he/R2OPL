@@ -1,16 +1,16 @@
 # @package _global_
 
-# OPDVR: Qwen3-4B-Instruct-2507 Teacher -> Qwen3-1.7B Student, 200 steps.
+# OPDVR: Gemma-4-31B-it Teacher -> Gemma-4-E2B-it Student, 200 steps.
 
 defaults:
   - /opdvr
   - _self_
 
-run_name: opdvr_qwen3_4b_instruct_2507_to_1p7b_len8k_200steps
-run_name_prefix: opdvr_qwen3_4b_instruct_2507_to_1p7b_len8k_200steps
+run_name: opdvr_gemma4_31b_it_to_e2b_it_len8k_100steps
+run_name_prefix: opdvr_gemma4_31b_it_to_e2b_it_len8k_100steps
 
-student_model_family: qwen3
-teacher_model_family: qwen3
+student_model_family: gemini4
+teacher_model_family: gemini4
 
 data:
   max_prompt_length: 2048
@@ -18,7 +18,7 @@ data:
 
 actor_rollout_ref:
   model:
-    path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-1.7B
+    path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-E2B-it
   actor:
     ppo_max_token_len_per_gpu: 10241
     optim:
@@ -46,7 +46,7 @@ distillation:
   teacher_chunk_size: 128
   teacher_models:
     teacher_model:
-      model_path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
+      model_path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-31B
       inference:
         enable_sleep_mode: false
         free_cache_engine: false
@@ -66,7 +66,7 @@ distillation:
 
 trainer:
   experiment_name: ${run_name}
-  total_training_steps: 200
+  total_training_steps: 100
   default_local_dir: ./outputs/${run_name}
   val_before_train: true
   test_freq: 20
