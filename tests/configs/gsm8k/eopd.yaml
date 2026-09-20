@@ -1,0 +1,9 @@
+# @package _global_
+defaults:
+  - /eopd
+  - /gsm8k/common
+  - /gsm8k/teacher
+  - _self_
+
+run_name: eopd_gsm8k_2steps
+run_name_prefix: eopd_gsm8k_2steps

@@ -349,6 +349,12 @@ class vLLMHttpServer:
                 "full_vocab_entropy_topk and eopd_entropy_topk must match "
                 "when both are configured."
             )
+        if self._eopd_entropy_topk is not None:
+            # Our bounded full-vocabulary entropy hook patches V1's
+            # sampler.gather_logprobs. V2 uses a separate prompt-logprob worker
+            # and cannot run that hook. Select V1 before building the engine;
+            # this actor's engine subprocesses inherit the setting.
+            os.environ["VLLM_USE_V2_MODEL_RUNNER"] = "0"
         if self.config.get("limit_images", None):  # support for multi-image data
             engine_kwargs["limit_mm_per_prompt"] = {"image": self.config.get("limit_images")}
 

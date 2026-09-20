@@ -1503,13 +1503,23 @@ class FSDPEngineWithLMHead(FSDPEngine):
                 data=micro_batch, key="distillation_combined_topk", default=False
             )
             if direct_chunked or combined_topk:
-                if not use_remove_padding:
-                    raise NotImplementedError("chunked direct OPD currently requires use_remove_padding=true")
-                teacher_ids = micro_batch["teacher_ids"].values().unsqueeze(0)
-                teacher_logps = micro_batch["teacher_logprobs"].values().unsqueeze(0)
-                if self.use_ulysses_sp:
-                    teacher_ids = slice_input_tensor(teacher_ids, dim=1, padding=True)
-                    teacher_logps = slice_input_tensor(teacher_logps, dim=1, padding=True)
+                if use_remove_padding:
+                    teacher_ids = micro_batch["teacher_ids"].values().unsqueeze(0)
+                    teacher_logps = micro_batch["teacher_logprobs"].values().unsqueeze(0)
+                    if self.use_ulysses_sp:
+                        teacher_ids = slice_input_tensor(teacher_ids, dim=1, padding=True)
+                        teacher_logps = slice_input_tensor(teacher_logps, dim=1, padding=True)
+                else:
+                    # Match the dense Student layout while keeping the same
+                    # chunked vocabulary projection and distillation objective.
+                    dense_shape = model_inputs["input_ids"].shape
+                    topk = micro_batch["teacher_ids"].shape[-1]
+                    teacher_ids = torch.nested.to_padded_tensor(
+                        micro_batch["teacher_ids"], 0, output_size=(*dense_shape, topk)
+                    )
+                    teacher_logps = torch.nested.to_padded_tensor(
+                        micro_batch["teacher_logprobs"], 0, output_size=(*dense_shape, topk)
+                    )
                 extra_args.update(
                     teacher_topk_ids=teacher_ids,
                     teacher_topk_log_probs=teacher_logps,
@@ -1521,10 +1531,25 @@ class FSDPEngineWithLMHead(FSDPEngine):
                     ),
                 )
                 if combined_topk:
-                    teacher_entropy = micro_batch["teacher_entropy"].values().reshape(1, -1)
-                    if self.use_ulysses_sp:
-                        teacher_entropy = slice_input_tensor(
-                            teacher_entropy, dim=1, padding=True
+                    if use_remove_padding:
+                        teacher_entropy = micro_batch["teacher_entropy"].values().reshape(1, -1)
+                        if self.use_ulysses_sp:
+                            teacher_entropy = slice_input_tensor(teacher_entropy, dim=1, padding=True)
+                    else:
+                        # The rollout pipeline carries entropy as (batch, j, 1),
+                        # while the fused kernel expects one scalar per token.
+                        entropy_tokens = torch.nested.nested_tensor_from_jagged(
+                            micro_batch["teacher_entropy"].values().reshape(-1),
+                            micro_batch["teacher_entropy"].offsets(),
+                        )
+                        teacher_entropy = torch.nested.to_padded_tensor(
+                            entropy_tokens, 0, output_size=dense_shape
+                        )
+                        shifted = torch.nested.nested_tensor_from_jagged(
+                            output_args["input_ids_rmpad_rolled"], micro_batch["input_ids"].offsets()
+                        )
+                        extra_args["shift_labels"] = torch.nested.to_padded_tensor(
+                            shifted, 0, output_size=dense_shape
                         )
                     extra_args.update(
                         teacher_entropy=teacher_entropy,
@@ -1702,8 +1727,19 @@ class FSDPEngineWithLMHead(FSDPEngine):
                     # padding columns per sequence and pack the valid tokens to (total_nnz,).
                     cu_seqlens = input_ids.offsets()
                     seq_lengths = cu_seqlens.diff()
-                    arange = torch.arange(output.log_probs.shape[1], device=output.log_probs.device)
+                    dense_output = output.log_probs if output.log_probs is not None else output.distillation_losses
+                    arange = torch.arange(dense_output.shape[1], device=dense_output.device)
                     mask = arange < seq_lengths.unsqueeze(1)
+
+                    if distillation_use_topk:
+                        aux_outputs = getattr(output, "fused_linear_aux", None) or output
+                        if getattr(aux_outputs, "distillation_losses", None) is not None:
+                            for field_name in (
+                                "distillation_losses", "student_mass", "teacher_mass",
+                                "overlap_count", "overlap_token_advantage",
+                            ):
+                                values = getattr(aux_outputs, field_name)[mask]
+                                model_output[field_name] = torch.nested.nested_tensor_from_jagged(values, cu_seqlens)
 
                     log_probs = None
                     if not distillation_only:
@@ -1711,6 +1747,8 @@ class FSDPEngineWithLMHead(FSDPEngine):
                         log_probs = torch.nested.nested_tensor_from_jagged(log_probs, cu_seqlens)
 
                     if calculate_entropy:
+                        if output.entropy is None:
+                            raise NotImplementedError("EOPD combined chunking does not compute Student entropy.")
                         entropy = output.entropy[mask]
                         entropy = torch.nested.nested_tensor_from_jagged(entropy, cu_seqlens)
                 else:
