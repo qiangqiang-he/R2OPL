@@ -1,0 +1,104 @@
+# @package _global_
+
+# Single-GPU formal-entrypoint verification of PG-OPD (the simplest algorithm
+# with a Teacher).  Runs the complete start_train.sh pipeline: hydra compose
+# → init_workers → CheckpointEngineManager → online rollout + training loop.
+# Only 2 steps on a tiny batch; Teacher is Qwen3-4B-Instruct-2507.
+
+defaults:
+  - /pg_opd/pg_opd_qwen3_4b_instruct_2507_to_1p7b_len8k_100steps
+  - _self_
+
+run_name: pg_opd_formal_entry_single_gpu
+run_name_prefix: pg_opd_formal_entry_single_gpu
+
+student_model_family: qwen3
+teacher_model_family: qwen3
+
+data:
+  train_batch_size: 4
+  max_prompt_length: 2048
+  max_response_length: 4096
+
+actor_rollout_ref:
+  model:
+    path: ./models/Qwen3-1.7B
+  actor:
+    ppo_mini_batch_size: 4
+    ppo_max_token_len_per_gpu: 6145
+    optim:
+      lr: 1.0e-7
+  rollout:
+    n: 4
+    data_parallel_size: 1
+    max_model_len: 6145
+    max_num_batched_tokens: 6145
+    max_num_seqs: 8
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    log_prob_max_token_len_per_gpu: 6145
+    val_kwargs:
+      n: 4
+      temperature: 0.6
+      top_p: 0.95
+      top_k: -1
+      do_sample: true
+  ref:
+    log_prob_max_token_len_per_gpu: 6145
+
+rlvr_generation:
+  train_max_new_tokens: 512
+  val_max_new_tokens: 512
+
+distillation:
+  n_gpus_per_node: 1
+  nnodes: 1
+  student_chunk_size: 1024
+  teacher_chunk_size: 128
+  teacher_models:
+    teacher_model:
+      model_path: ./models/Qwen3-4B-Instruct-2507
+      inference:
+        enable_sleep_mode: false
+        free_cache_engine: false
+        prompt_length: 2048
+        response_length: 512
+        max_model_len: 6145
+        max_num_seqs: 8
+        max_num_batched_tokens: 6145
+        tensor_model_parallel_size: 1
+        data_parallel_size: 1
+        pipeline_model_parallel_size: 1
+        gpu_memory_utilization: 0.55
+        enable_chunked_prefill: true
+        enable_prefix_caching: true
+        engine_kwargs:
+          vllm:
+            max_logprobs: 16
+  distillation_loss:
+    loss_mode: reverse_kl
+    topk: null
+    diagnostic_topk: 16
+    selection_ratio: 1.0
+    selection_method: random
+    use_task_rewards: false
+    loss_max_clamp: 20.0
+    log_prob_min_clamp: null
+    use_policy_gradient: true
+    policy_loss_mode: reinforce
+
+ersr:
+  enabled: false
+
+trainer:
+  n_gpus_per_node: 1
+  nnodes: 1
+  total_training_steps: 2
+  total_epochs: 1
+  val_before_train: false
+  test_freq: 1
+  save_freq: -1
+  logger: [console]
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}
