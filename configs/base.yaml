@@ -146,5 +146,9 @@ trainer:
   test_freq: 20
   save_freq: 20
   resume_mode: auto
+  # Set this only to import a legacy WandB run that predates wandb_state.json.
+  wandb_run_id: null
+  # Optional fallback when the imported run's latest step cannot be queried.
+  wandb_last_logged_step: null
   log_val_generations: 10
   seed: 42

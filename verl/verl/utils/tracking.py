@@ -33,6 +33,65 @@ logger = logging.getLogger(__name__)
 
 MLFLOW_MAX_ATTEMPTS = 3
 MLFLOW_SLEEP_SECONDS = 5
+WANDB_STATE_FILENAME = "wandb_state.json"
+
+
+def _nonempty_string(value: Any) -> str | None:
+    """Return a stripped string value, treating empty values as absent."""
+    if value is None:
+        return None
+    value = str(value).strip()
+    return value or None
+
+
+def _optional_step(value: Any) -> int | None:
+    """Parse an optional non-negative training step."""
+    if value is None or value == "":
+        return None
+    step = int(value)
+    if step < 0:
+        raise ValueError(f"WandB step must be non-negative, got {step}")
+    return step
+
+
+def should_skip_wandb_step(step: int) -> bool:
+    """Whether a replayed step must be withheld from WandB history."""
+    skip_until = os.environ.get("RLVR_WANDB_SKIP_UNTIL_STEP")
+    return skip_until is not None and int(step) <= int(skip_until)
+
+
+class WandbStateStore:
+    """Persist the WandB identity and latest uploaded step beside checkpoints."""
+
+    def __init__(self, default_local_dir: str | None):
+        self.path = None if not default_local_dir else Path(default_local_dir) / WANDB_STATE_FILENAME
+
+    def load(self) -> dict[str, Any] | None:
+        if self.path is None or not self.path.is_file():
+            return None
+        try:
+            payload = json.loads(self.path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            logger.warning("Unable to read WandB state at %s: %s", self.path, exc)
+            return None
+        if not isinstance(payload, dict) or _nonempty_string(payload.get("run_id")) is None:
+            logger.warning("Ignoring invalid WandB state at %s", self.path)
+            return None
+        return payload
+
+    def save(self, payload: dict[str, Any]) -> None:
+        if self.path is None:
+            return
+        try:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            temporary_path = self.path.with_suffix(".tmp")
+            temporary_path.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            os.replace(temporary_path, self.path)
+        except OSError as exc:
+            raise RuntimeError(f"Unable to persist WandB state at {self.path}") from exc
 
 
 class Tracking:
@@ -59,7 +118,14 @@ class Tracking:
         "rl_insight",
     ]
 
-    def __init__(self, project_name, experiment_name, default_backend: str | list[str] = "console", config=None):
+    def __init__(
+        self,
+        project_name,
+        experiment_name,
+        default_backend: str | list[str] = "console",
+        config=None,
+        resume_step: int = 0,
+    ):
         if isinstance(default_backend, str):
             default_backend = [default_backend]
         for backend in default_backend:
@@ -72,8 +138,14 @@ class Tracking:
 
         self.logger = {}
         self._finished = False
+        self.wandb_resume_source = "new"
+        self.wandb_skip_until_step: int | None = None
+        self._wandb_state_store: WandbStateStore | None = None
+        self._wandb_state: dict[str, Any] | None = None
 
         if "tracking" in default_backend or "wandb" in default_backend:
+            # ``os`` is also imported in optional backend branches below, so
+            # bind it before accessing the WandB environment variables.
             import os
 
             import wandb
@@ -82,12 +154,33 @@ class Tracking:
             if config and config["trainer"].get("wandb_proxy", None):
                 settings = wandb.Settings(https_proxy=config["trainer"]["wandb_proxy"])
             entity = os.environ.get("WANDB_ENTITY", None)
-            run_id = os.environ.get("WANDB_RUN_ID")
-            resume = os.environ.get("WANDB_RESUME")
+            trainer_config = config.get("trainer", {}) if config else {}
+            self._wandb_state_store = WandbStateStore(trainer_config.get("default_local_dir"))
+            persisted_state = self._wandb_state_store.load()
+            configured_run_id = _nonempty_string(trainer_config.get("wandb_run_id"))
+            persisted_run_id = (
+                _nonempty_string(persisted_state.get("run_id")) if persisted_state and int(resume_step) > 0 else None
+            )
+            environment_run_id = _nonempty_string(os.environ.get("WANDB_RUN_ID"))
+            if configured_run_id is not None:
+                run_id = configured_run_id
+                self.wandb_resume_source = "config"
+            elif persisted_run_id is not None:
+                run_id = persisted_run_id
+                self.wandb_resume_source = "state"
+            elif environment_run_id is not None:
+                run_id = environment_run_id
+                self.wandb_resume_source = "environment"
+            else:
+                run_id = None
+
+            # A supplied identity must point to the pre-existing run.  Do not
+            # silently create another run with a reused ID.
+            resume = "must" if run_id is not None else None
             group_name = "temp"
             if config:
                 group_name = str(config.get("group_name") or "").strip() or "temp"
-            wandb.init(
+            run = wandb.init(
                 project=project_name,
                 name=experiment_name,
                 group=group_name,
@@ -98,6 +191,56 @@ class Tracking:
                 resume=resume,
             )
             self.logger["wandb"] = wandb
+            active_run = getattr(wandb, "run", None) or run
+            active_run_id = _nonempty_string(getattr(active_run, "id", None))
+            if active_run_id is None:
+                raise RuntimeError("WandB did not expose a run ID after initialization")
+
+            explicit_last_step = _optional_step(trainer_config.get("wandb_last_logged_step"))
+            persisted_last_step = (
+                _optional_step(persisted_state.get("last_logged_step"))
+                if persisted_state and persisted_state.get("run_id") == active_run_id
+                else None
+            )
+            remote_last_step = (
+                self._get_wandb_remote_last_step(
+                    wandb=wandb,
+                    active_run=active_run,
+                    project_name=project_name,
+                    entity=entity,
+                )
+                if self.wandb_resume_source != "new"
+                else None
+            )
+            known_last_steps = [
+                step
+                for step in (
+                    explicit_last_step,
+                    persisted_last_step,
+                    remote_last_step,
+                    _optional_step(os.environ.get("RLVR_WANDB_SKIP_UNTIL_STEP")),
+                )
+                if self.wandb_resume_source != "new" and step is not None
+            ]
+            if self.wandb_resume_source != "new" and not known_last_steps:
+                raise RuntimeError(
+                    "Cannot determine the last WandB step for a resumed run. "
+                    "Set trainer.wandb_last_logged_step or restore wandb_state.json."
+                )
+            if known_last_steps:
+                self.wandb_skip_until_step = max(known_last_steps)
+                if self.wandb_resume_source != "new":
+                    os.environ["RLVR_WANDB_SKIP_UNTIL_STEP"] = str(self.wandb_skip_until_step)
+
+            self._wandb_state = {
+                "version": 1,
+                "run_id": active_run_id,
+                "project_name": project_name,
+                "experiment_name": experiment_name,
+                "entity": _nonempty_string(getattr(active_run, "entity", None)) or entity,
+                "last_logged_step": self.wandb_skip_until_step,
+            }
+            self._wandb_state_store.save(self._wandb_state)
 
         if "trackio" in default_backend:
             import trackio
@@ -202,21 +345,45 @@ class Tracking:
         if "rl_insight" in default_backend:
             self.logger["rl_insight"] = RLInsightLogger(project_name, experiment_name, config)
 
+    def _get_wandb_remote_last_step(self, wandb, active_run, project_name: str, entity: str | None) -> int | None:
+        """Read the last server-side history step for an existing WandB run."""
+        try:
+            run_entity = _nonempty_string(getattr(active_run, "entity", None)) or entity
+            run_project = _nonempty_string(getattr(active_run, "project", None)) or project_name
+            run_id = _nonempty_string(getattr(active_run, "id", None))
+            if run_entity is None or run_project is None or run_id is None:
+                raise RuntimeError("WandB did not provide entity, project, and run ID for history lookup")
+            remote_run = wandb.Api().run(f"{run_entity}/{run_project}/{run_id}")
+            return _optional_step(getattr(remote_run, "lastHistoryStep", None))
+        except Exception as exc:
+            logger.warning("Unable to query the last WandB history step: %s", exc)
+            return None
+
+    def _record_wandb_step(self, step: int) -> None:
+        if self._wandb_state is None or self._wandb_state_store is None:
+            return
+        previous_step = _optional_step(self._wandb_state.get("last_logged_step"))
+        if previous_step is not None and step <= previous_step:
+            return
+        self._wandb_state["last_logged_step"] = step
+        self._wandb_state_store.save(self._wandb_state)
+
+    def should_skip_initial_validation(self, resume_step: int) -> bool:
+        """Avoid duplicate validation after a checkpoint and WandB continuation."""
+        return int(resume_step) > 0 and self.wandb_resume_source != "new"
+
     def log(self, data, step, backend=None):
         # When resuming from an older checkpoint into the same W&B run, the
         # service may already contain a few steps newer than that checkpoint.
         # Suppress only those replayed W&B points; console/file logging remains
         # intact and logging automatically resumes on the following step.
-        wandb_skip_until = os.environ.get("RLVR_WANDB_SKIP_UNTIL_STEP")
         for default_backend, logger_instance in self.logger.items():
             if backend is None or default_backend in backend:
-                if (
-                    default_backend == "wandb"
-                    and wandb_skip_until is not None
-                    and int(step) <= int(wandb_skip_until)
-                ):
+                if default_backend == "wandb" and should_skip_wandb_step(step):
                     continue
                 logger_instance.log(data=data, step=step)
+                if default_backend == "wandb":
+                    self._record_wandb_step(int(step))
 
     def finish(self, exit_code: int = 0):
         """Flush and finalize every configured backend exactly once."""
@@ -720,6 +887,8 @@ class ValidationGenerationsLogger:
 
     def _log_generations_to_wandb(self, samples, step, wandb, data_sources=None):
         """Log samples to wandb as a table"""
+        if should_skip_wandb_step(step):
+            return
 
         if data_sources is not None:
             if len(data_sources) != len(samples):
@@ -921,7 +1090,7 @@ class DapoFilteredRewardTableLogger:
     def _log_to_wandb(self, reward_counts: dict, step: int):
         import wandb
 
-        if wandb.run is None:
+        if wandb.run is None or should_skip_wandb_step(step):
             return
 
         row = {float(value): int(count) for value, count in reward_counts.items()}
