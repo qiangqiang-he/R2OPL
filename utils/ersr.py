@@ -14,7 +14,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, Iterable, Mapping, Sequence
 
-from utils.answer_verifier import verify_response_answer
+from utils.answer_verifier import verify_dataset_response_answer, verify_response_answer
 from utils.conservative_step_splitter import split_rollout_steps
 
 
@@ -259,6 +259,7 @@ def reward_for_continuation(
     response_prefix_ids: Sequence[int],
     continuation_ids: Sequence[int],
     answer: str,
+    data_source: str | None = None,
 ) -> float:
     """Grade a continuation, allowing the continuation itself to be empty."""
 
@@ -270,6 +271,10 @@ def reward_for_continuation(
         skip_special_tokens=True,
         clean_up_tokenization_spaces=False,
     )
+    # Training callers retain their exact verifier. Standalone evaluation
+    # explicitly supplies the dataset, including SciBench's 5% tolerance.
+    if data_source is not None:
+        return float(verify_dataset_response_answer(response, str(answer), data_source))
     return float(verify_response_answer(response, str(answer)))
 
 

@@ -2152,803 +2152,803 @@
         "num_samples": 200,
         "items": [
             {
-                "question": "The change in molar internal energy when $\\mathrm{CaCO}_3(\\mathrm{~s})$ as calcite converts to another form, aragonite, is $+0.21 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Calculate the difference between the molar enthalpy and internal energy changes when the pressure is 1.0 bar given that the densities of the polymorphs are $2.71 \\mathrm{~g} \\mathrm{~cm}^{-3}$ and $2.93 \\mathrm{~g} \\mathrm{~cm}^{-3}$, respectively.",
+                "question": "The change in molar internal energy when $\\mathrm{CaCO}_3(\\mathrm{~s})$ as calcite converts to another form, aragonite, is $+0.21 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Calculate the difference between the molar enthalpy and internal energy changes when the pressure is 1.0 bar given that the densities of the polymorphs are $2.71 \\mathrm{~g} \\mathrm{~cm}^{-3}$ and $2.93 \\mathrm{~g} \\mathrm{~cm}^{-3}$, respectively. The required unit for the final answer is $\\mathrm{~Pa} \\mathrm{~m}^3 \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-0.28"
             },
             {
-                "question": "The positron has charge $+e$ and mass equal to the electron mass. Calculate in electronvolts the ground-state energy of positronium-an \"atom\" that consists of a positron and an electron.",
+                "question": "The positron has charge $+e$ and mass equal to the electron mass. Calculate in electronvolts the ground-state energy of positronium-an \"atom\" that consists of a positron and an electron. The required unit for the final answer is $\\mathrm{eV}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-6.8"
             },
             {
-                "question": "When an excited nucleus decays, it emits a $\\gamma$ ray. The lifetime of an excited state of a nucleus is of the order of $10^{-12} \\mathrm{~s}$. What is the uncertainty in the energy of the $\\gamma$ ray produced?",
+                "question": "When an excited nucleus decays, it emits a $\\gamma$ ray. The lifetime of an excited state of a nucleus is of the order of $10^{-12} \\mathrm{~s}$. What is the uncertainty in the energy of the $\\gamma$ ray produced? The required unit for the final answer is $10^{-22} \\mathrm{~J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "7"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. A chemical reaction takes place in a container of cross-sectional area $100 \\mathrm{~cm}^2$. As a result of the reaction, a piston is pushed out through $10 \\mathrm{~cm}$ against an external pressure of $1.0 \\mathrm{~atm}$. Calculate the work done by the system.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. A chemical reaction takes place in a container of cross-sectional area $100 \\mathrm{~cm}^2$. As a result of the reaction, a piston is pushed out through $10 \\mathrm{~cm}$ against an external pressure of $1.0 \\mathrm{~atm}$. Calculate the work done by the system. The required unit for the final answer is $\\mathrm{J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-100"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Suppose that $3.0 \\mathrm{mmol} \\mathrm{N}_2$ (g) occupies $36 \\mathrm{~cm}^3$ at $300 \\mathrm{~K}$ and expands to $60 \\mathrm{~cm}^3$. Calculate $\\Delta G$ for the process.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Suppose that $3.0 \\mathrm{mmol} \\mathrm{N}_2$ (g) occupies $36 \\mathrm{~cm}^3$ at $300 \\mathrm{~K}$ and expands to $60 \\mathrm{~cm}^3$. Calculate $\\Delta G$ for the process. The required unit for the final answer is $\\text{J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-3.8"
             },
             {
-                "question": "In the blizzard of ' 88 , a rancher was forced to drop hay bales from an airplane to feed her cattle. The plane flew horizontally at $160 \\mathrm{~km} / \\mathrm{hr}$ and dropped the bales from a height of $80 \\mathrm{~m}$ above the flat range. She wanted the bales of hay to land $30 \\mathrm{~m}$ behind the cattle so as to not hit them. How far behind the cattle should she push the bales out of the airplane?",
+                "question": "In the blizzard of ' 88 , a rancher was forced to drop hay bales from an airplane to feed her cattle. The plane flew horizontally at $160 \\mathrm{~km} / \\mathrm{hr}$ and dropped the bales from a height of $80 \\mathrm{~m}$ above the flat range. She wanted the bales of hay to land $30 \\mathrm{~m}$ behind the cattle so as to not hit them. How far behind the cattle should she push the bales out of the airplane? The required unit for the final answer is $\\mathrm{~m}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "210"
             },
             {
-                "question": "Calculate the wavelength and the energy of a photon associated with the series limit of the Lyman series.",
+                "question": "Calculate the wavelength and the energy of a photon associated with the series limit of the Lyman series. The required unit for the final answer is nm. Put only the numerical value in \\boxed{...}.",
                 "answer": "91.17"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. The standard enthalpy of formation of ethylbenzene is $-12.5 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Calculate its standard enthalpy of combustion.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. The standard enthalpy of formation of ethylbenzene is $-12.5 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Calculate its standard enthalpy of combustion. The required unit for the final answer is $\\mathrm{kJ} \\mathrm{mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-4564.7"
             },
             {
-                "question": "What is the temperature of a two-level system of energy separation equivalent to $400 \\mathrm{~cm}^{-1}$ when the population of the upper state is one-third that of the lower state?",
+                "question": "What is the temperature of a two-level system of energy separation equivalent to $400 \\mathrm{~cm}^{-1}$ when the population of the upper state is one-third that of the lower state? The required unit for the final answer is $ \\mathrm{~K}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "524"
             },
             {
-                "question": "A sample of the sugar D-ribose of mass $0.727 \\mathrm{~g}$ was placed in a calorimeter and then ignited in the presence of excess oxygen. The temperature rose by $0.910 \\mathrm{~K}$. In a separate experiment in the same calorimeter, the combustion of $0.825 \\mathrm{~g}$ of benzoic acid, for which the internal energy of combustion is $-3251 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$, gave a temperature rise of $1.940 \\mathrm{~K}$. Calculate the enthalpy of formation of D-ribose.",
+                "question": "A sample of the sugar D-ribose of mass $0.727 \\mathrm{~g}$ was placed in a calorimeter and then ignited in the presence of excess oxygen. The temperature rose by $0.910 \\mathrm{~K}$. In a separate experiment in the same calorimeter, the combustion of $0.825 \\mathrm{~g}$ of benzoic acid, for which the internal energy of combustion is $-3251 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$, gave a temperature rise of $1.940 \\mathrm{~K}$. Calculate the enthalpy of formation of D-ribose. The required unit for the final answer is $\\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-1270"
             },
             {
-                "question": "The huge advantage of using the conservation of energy instead of Newton's laws of motion is that we can jump from the initial state to the final state without considering all the intermediate motion. Here is an example. In Figure, a child of mass $m$ is released from rest at the top of a water slide, at height $h=8.5 \\mathrm{~m}$ above the bottom of the slide. Assuming that the slide is frictionless because of the water on it, find the child's speed at the bottom of the slide.",
+                "question": "The huge advantage of using the conservation of energy instead of Newton's laws of motion is that we can jump from the initial state to the final state without considering all the intermediate motion. Here is an example. In Figure, a child of mass $m$ is released from rest at the top of a water slide, at height $h=8.5 \\mathrm{~m}$ above the bottom of the slide. Assuming that the slide is frictionless because of the water on it, find the child's speed at the bottom of the slide. The required unit for the final answer is m/s. Put only the numerical value in \\boxed{...}.",
                 "answer": "13"
             },
             {
-                "question": "If $125 \\mathrm{~cm}^3$ of hydrogen gas effuses through a small hole in 135 seconds, how long will it take the same volume of oxygen gas to effuse under the same temperature and pressure?",
+                "question": "If $125 \\mathrm{~cm}^3$ of hydrogen gas effuses through a small hole in 135 seconds, how long will it take the same volume of oxygen gas to effuse under the same temperature and pressure? The required unit for the final answer is $\\mathrm{s}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "537"
             },
             {
-                "question": "Two charged particles are fixed to an $x$ axis: Particle 1 of charge $q_1=2.1 \\times 10^{-8} \\mathrm{C}$ is at position $x=20 \\mathrm{~cm}$ and particle 2 of charge $q_2=-4.00 q_1$ is at position $x=70 \\mathrm{~cm}$. At what coordinate on the axis (other than at infinity) is the net electric field produced by the two particles equal to zero?",
+                "question": "Two charged particles are fixed to an $x$ axis: Particle 1 of charge $q_1=2.1 \\times 10^{-8} \\mathrm{C}$ is at position $x=20 \\mathrm{~cm}$ and particle 2 of charge $q_2=-4.00 q_1$ is at position $x=70 \\mathrm{~cm}$. At what coordinate on the axis (other than at infinity) is the net electric field produced by the two particles equal to zero? The required unit for the final answer is $\\mathrm{~cm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-30"
             },
             {
-                "question": "For an electron in a certain rectangular well with a depth of $20.0 \\mathrm{eV}$, the lowest energy level lies $3.00 \\mathrm{eV}$ above the bottom of the well. Find the width of this well. Hint: Use $\\tan \\theta=\\sin \\theta / \\cos \\theta$",
+                "question": "For an electron in a certain rectangular well with a depth of $20.0 \\mathrm{eV}$, the lowest energy level lies $3.00 \\mathrm{eV}$ above the bottom of the well. Find the width of this well. Hint: Use $\\tan \\theta=\\sin \\theta / \\cos \\theta$ The required unit for the final answer is $\\mathrm{~nm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.264"
             },
             {
-                "question": "An unknown charge sits on a conducting solid sphere of radius $10 \\mathrm{~cm}$. If the electric field $15 \\mathrm{~cm}$ from the center of the sphere has the magnitude $3.0 \\times 10^3 \\mathrm{~N} / \\mathrm{C}$ and is directed radially inward, what is the net charge on the sphere?",
+                "question": "An unknown charge sits on a conducting solid sphere of radius $10 \\mathrm{~cm}$. If the electric field $15 \\mathrm{~cm}$ from the center of the sphere has the magnitude $3.0 \\times 10^3 \\mathrm{~N} / \\mathrm{C}$ and is directed radially inward, what is the net charge on the sphere? The required unit for the final answer is $\\mathrm{nC}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-7.5"
             },
             {
-                "question": "A deuteron (nucleus of deuterium atom consisting of a proton and a neutron) with speed $14.9$ km / s collides elastically with a neutron at rest. Use the approximation that the deuteron is twice the mass of the neutron. If the deuteron is scattered through a LAB angle $\\psi = 10^\\circ$, what is the final speed of the neutron?",
+                "question": "A deuteron (nucleus of deuterium atom consisting of a proton and a neutron) with speed $14.9$ km / s collides elastically with a neutron at rest. Use the approximation that the deuteron is twice the mass of the neutron. If the deuteron is scattered through a LAB angle $\\psi = 10^\\circ$, what is the final speed of the neutron? The required unit for the final answer is km / s. Put only the numerical value in \\boxed{...}.",
                 "answer": "5.18"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. The fugacity coefficient of a certain gas at $200 \\mathrm{~K}$ and 50 bar is 0.72. Calculate the difference of its molar Gibbs energy from that of a perfect gas in the same state.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. The fugacity coefficient of a certain gas at $200 \\mathrm{~K}$ and 50 bar is 0.72. Calculate the difference of its molar Gibbs energy from that of a perfect gas in the same state. The required unit for the final answer is $\\mathrm{kJ} \\mathrm{mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-0.55"
             },
             {
-                "question": "Calculate the de Broglie wavelength of an electron traveling at $1.00 \\%$ of the speed of light.",
+                "question": "Calculate the de Broglie wavelength of an electron traveling at $1.00 \\%$ of the speed of light. The required unit for the final answer is $\\mathrm{pm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "243"
             },
             {
-                "question": "A vessel contains $1.15 \\mathrm{~g}$ liq $\\mathrm{H}_2 \\mathrm{O}$ in equilibrium with water vapor at $30 .{ }^{\\circ} \\mathrm{C}$. At this temperature, the vapor pressure of $\\mathrm{H}_2 \\mathrm{O}$ is 31.82 torr. What volume increase is necessary for all the water to evaporate?",
+                "question": "A vessel contains $1.15 \\mathrm{~g}$ liq $\\mathrm{H}_2 \\mathrm{O}$ in equilibrium with water vapor at $30 .{ }^{\\circ} \\mathrm{C}$. At this temperature, the vapor pressure of $\\mathrm{H}_2 \\mathrm{O}$ is 31.82 torr. What volume increase is necessary for all the water to evaporate? The required unit for the final answer is $\\mathrm{~L}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "37.9"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate $\\Delta S_\\text{tot}$ when two copper blocks, each of mass $10.0 \\mathrm{~kg}$, one at $100^{\\circ} \\mathrm{C}$ and the other at $0^{\\circ} \\mathrm{C}$, are placed in contact in an isolated container. The specific heat capacity of copper is $0.385 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~g}^{-1}$ and may be assumed constant over the temperature range involved.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate $\\Delta S_\\text{tot}$ when two copper blocks, each of mass $10.0 \\mathrm{~kg}$, one at $100^{\\circ} \\mathrm{C}$ and the other at $0^{\\circ} \\mathrm{C}$, are placed in contact in an isolated container. The specific heat capacity of copper is $0.385 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~g}^{-1}$ and may be assumed constant over the temperature range involved. The required unit for the final answer is $\\mathrm{J} \\mathrm{K}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "+93.4"
             },
             {
-                "question": "Calculate the percentage difference between $\\ln (1+x)$ and $x$ for $x=0.0050$",
+                "question": "Calculate the percentage difference between $\\ln (1+x)$ and $x$ for $x=0.0050$ The required unit for the final answer is %. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.249"
             },
             {
-                "question": "A British warship fires a projectile due south near the Falkland Islands during World War I at latitude $50^{\\circ} \\mathrm{S}$. If the shells are fired at $37^{\\circ}$ elevation with a speed of $800 \\mathrm{~m} / \\mathrm{s}$, by how much do the shells miss their target?",
+                "question": "A British warship fires a projectile due south near the Falkland Islands during World War I at latitude $50^{\\circ} \\mathrm{S}$. If the shells are fired at $37^{\\circ}$ elevation with a speed of $800 \\mathrm{~m} / \\mathrm{s}$, by how much do the shells miss their target? The required unit for the final answer is $\\mathrm{~m}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "260"
             },
             {
-                "question": "The height of a hill in meters is given by $z=2 x y-3 x^2-4 y^2-18 x+28 y+12$, where $x$ is the distance east and $y$ is the distance north of the origin. What is the $x$ distance of the top of the hill?",
+                "question": "The height of a hill in meters is given by $z=2 x y-3 x^2-4 y^2-18 x+28 y+12$, where $x$ is the distance east and $y$ is the distance north of the origin. What is the $x$ distance of the top of the hill? The required unit for the final answer is m. Put only the numerical value in \\boxed{...}.",
                 "answer": "-2"
             },
             {
-                "question": "Calculate $\\Delta G$ for the isothermal expansion of $2.25 \\mathrm{~mol}$ of an ideal gas at $325 \\mathrm{~K}$ from an initial pressure of 12.0 bar to a final pressure of 2.5 bar.",
+                "question": "Calculate $\\Delta G$ for the isothermal expansion of $2.25 \\mathrm{~mol}$ of an ideal gas at $325 \\mathrm{~K}$ from an initial pressure of 12.0 bar to a final pressure of 2.5 bar. The required unit for the final answer is $10^3 \\mathrm{~J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-9.54"
             },
             {
-                "question": "Suppose that $10.0 \\mathrm{~mol} \\mathrm{C}_2 \\mathrm{H}_6(\\mathrm{~g})$ is confined to $4.860 \\mathrm{dm}^3$ at $27^{\\circ} \\mathrm{C}$. Predict the pressure exerted by the ethane from the perfect gas.",
+                "question": "Suppose that $10.0 \\mathrm{~mol} \\mathrm{C}_2 \\mathrm{H}_6(\\mathrm{~g})$ is confined to $4.860 \\mathrm{dm}^3$ at $27^{\\circ} \\mathrm{C}$. Predict the pressure exerted by the ethane from the perfect gas. The required unit for the final answer is $\\mathrm{atm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "50.7"
             },
             {
-                "question": "A child slides a block of mass $2 \\mathrm{~kg}$ along a slick kitchen floor. If the initial speed is 4 $\\mathrm{m} / \\mathrm{s}$ and the block hits a spring with spring constant $6 \\mathrm{~N} / \\mathrm{m}$, what is the maximum compression of the spring?",
+                "question": "A child slides a block of mass $2 \\mathrm{~kg}$ along a slick kitchen floor. If the initial speed is 4 $\\mathrm{m} / \\mathrm{s}$ and the block hits a spring with spring constant $6 \\mathrm{~N} / \\mathrm{m}$, what is the maximum compression of the spring? The required unit for the final answer is $\\mathrm{~m}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2.3"
             },
             {
-                "question": "Find the value of the integral $\\int_S(\\nabla \\times \\mathbf{A}) \\cdot d \\mathbf{a}$ if the vector $\\mathbf{A}=y \\mathbf{i}+z \\mathbf{j}+x \\mathbf{k}$ and $S$ is the surface defined by the paraboloid $z=1-x^2-y^2$, where $z \\geq 0$.",
+                "question": "Find the value of the integral $\\int_S(\\nabla \\times \\mathbf{A}) \\cdot d \\mathbf{a}$ if the vector $\\mathbf{A}=y \\mathbf{i}+z \\mathbf{j}+x \\mathbf{k}$ and $S$ is the surface defined by the paraboloid $z=1-x^2-y^2$, where $z \\geq 0$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-3.141592"
             },
             {
-                "question": "Calculate the reduced mass of a nitrogen molecule in which both nitrogen atoms have an atomic mass of 14.00.",
+                "question": "Calculate the reduced mass of a nitrogen molecule in which both nitrogen atoms have an atomic mass of 14.00. Put only the numerical value in \\boxed{...}.",
                 "answer": "7.00"
             },
             {
-                "question": "What pressure would $131 \\mathrm{g}$ of xenon gas in a vessel of volume $1.0 \\mathrm{dm}^3$ exert at $25^{\\circ} \\mathrm{C}$ assume it behaved as a perfect gas?",
+                "question": "What pressure would $131 \\mathrm{g}$ of xenon gas in a vessel of volume $1.0 \\mathrm{dm}^3$ exert at $25^{\\circ} \\mathrm{C}$ assume it behaved as a perfect gas? The required unit for the final answer is $\\mathrm{atm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "24"
             },
             {
-                "question": "The diffusion coefficient of a particular kind of t-RNA molecule is $D=1.0 \\times 10^{-11} \\mathrm{~m}^2 \\mathrm{~s}^{-1}$ in the medium of a cell interior. How long does it take molecules produced in the cell nucleus to reach the walls of the cell at a distance $1.0 \\mu \\mathrm{m}$, corresponding to the radius of the cell?",
+                "question": "The diffusion coefficient of a particular kind of t-RNA molecule is $D=1.0 \\times 10^{-11} \\mathrm{~m}^2 \\mathrm{~s}^{-1}$ in the medium of a cell interior. How long does it take molecules produced in the cell nucleus to reach the walls of the cell at a distance $1.0 \\mu \\mathrm{m}$, corresponding to the radius of the cell? The required unit for the final answer is $10^{-2} \\mathrm{~s}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.7"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. The standard enthalpy of combustion of solid phenol $\\left(\\mathrm{C}_6 \\mathrm{H}_5 \\mathrm{OH}\\right)$ is $-3054 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at $298 \\mathrm{~K}_{\\text {and }}$ its standard molar entropy is $144.0 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$. Calculate the standard Gibbs energy of formation of phenol at $298 \\mathrm{~K}$.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. The standard enthalpy of combustion of solid phenol $\\left(\\mathrm{C}_6 \\mathrm{H}_5 \\mathrm{OH}\\right)$ is $-3054 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at $298 \\mathrm{~K}_{\\text {and }}$ its standard molar entropy is $144.0 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$. Calculate the standard Gibbs energy of formation of phenol at $298 \\mathrm{~K}$. The required unit for the final answer is $\\mathrm{kJ} \\mathrm{mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-50"
             },
             {
-                "question": "In an industrial process, nitrogen is heated to $500 \\mathrm{~K}$ in a vessel of constant volume. If it enters the vessel at $100 \\mathrm{~atm}$ and $300 \\mathrm{~K}$, what pressure would it exert at the working temperature if it behaved as a perfect gas?",
+                "question": "In an industrial process, nitrogen is heated to $500 \\mathrm{~K}$ in a vessel of constant volume. If it enters the vessel at $100 \\mathrm{~atm}$ and $300 \\mathrm{~K}$, what pressure would it exert at the working temperature if it behaved as a perfect gas? The required unit for the final answer is $\\mathrm{atm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "167"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Consider a system consisting of $2.0 \\mathrm{~mol} \\mathrm{CO}_2(\\mathrm{~g})$, initially at $25^{\\circ} \\mathrm{C}$ and $10 \\mathrm{~atm}$ and confined to a cylinder of cross-section $10.0 \\mathrm{~cm}^2$. It is allowed to expand adiabatically against an external pressure of 1.0 atm until the piston has moved outwards through $20 \\mathrm{~cm}$. Assume that carbon dioxide may be considered a perfect gas with $C_{V, \\mathrm{~m}}=28.8 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$ and calculate $\\Delta S$.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Consider a system consisting of $2.0 \\mathrm{~mol} \\mathrm{CO}_2(\\mathrm{~g})$, initially at $25^{\\circ} \\mathrm{C}$ and $10 \\mathrm{~atm}$ and confined to a cylinder of cross-section $10.0 \\mathrm{~cm}^2$. It is allowed to expand adiabatically against an external pressure of 1.0 atm until the piston has moved outwards through $20 \\mathrm{~cm}$. Assume that carbon dioxide may be considered a perfect gas with $C_{V, \\mathrm{~m}}=28.8 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$ and calculate $\\Delta S$. The required unit for the final answer is $\\mathrm{J} \\mathrm{K}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "+0.60"
             },
             {
-                "question": "What is the uncertainty of the momentum of an electron if we know its position is somewhere in a $10 \\mathrm{pm}$ interval?",
+                "question": "What is the uncertainty of the momentum of an electron if we know its position is somewhere in a $10 \\mathrm{pm}$ interval? The required unit for the final answer is $10^{-23} \\mathrm{~kg} \\cdot \\mathrm{m} \\cdot \\mathrm{s}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "6.6"
             },
             {
-                "question": "Beams of high-speed protons can be produced in \"guns\" using electric fields to accelerate the protons. What acceleration would a proton experience if the gun's electric field were $2.00 \\times 10^4 \\mathrm{~N} / \\mathrm{C}$ ?",
+                "question": "Beams of high-speed protons can be produced in \"guns\" using electric fields to accelerate the protons. What acceleration would a proton experience if the gun's electric field were $2.00 \\times 10^4 \\mathrm{~N} / \\mathrm{C}$ ? The required unit for the final answer is $10^{12} \\mathrm{~m} / \\mathrm{s}^2 $. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.92"
             },
             {
-                "question": "A one-particle, one-dimensional system has $\\Psi=a^{-1 / 2} e^{-|x| / a}$ at $t=0$, where $a=1.0000 \\mathrm{~nm}$. At $t=0$, the particle's position is measured. Find the probability that the measured value lies between $x=1.5000 \\mathrm{~nm}$ and $x=1.5001 \\mathrm{~nm}$.",
+                "question": "A one-particle, one-dimensional system has $\\Psi=a^{-1 / 2} e^{-|x| / a}$ at $t=0$, where $a=1.0000 \\mathrm{~nm}$. At $t=0$, the particle's position is measured. Find the probability that the measured value lies between $x=1.5000 \\mathrm{~nm}$ and $x=1.5001 \\mathrm{~nm}$. The required unit for the final answer is $10^{-6}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "4.979"
             },
             {
-                "question": "Calculate the typical wavelength of neutrons that have reached thermal equilibrium with their surroundings at $373 \\mathrm{~K}$.",
+                "question": "Calculate the typical wavelength of neutrons that have reached thermal equilibrium with their surroundings at $373 \\mathrm{~K}$. The required unit for the final answer is $\\mathrm{pm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "226"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298 K unless otherwise stated. Estimate the standard reaction Gibbs energy of $\\mathrm{N}_2(\\mathrm{g})+3 \\mathrm{H}_2(\\mathrm{g}) \\rightarrow$ $2 \\mathrm{NH}_3$ (g) at $500 \\mathrm{~K}$.",
+                "question": "Assume that all gases are perfect and that data refer to 298 K unless otherwise stated. Estimate the standard reaction Gibbs energy of $\\mathrm{N}_2(\\mathrm{g})+3 \\mathrm{H}_2(\\mathrm{g}) \\rightarrow$ $2 \\mathrm{NH}_3$ (g) at $500 \\mathrm{~K}$. The required unit for the final answer is $\\mathrm{mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "7"
             },
             {
-                "question": "In a typical model rocket (Estes Alpha III) the Estes C6 solid rocket engine provides a total impulse of $8.5$ N-s. Assume the total rocket mass at launch is $54$ g and that it has a rocket engine of mass $20$ g that burns evenly for $1.5$ s. The rocket diameter is $24$ mm. Assume a constant burn rate of the propellent mass ($11$ g), a rocket exhaust speed $800$ m/s, vertical ascent, and drag coefficient $c_w = 0.75$. Take into account the change of rocket mass with time and omit the effect of gravity. Find the rocket's speed at burn out.",
+                "question": "In a typical model rocket (Estes Alpha III) the Estes C6 solid rocket engine provides a total impulse of $8.5$ N-s. Assume the total rocket mass at launch is $54$ g and that it has a rocket engine of mass $20$ g that burns evenly for $1.5$ s. The rocket diameter is $24$ mm. Assume a constant burn rate of the propellent mass ($11$ g), a rocket exhaust speed $800$ m/s, vertical ascent, and drag coefficient $c_w = 0.75$. Take into account the change of rocket mass with time and omit the effect of gravity. Find the rocket's speed at burn out. The required unit for the final answer is m/s. Put only the numerical value in \\boxed{...}.",
                 "answer": "131"
             },
             {
-                "question": "Find the probability that the electron in the ground-state $\\mathrm{H}$ atom is less than a distance $a$ from the nucleus.",
+                "question": "Find the probability that the electron in the ground-state $\\mathrm{H}$ atom is less than a distance $a$ from the nucleus. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.323"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. Calculate the work needed for a $65 \\mathrm{~kg}$ person to climb through $4.0 \\mathrm{~m}$ on the surface of the Moon $\\left(g=1.60 \\mathrm{~m} \\mathrm{~s}^{-2}\\right)$.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. Calculate the work needed for a $65 \\mathrm{~kg}$ person to climb through $4.0 \\mathrm{~m}$ on the surface of the Moon $\\left(g=1.60 \\mathrm{~m} \\mathrm{~s}^{-2}\\right)$. The required unit for the final answer is $\\mathrm{J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "420"
             },
             {
-                "question": "You have collected a tissue specimen that you would like to preserve by freeze drying. To ensure the integrity of the specimen, the temperature should not exceed $-5.00{ }^{\\circ} \\mathrm{C}$. The vapor pressure of ice at $273.16 \\mathrm{~K}$ is $624 \\mathrm{~Pa}$. What is the maximum pressure at which the freeze drying can be carried out?",
+                "question": "You have collected a tissue specimen that you would like to preserve by freeze drying. To ensure the integrity of the specimen, the temperature should not exceed $-5.00{ }^{\\circ} \\mathrm{C}$. The vapor pressure of ice at $273.16 \\mathrm{~K}$ is $624 \\mathrm{~Pa}$. What is the maximum pressure at which the freeze drying can be carried out? The required unit for the final answer is $\\mathrm{~Pa}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "425"
             },
             {
-                "question": "Calculate $\\Delta S^{\\circ}$ for the reaction $3 \\mathrm{H}_2(g)+\\mathrm{N}_2(g) \\rightarrow$ $2 \\mathrm{NH}_3(g)$ at $725 \\mathrm{~K}$. Omit terms in the temperature-dependent heat capacities higher than $T^2 / \\mathrm{K}^2$.",
+                "question": "Calculate $\\Delta S^{\\circ}$ for the reaction $3 \\mathrm{H}_2(g)+\\mathrm{N}_2(g) \\rightarrow$ $2 \\mathrm{NH}_3(g)$ at $725 \\mathrm{~K}$. Omit terms in the temperature-dependent heat capacities higher than $T^2 / \\mathrm{K}^2$. The required unit for the final answer is $\\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-191.2"
             },
             {
-                "question": "Calculate the separation of the $\\{123\\}$ planes of an orthorhombic unit cell with $a=0.82 \\mathrm{~nm}, b=0.94 \\mathrm{~nm}$, and $c=0.75 \\mathrm{~nm}$.",
+                "question": "Calculate the separation of the $\\{123\\}$ planes of an orthorhombic unit cell with $a=0.82 \\mathrm{~nm}, b=0.94 \\mathrm{~nm}$, and $c=0.75 \\mathrm{~nm}$. The required unit for the final answer is $\\mathrm{~nm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.21"
             },
             {
-                "question": "A crude model for the molecular distribution of atmospheric gases above Earth's surface (denoted by height $h$ ) can be obtained by considering the potential energy due to gravity:\r\n$$\r\nP(h)=e^{-m g h / k T}\r\n$$\r\nIn this expression $m$ is the per-particle mass of the gas, $g$ is the acceleration due to gravity, $k$ is a constant equal to $1.38 \\times 10^{-23} \\mathrm{~J} \\mathrm{~K}^{-1}$, and $T$ is temperature. Determine $\\langle h\\rangle$ for methane $\\left(\\mathrm{CH}_4\\right)$ using this distribution function.",
+                "question": "A crude model for the molecular distribution of atmospheric gases above Earth's surface (denoted by height $h$ ) can be obtained by considering the potential energy due to gravity:\r\n$$\r\nP(h)=e^{-m g h / k T}\r\n$$\r\nIn this expression $m$ is the per-particle mass of the gas, $g$ is the acceleration due to gravity, $k$ is a constant equal to $1.38 \\times 10^{-23} \\mathrm{~J} \\mathrm{~K}^{-1}$, and $T$ is temperature. Determine $\\langle h\\rangle$ for methane $\\left(\\mathrm{CH}_4\\right)$ using this distribution function. The required unit for the final answer is $10^4 \\mathrm{~m}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.6"
             },
             {
-                "question": "Evaluate the series\r\n$$\r\nS=\\sum_{n=1}^{\\infty} \\frac{(-1)^{n+1}}{2^n}\r\n$$",
+                "question": "Evaluate the series\r\n$$\r\nS=\\sum_{n=1}^{\\infty} \\frac{(-1)^{n+1}}{2^n}\r\n$$ Put only the numerical value in \\boxed{...}.",
                 "answer": "0.3333333"
             },
             {
-                "question": "Calculate $\\Delta_{\\mathrm{r}} G^{\\ominus}(375 \\mathrm{~K})$ for the reaction $2 \\mathrm{CO}(\\mathrm{g})+\\mathrm{O}_2(\\mathrm{~g}) \\rightarrow 2 \\mathrm{CO}_2(\\mathrm{~g})$ from the values of $\\Delta_{\\mathrm{r}} G^{\\ominus}(298 \\mathrm{~K})$ : and $\\Delta_{\\mathrm{r}} H^{\\ominus}(298 \\mathrm{~K})$, and the GibbsHelmholtz equation.",
+                "question": "Calculate $\\Delta_{\\mathrm{r}} G^{\\ominus}(375 \\mathrm{~K})$ for the reaction $2 \\mathrm{CO}(\\mathrm{g})+\\mathrm{O}_2(\\mathrm{~g}) \\rightarrow 2 \\mathrm{CO}_2(\\mathrm{~g})$ from the values of $\\Delta_{\\mathrm{r}} G^{\\ominus}(298 \\mathrm{~K})$ : and $\\Delta_{\\mathrm{r}} H^{\\ominus}(298 \\mathrm{~K})$, and the GibbsHelmholtz equation. The required unit for the final answer is $\\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-501"
             },
             {
-                "question": "A new single-stage rocket is developed in the year 2023, having a gas exhaust velocity of $4000$ m/s. The total mass of the rocket is $10^5$ kg, with $90$% of its mass being fuel. The fuel burns quickly in $100$ s at a constant rate. For testing purposes, the rocket is launched vertically at rest from Earth's surface. Neglecting air resistance and assuming that the acceleration of gravity is constant, the launched object can reach 3700 km above the surface of Earth. If the object has a radius of $20$ cm and the air resistance is proportional to the square of the object's speed with $c_w = 0.2$, assuming the density of air is constant, the maximum height reached is 890 km. Including the fact that the acceleration of gravity decreases as the object soars above Earth, the height reached is 950 km. Now add the effects of the decrease in air density with altitude to the calculation. We can very roughly represent the air density by $log_{10}(\\rho) = -0.05h + 0.11$ where $\\rho$ is the air density in $kg/m^3$ and $h$ is the altitude above Earth in km. Determine how high the object now goes.",
+                "question": "A new single-stage rocket is developed in the year 2023, having a gas exhaust velocity of $4000$ m/s. The total mass of the rocket is $10^5$ kg, with $90$% of its mass being fuel. The fuel burns quickly in $100$ s at a constant rate. For testing purposes, the rocket is launched vertically at rest from Earth's surface. Neglecting air resistance and assuming that the acceleration of gravity is constant, the launched object can reach 3700 km above the surface of Earth. If the object has a radius of $20$ cm and the air resistance is proportional to the square of the object's speed with $c_w = 0.2$, assuming the density of air is constant, the maximum height reached is 890 km. Including the fact that the acceleration of gravity decreases as the object soars above Earth, the height reached is 950 km. Now add the effects of the decrease in air density with altitude to the calculation. We can very roughly represent the air density by $log_{10}(\\rho) = -0.05h + 0.11$ where $\\rho$ is the air density in $kg/m^3$ and $h$ is the altitude above Earth in km. Determine how high the object now goes. The required unit for the final answer is km. Put only the numerical value in \\boxed{...}.",
                 "answer": "8900"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K.  Given the reactions (1) and (2) below, determine $\\Delta_{\\mathrm{r}} H^{\\ominus}$ for reaction (3).\r\n\r\n(1) $\\mathrm{H}_2(\\mathrm{g})+\\mathrm{Cl}_2(\\mathrm{g}) \\rightarrow 2 \\mathrm{HCl}(\\mathrm{g})$, $\\Delta_{\\mathrm{r}} H^{\\ominus}=-184.62 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\n\r\n(2) $2 \\mathrm{H}_2(\\mathrm{g})+\\mathrm{O}_2(\\mathrm{g}) \\rightarrow 2 \\mathrm{H}_2 \\mathrm{O}(\\mathrm{g})$, $\\Delta_{\\mathrm{r}} H^\\ominus=-483.64 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\n\r\n(3) $4 \\mathrm{HCl}(\\mathrm{g})+\\mathrm{O}_2(\\mathrm{g}) \\rightarrow 2 \\mathrm{Cl}_2(\\mathrm{g})+2 \\mathrm{H}_2 \\mathrm{O}(\\mathrm{g})$",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K.  Given the reactions (1) and (2) below, determine $\\Delta_{\\mathrm{r}} H^{\\ominus}$ for reaction (3).\r\n\r\n(1) $\\mathrm{H}_2(\\mathrm{g})+\\mathrm{Cl}_2(\\mathrm{g}) \\rightarrow 2 \\mathrm{HCl}(\\mathrm{g})$, $\\Delta_{\\mathrm{r}} H^{\\ominus}=-184.62 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\n\r\n(2) $2 \\mathrm{H}_2(\\mathrm{g})+\\mathrm{O}_2(\\mathrm{g}) \\rightarrow 2 \\mathrm{H}_2 \\mathrm{O}(\\mathrm{g})$, $\\Delta_{\\mathrm{r}} H^\\ominus=-483.64 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\n\r\n(3) $4 \\mathrm{HCl}(\\mathrm{g})+\\mathrm{O}_2(\\mathrm{g}) \\rightarrow 2 \\mathrm{Cl}_2(\\mathrm{g})+2 \\mathrm{H}_2 \\mathrm{O}(\\mathrm{g})$ The required unit for the final answer is $\\mathrm{KJ} \\mathrm{mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-114.40"
             },
             {
-                "question": "Two narrow slits separated by $0.10 \\mathrm{~mm}$ are illuminated by light of wavelength $600 \\mathrm{~nm}$. If a detector is located $2.00 \\mathrm{~m}$ beyond the slits, what is the distance between the central maximum and the first maximum?",
+                "question": "Two narrow slits separated by $0.10 \\mathrm{~mm}$ are illuminated by light of wavelength $600 \\mathrm{~nm}$. If a detector is located $2.00 \\mathrm{~m}$ beyond the slits, what is the distance between the central maximum and the first maximum? The required unit for the final answer is mm. Put only the numerical value in \\boxed{...}.",
                 "answer": "12"
             },
             {
-                "question": "A charged nonconducting rod, with a length of $2.00 \\mathrm{~m}$ and a cross-sectional area of $4.00 \\mathrm{~cm}^2$, lies along the positive side of an $x$ axis with one end at the origin. The volume charge density $\\rho$ is charge per unit volume in coulombs per cubic meter. How many excess electrons are on the rod if $\\rho$ is uniform, with a value of $-4.00 \\mu \\mathrm{C} / \\mathrm{m}^3$?",
+                "question": "A charged nonconducting rod, with a length of $2.00 \\mathrm{~m}$ and a cross-sectional area of $4.00 \\mathrm{~cm}^2$, lies along the positive side of an $x$ axis with one end at the origin. The volume charge density $\\rho$ is charge per unit volume in coulombs per cubic meter. How many excess electrons are on the rod if $\\rho$ is uniform, with a value of $-4.00 \\mu \\mathrm{C} / \\mathrm{m}^3$? The required unit for the final answer is $10^{10} \\text { electrons; }$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2.00"
             },
             {
-                "question": "A spherical water drop $1.20 \\mu \\mathrm{m}$ in diameter is suspended in calm air due to a downward-directed atmospheric electric field of magnitude $E=462 \\mathrm{~N} / \\mathrm{C}$. What is the magnitude of the gravitational force on the drop?",
+                "question": "A spherical water drop $1.20 \\mu \\mathrm{m}$ in diameter is suspended in calm air due to a downward-directed atmospheric electric field of magnitude $E=462 \\mathrm{~N} / \\mathrm{C}$. What is the magnitude of the gravitational force on the drop? The required unit for the final answer is $10^{-15} \\mathrm{~N} $. Put only the numerical value in \\boxed{...}.",
                 "answer": "8.87"
             },
             {
-                "question": "The mass density of water vapour at $327.6 \\mathrm{~atm}$ and $776.4 \\mathrm{~K}$ is $133.2 \\mathrm{~kg} \\mathrm{~m}^{-3}$. Given that for water $T_{\\mathrm{c}}=647.4 \\mathrm{~K}, p_{\\mathrm{c}}=218.3 \\mathrm{~atm}, a=5.464 \\mathrm{dm}^6 \\mathrm{~atm} \\mathrm{~mol}^{-2}$, $b=0.03049 \\mathrm{dm}^3 \\mathrm{~mol}^{-1}$, and $M=18.02 \\mathrm{~g} \\mathrm{~mol}^{-1}$, calculate the compression factor from the virial expansion of the van der Waals equation.",
+                "question": "The mass density of water vapour at $327.6 \\mathrm{~atm}$ and $776.4 \\mathrm{~K}$ is $133.2 \\mathrm{~kg} \\mathrm{~m}^{-3}$. Given that for water $T_{\\mathrm{c}}=647.4 \\mathrm{~K}, p_{\\mathrm{c}}=218.3 \\mathrm{~atm}, a=5.464 \\mathrm{dm}^6 \\mathrm{~atm} \\mathrm{~mol}^{-2}$, $b=0.03049 \\mathrm{dm}^3 \\mathrm{~mol}^{-1}$, and $M=18.02 \\mathrm{~g} \\mathrm{~mol}^{-1}$, calculate the compression factor from the virial expansion of the van der Waals equation. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.7158"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the change in entropy when $25 \\mathrm{~kJ}$ of energy is transferred reversibly and isothermally as heat to a large block of iron at $100^{\\circ} \\mathrm{C}$.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the change in entropy when $25 \\mathrm{~kJ}$ of energy is transferred reversibly and isothermally as heat to a large block of iron at $100^{\\circ} \\mathrm{C}$. The required unit for the final answer is $\\mathrm{J} \\mathrm{K}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "67"
             },
             {
-                "question": "A perfect gas undergoes isothermal compression, which reduces its volume by $2.20 \\mathrm{dm}^3$. The final pressure and volume of the gas are $5.04 \\mathrm{bar}$ and $4.65 \\mathrm{dm}^3$, respectively. Calculate the original pressure of the gas in atm.",
+                "question": "A perfect gas undergoes isothermal compression, which reduces its volume by $2.20 \\mathrm{dm}^3$. The final pressure and volume of the gas are $5.04 \\mathrm{bar}$ and $4.65 \\mathrm{dm}^3$, respectively. Calculate the original pressure of the gas in atm. The required unit for the final answer is $\\mathrm{atm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "3.38"
             },
             {
-                "question": "An electron is released from rest in a uniform electric field of magnitude $2.00 \\times 10^4 \\mathrm{~N} / \\mathrm{C}$. Calculate the acceleration of the electron. (Ignore gravitation.)",
+                "question": "An electron is released from rest in a uniform electric field of magnitude $2.00 \\times 10^4 \\mathrm{~N} / \\mathrm{C}$. Calculate the acceleration of the electron. (Ignore gravitation.) The required unit for the final answer is $10^{15} \\mathrm{~m} / \\mathrm{s}^2$. Put only the numerical value in \\boxed{...}.",
                 "answer": "3.51"
             },
             {
-                "question": "Calculate the rotational partition function for $\\mathrm{SO}_2$ at $298 \\mathrm{~K}$ where $B_A=2.03 \\mathrm{~cm}^{-1}, B_B=0.344 \\mathrm{~cm}^{-1}$, and $B_C=0.293 \\mathrm{~cm}^{-1}$",
+                "question": "Calculate the rotational partition function for $\\mathrm{SO}_2$ at $298 \\mathrm{~K}$ where $B_A=2.03 \\mathrm{~cm}^{-1}, B_B=0.344 \\mathrm{~cm}^{-1}$, and $B_C=0.293 \\mathrm{~cm}^{-1}$ Put only the numerical value in \\boxed{...}.",
                 "answer": "5840"
             },
             {
-                "question": "An infinite line of charge produces a field of magnitude $4.5 \\times$ $10^4 \\mathrm{~N} / \\mathrm{C}$ at distance $2.0 \\mathrm{~m}$. Find the linear charge density.",
+                "question": "An infinite line of charge produces a field of magnitude $4.5 \\times$ $10^4 \\mathrm{~N} / \\mathrm{C}$ at distance $2.0 \\mathrm{~m}$. Find the linear charge density. The required unit for the final answer is $\\mu \\mathrm{C} / \\mathrm{m}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "5.0"
             },
             {
-                "question": "A new single-stage rocket is developed in the year 2023, having a gas exhaust velocity of $4000$ m/s. The total mass of the rocket is $10^5$ kg, with $90$% of its mass being fuel. The fuel burns quickly in $100$ s at a constant rate. For testing purposes, the rocket is launched vertically at rest from Earth's surface. Neglecting air resistance and assuming that the acceleration of gravity is constant, the launched object can reach 3700 km above the surface of Earth. If the object has a radius of $20$ cm and the air resistance is proportional to the square of the object's speed with $c_w = 0.2$, assuming the density of air is constant, the maximum height reached is 890 km. Now also include the fact that the acceleration of gravity decreases as the object soars above Earth. Find the height reached.",
+                "question": "A new single-stage rocket is developed in the year 2023, having a gas exhaust velocity of $4000$ m/s. The total mass of the rocket is $10^5$ kg, with $90$% of its mass being fuel. The fuel burns quickly in $100$ s at a constant rate. For testing purposes, the rocket is launched vertically at rest from Earth's surface. Neglecting air resistance and assuming that the acceleration of gravity is constant, the launched object can reach 3700 km above the surface of Earth. If the object has a radius of $20$ cm and the air resistance is proportional to the square of the object's speed with $c_w = 0.2$, assuming the density of air is constant, the maximum height reached is 890 km. Now also include the fact that the acceleration of gravity decreases as the object soars above Earth. Find the height reached. The required unit for the final answer is km. Put only the numerical value in \\boxed{...}.",
                 "answer": "950"
             },
             {
-                "question": "If the particles in a system all move together, the com moves with them-no trouble there. But what happens when they move in different directions with different accelerations? Here is an example.\r\n\r\nThe three particles in Figure are initially at rest. Each experiences an external force due to bodies outside the three-particle system. The directions are indicated, and the magnitudes are $F_1=6.0 \\mathrm{~N}, F_2=12 \\mathrm{~N}$, and $F_3=14 \\mathrm{~N}$. What is the acceleration of the center of mass of the system?",
+                "question": "If the particles in a system all move together, the com moves with them-no trouble there. But what happens when they move in different directions with different accelerations? Here is an example.\r\n\r\nThe three particles in Figure are initially at rest. Each experiences an external force due to bodies outside the three-particle system. The directions are indicated, and the magnitudes are $F_1=6.0 \\mathrm{~N}, F_2=12 \\mathrm{~N}$, and $F_3=14 \\mathrm{~N}$. What is the acceleration of the center of mass of the system? The required unit for the final answer is $m/s^2$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.16"
             },
             {
-                "question": "An electron is accelerated in an electron microscope from rest through a potential difference $\\Delta \\phi=100 \\mathrm{kV}$ and acquires an energy of $e \\Delta \\phi$. What is its final speed?",
+                "question": "An electron is accelerated in an electron microscope from rest through a potential difference $\\Delta \\phi=100 \\mathrm{kV}$ and acquires an energy of $e \\Delta \\phi$. What is its final speed? The required unit for the final answer is $10^8 \\mathrm{~m} \\mathrm{~s}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.88"
             },
             {
-                "question": "Although the crystallization of large biological molecules may not be as readily accomplished as that of small molecules, their crystal lattices are no different. Tobacco seed globulin forms face-centred cubic crystals with unit cell dimension of $12.3 \\mathrm{~nm}$ and a density of $1.287 \\mathrm{~g} \\mathrm{~cm}^{-3}$. Determine its molar mass.",
+                "question": "Although the crystallization of large biological molecules may not be as readily accomplished as that of small molecules, their crystal lattices are no different. Tobacco seed globulin forms face-centred cubic crystals with unit cell dimension of $12.3 \\mathrm{~nm}$ and a density of $1.287 \\mathrm{~g} \\mathrm{~cm}^{-3}$. Determine its molar mass. The required unit for the final answer is $10^5 \\mathrm{~g} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "3.61"
             },
             {
-                "question": "A potato of mass 0.5 kg moves under Earth's gravity with an air resistive force of -$kmv$. The terminal velocity of the potato when released from rest is $v = 1000$ m/s, with $k=0.01s^{-1}$. Find the maximum height of the potato if it has the same value of k, but it is initially shot directly upward with a student-made potato gun with an initial velocity of $120$ m/s.",
+                "question": "A potato of mass 0.5 kg moves under Earth's gravity with an air resistive force of -$kmv$. The terminal velocity of the potato when released from rest is $v = 1000$ m/s, with $k=0.01s^{-1}$. Find the maximum height of the potato if it has the same value of k, but it is initially shot directly upward with a student-made potato gun with an initial velocity of $120$ m/s. The required unit for the final answer is $m$. Put only the numerical value in \\boxed{...}.",
                 "answer": "680"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. A strip of magnesium of mass $15 \\mathrm{~g}$ is placed in a beaker of dilute hydrochloric acid. Calculate the work done by the system as a result of the reaction. The atmospheric pressure is 1.0 atm and the temperature $25^{\\circ} \\mathrm{C}$.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. A strip of magnesium of mass $15 \\mathrm{~g}$ is placed in a beaker of dilute hydrochloric acid. Calculate the work done by the system as a result of the reaction. The atmospheric pressure is 1.0 atm and the temperature $25^{\\circ} \\mathrm{C}$. The required unit for the final answer is $\\text{kJ}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-1.5"
             },
             {
-                "question": "When an electric discharge is passed through gaseous hydrogen, the $\\mathrm{H}_2$ molecules are dissociated and energetically excited $\\mathrm{H}$ atoms are produced. If the electron in an excited $\\mathrm{H}$ atom makes a transition from $n=2$ to $n=1$, calculate the wavenumber of the corresponding line in the emission spectrum.",
+                "question": "When an electric discharge is passed through gaseous hydrogen, the $\\mathrm{H}_2$ molecules are dissociated and energetically excited $\\mathrm{H}$ atoms are produced. If the electron in an excited $\\mathrm{H}$ atom makes a transition from $n=2$ to $n=1$, calculate the wavenumber of the corresponding line in the emission spectrum. The required unit for the final answer is $\\mathrm{~cm}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "82258"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298 K unless otherwise stated. Find an expression for the fugacity coefficient of a gas that obeys the equation of state $p V_{\\mathrm{m}}=R T\\left(1+B / V_{\\mathrm{m}}+C / V_{\\mathrm{m}}^2\\right)$. Use the resulting expression to estimate the fugacity of argon at 1.00 atm and $100 \\mathrm{~K}$ using $B=-21.13 \\mathrm{~cm}^3 \\mathrm{~mol}^{-1}$ and $C=1054 \\mathrm{~cm}^6 \\mathrm{~mol}^{-2}$.",
+                "question": "Assume that all gases are perfect and that data refer to 298 K unless otherwise stated. Find an expression for the fugacity coefficient of a gas that obeys the equation of state $p V_{\\mathrm{m}}=R T\\left(1+B / V_{\\mathrm{m}}+C / V_{\\mathrm{m}}^2\\right)$. Use the resulting expression to estimate the fugacity of argon at 1.00 atm and $100 \\mathrm{~K}$ using $B=-21.13 \\mathrm{~cm}^3 \\mathrm{~mol}^{-1}$ and $C=1054 \\mathrm{~cm}^6 \\mathrm{~mol}^{-2}$. The required unit for the final answer is $\\text{atm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.9974"
             },
             {
-                "question": "The barometric formula relates the pressure of a gas of molar mass $M$ at an altitude $h$ to its pressure $p_0$ at sea level. Derive this relation by showing that the change in pressure $\\mathrm{d} p$ for an infinitesimal change in altitude $\\mathrm{d} h$ where the density is $\\rho$ is $\\mathrm{d} p=-\\rho g \\mathrm{~d} h$. Remember that $\\rho$ depends on the pressure. Evaluate the pressure difference between the top and bottom of a laboratory vessel of height 15 cm.",
+                "question": "The barometric formula relates the pressure of a gas of molar mass $M$ at an altitude $h$ to its pressure $p_0$ at sea level. Derive this relation by showing that the change in pressure $\\mathrm{d} p$ for an infinitesimal change in altitude $\\mathrm{d} h$ where the density is $\\rho$ is $\\mathrm{d} p=-\\rho g \\mathrm{~d} h$. Remember that $\\rho$ depends on the pressure. Evaluate the pressure difference between the top and bottom of a laboratory vessel of height 15 cm. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.00017"
             },
             {
-                "question": "For water, $\\Delta H_{\\text {vaporization }}$ is $40.656 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$, and the normal boiling point is $373.12 \\mathrm{~K}$. Calculate the boiling point for water on the top of Mt. Everest (elevation $8848 \\mathrm{~m}$ ), where the barometric pressure is 253 Torr.",
+                "question": "For water, $\\Delta H_{\\text {vaporization }}$ is $40.656 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$, and the normal boiling point is $373.12 \\mathrm{~K}$. Calculate the boiling point for water on the top of Mt. Everest (elevation $8848 \\mathrm{~m}$ ), where the barometric pressure is 253 Torr. The required unit for the final answer is $\\mathrm{~K}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "344"
             },
             {
-                "question": "Imagine gaseous $\\mathrm{Ar}$ at $298 \\mathrm{~K}$ confined to move in a two-dimensional plane of area $1.00 \\mathrm{~cm}^2$. What is the value of the translational partition function?",
+                "question": "Imagine gaseous $\\mathrm{Ar}$ at $298 \\mathrm{~K}$ confined to move in a two-dimensional plane of area $1.00 \\mathrm{~cm}^2$. What is the value of the translational partition function? The required unit for the final answer is $10^{17}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "3.9"
             },
             {
-                "question": "Given a context information that there is also an uncertainty principle for energy and time:\n$$\n\\Delta E \\Delta t \\geq h\n$$, another application of the relationship has to do with the excitedstate energies and lifetimes of atoms and molecules. If we know that the lifetime of an excited state is $10^{-9} \\mathrm{~s}$, then what is the uncertainty in the energy of this state?",
+                "question": "Given a context information that there is also an uncertainty principle for energy and time:\n$$\n\\Delta E \\Delta t \\geq h\n$$, another application of the relationship has to do with the excitedstate energies and lifetimes of atoms and molecules. If we know that the lifetime of an excited state is $10^{-9} \\mathrm{~s}$, then what is the uncertainty in the energy of this state? The required unit for the final answer is $10^{-25} \\mathrm{~J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "7"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. The change in the Gibbs energy of a certain constant-pressure process was found to fit the expression $\\Delta G / \\text{J}=-85.40+36.5(T / \\text{K})$. Calculate the value of $\\Delta S$ for the process.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. The change in the Gibbs energy of a certain constant-pressure process was found to fit the expression $\\Delta G / \\text{J}=-85.40+36.5(T / \\text{K})$. Calculate the value of $\\Delta S$ for the process. The required unit for the final answer is $\\mathrm{J} \\mathrm{K}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-36.5"
             },
             {
-                "question": "A food shipper pushes a wood crate of cabbage heads (total mass $m=14 \\mathrm{~kg}$ ) across a concrete floor with a constant horizontal force $\\vec{F}$ of magnitude $40 \\mathrm{~N}$. In a straight-line displacement of magnitude $d=0.50 \\mathrm{~m}$, the speed of the crate decreases from $v_0=0.60 \\mathrm{~m} / \\mathrm{s}$ to $v=0.20 \\mathrm{~m} / \\mathrm{s}$. What is the increase $\\Delta E_{\\text {th }}$ in the thermal energy of the crate and floor?",
+                "question": "A food shipper pushes a wood crate of cabbage heads (total mass $m=14 \\mathrm{~kg}$ ) across a concrete floor with a constant horizontal force $\\vec{F}$ of magnitude $40 \\mathrm{~N}$. In a straight-line displacement of magnitude $d=0.50 \\mathrm{~m}$, the speed of the crate decreases from $v_0=0.60 \\mathrm{~m} / \\mathrm{s}$ to $v=0.20 \\mathrm{~m} / \\mathrm{s}$. What is the increase $\\Delta E_{\\text {th }}$ in the thermal energy of the crate and floor? The required unit for the final answer is J. Put only the numerical value in \\boxed{...}.",
                 "answer": "22.2"
             },
             {
-                "question": "The nucleus of a plutonium-239 atom contains 94 protons. Assume that the nucleus is a sphere with radius $6.64 \\mathrm{fm}$ and with the charge of the protons uniformly spread through the sphere. At the surface of the nucleus, what are the magnitude of the electric field produced by the protons?",
+                "question": "The nucleus of a plutonium-239 atom contains 94 protons. Assume that the nucleus is a sphere with radius $6.64 \\mathrm{fm}$ and with the charge of the protons uniformly spread through the sphere. At the surface of the nucleus, what are the magnitude of the electric field produced by the protons? The required unit for the final answer is $10^{21} \\mathrm{~N} / \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "3.07"
             },
             {
-                "question": "At $298.15 \\mathrm{~K}, \\Delta G_f^{\\circ}(\\mathrm{HCOOH}, g)=-351.0 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ and $\\Delta G_f^{\\circ}(\\mathrm{HCOOH}, l)=-361.4 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Calculate the vapor pressure of formic acid at this temperature.",
+                "question": "At $298.15 \\mathrm{~K}, \\Delta G_f^{\\circ}(\\mathrm{HCOOH}, g)=-351.0 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ and $\\Delta G_f^{\\circ}(\\mathrm{HCOOH}, l)=-361.4 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Calculate the vapor pressure of formic acid at this temperature. The required unit for the final answer is $10^3 \\mathrm{~Pa}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.51"
             },
             {
-                "question": "$$\r\n\\text {Calculate the energy of a photon for a wavelength of } 100 \\mathrm{pm} \\text { (about one atomic diameter). }\r\n$$",
+                "question": "$$\r\n\\text {Calculate the energy of a photon for a wavelength of } 100 \\mathrm{pm} \\text { (about one atomic diameter). }\r\n$$ The required unit for the final answer is $10^{-15} \\mathrm{~J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2"
             },
             {
-                "question": "Calculate the ratio of the electrical and gravitational forces between a proton and an electron.",
+                "question": "Calculate the ratio of the electrical and gravitational forces between a proton and an electron. The required unit for the final answer is $10^{39}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2"
             },
             {
-                "question": "When the force on an object depends on the position of the object, we cannot find the work done by it on the object by simply multiplying the force by the displacement. The reason is that there is no one value for the force-it changes. So, we must find the work in tiny little displacements and then add up all the work results. We effectively say, \"Yes, the force varies over any given tiny little displacement, but the variation is so small we can approximate the force as being constant during the displacement.\" Sure, it is not precise, but if we make the displacements infinitesimal, then our error becomes infinitesimal and the result becomes precise. But, to add an infinite number of work contributions by hand would take us forever, longer than a semester. So, we add them up via an integration, which allows us to do all this in minutes (much less than a semester).\r\n\r\nForce $\\vec{F}=\\left(3 x^2 \\mathrm{~N}\\right) \\hat{\\mathrm{i}}+(4 \\mathrm{~N}) \\hat{\\mathrm{j}}$, with $x$ in meters, acts on a particle, changing only the kinetic energy of the particle. How much work is done on the particle as it moves from coordinates $(2 \\mathrm{~m}, 3 \\mathrm{~m})$ to $(3 \\mathrm{~m}, 0 \\mathrm{~m})$ ?",
+                "question": "When the force on an object depends on the position of the object, we cannot find the work done by it on the object by simply multiplying the force by the displacement. The reason is that there is no one value for the force-it changes. So, we must find the work in tiny little displacements and then add up all the work results. We effectively say, \"Yes, the force varies over any given tiny little displacement, but the variation is so small we can approximate the force as being constant during the displacement.\" Sure, it is not precise, but if we make the displacements infinitesimal, then our error becomes infinitesimal and the result becomes precise. But, to add an infinite number of work contributions by hand would take us forever, longer than a semester. So, we add them up via an integration, which allows us to do all this in minutes (much less than a semester).\r\n\r\nForce $\\vec{F}=\\left(3 x^2 \\mathrm{~N}\\right) \\hat{\\mathrm{i}}+(4 \\mathrm{~N}) \\hat{\\mathrm{j}}$, with $x$ in meters, acts on a particle, changing only the kinetic energy of the particle. How much work is done on the particle as it moves from coordinates $(2 \\mathrm{~m}, 3 \\mathrm{~m})$ to $(3 \\mathrm{~m}, 0 \\mathrm{~m})$ ? The required unit for the final answer is J. Put only the numerical value in \\boxed{...}.",
                 "answer": "7.0"
             },
             {
-                "question": "Use the function described in Example 4.3, $x_{n+1}=\\alpha x_n\\left(1-x_n^2\\right)$ where $\\alpha=2.5$. Consider two starting values of $x_1$ that are similar, 0.9000000 and 0.9000001 . Determine the lowest value of $n$ for which the two values diverge by more than $30 \\%$.",
+                "question": "Use the function described in Example 4.3, $x_{n+1}=\\alpha x_n\\left(1-x_n^2\\right)$ where $\\alpha=2.5$. Consider two starting values of $x_1$ that are similar, 0.9000000 and 0.9000001 . Determine the lowest value of $n$ for which the two values diverge by more than $30 \\%$. Put only the numerical value in \\boxed{...}.",
                 "answer": "30"
             },
             {
-                "question": "Carbon-14 is a radioactive nucleus with a half-life of 5760 years. Living matter exchanges carbon with its surroundings (for example, through $\\mathrm{CO}_2$ ) so that a constant level of ${ }^{14} \\mathrm{C}$ is maintained, corresponding to 15.3 decay events per minute. Once living matter has died, carbon contained in the matter is not exchanged with the surroundings, and the amount of ${ }^{14} \\mathrm{C}$ that remains in the dead material decreases with time due to radioactive decay. Consider a piece of fossilized wood that demonstrates $2.4{ }^{14} \\mathrm{C}$ decay events per minute. How old is the wood?",
+                "question": "Carbon-14 is a radioactive nucleus with a half-life of 5760 years. Living matter exchanges carbon with its surroundings (for example, through $\\mathrm{CO}_2$ ) so that a constant level of ${ }^{14} \\mathrm{C}$ is maintained, corresponding to 15.3 decay events per minute. Once living matter has died, carbon contained in the matter is not exchanged with the surroundings, and the amount of ${ }^{14} \\mathrm{C}$ that remains in the dead material decreases with time due to radioactive decay. Consider a piece of fossilized wood that demonstrates $2.4{ }^{14} \\mathrm{C}$ decay events per minute. How old is the wood? The required unit for the final answer is $10^{11} \\mathrm{~s}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "4.86"
             },
             {
-                "question": "A constant-volume perfect gas thermometer indicates a pressure of $6.69 \\mathrm{kPa}$ at the triple point temperature of water (273.16 K). What pressure indicates a temperature of $100.00^{\\circ} \\mathrm{C}$?",
+                "question": "A constant-volume perfect gas thermometer indicates a pressure of $6.69 \\mathrm{kPa}$ at the triple point temperature of water (273.16 K). What pressure indicates a temperature of $100.00^{\\circ} \\mathrm{C}$? The required unit for the final answer is $\\mathrm{kPa}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "9.14"
             },
             {
-                "question": "What is the value of the angular-momentum quantum number $l$ for a $t$ orbital?",
+                "question": "What is the value of the angular-momentum quantum number $l$ for a $t$ orbital? Put only the numerical value in \\boxed{...}.",
                 "answer": "14"
             },
             {
-                "question": "A billiard ball of intial velocity $u_1$ collides with another billard ball (same mass) initially at rest. The first ball moves off at $\\psi = 45^\\circ$. For an elastic collision, say the velocities of both balls after the collision is $v_1 = v_2 = \\frac{u_1}{\\sqrt(2)}$. At what LAB angle does the second ball emerge?",
+                "question": "A billiard ball of intial velocity $u_1$ collides with another billard ball (same mass) initially at rest. The first ball moves off at $\\psi = 45^\\circ$. For an elastic collision, say the velocities of both balls after the collision is $v_1 = v_2 = \\frac{u_1}{\\sqrt(2)}$. At what LAB angle does the second ball emerge? The required unit for the final answer is $^\\circ$. Put only the numerical value in \\boxed{...}.",
                 "answer": "45"
             },
             {
-                "question": "The thermal conductivities of acetylene $\\left(\\mathrm{C}_2 \\mathrm{H}_2\\right)$ and $\\mathrm{N}_2$ at $273 \\mathrm{~K}$ and $1 \\mathrm{~atm}$ are 0.01866 and $0.0240 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~m}^{-1} \\mathrm{~s}^{-1}$, respectively. Based on these data, what is the ratio of the collisional cross section of acetylene relative to $\\mathrm{N}_2$ ?",
+                "question": "The thermal conductivities of acetylene $\\left(\\mathrm{C}_2 \\mathrm{H}_2\\right)$ and $\\mathrm{N}_2$ at $273 \\mathrm{~K}$ and $1 \\mathrm{~atm}$ are 0.01866 and $0.0240 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~m}^{-1} \\mathrm{~s}^{-1}$, respectively. Based on these data, what is the ratio of the collisional cross section of acetylene relative to $\\mathrm{N}_2$ ? Put only the numerical value in \\boxed{...}.",
                 "answer": "1.33"
             },
             {
-                "question": "When ultraviolet radiation of wavelength $58.4 \\mathrm{~nm}$ from a helium lamp is directed on to a sample of krypton, electrons are ejected with a speed of $1.59 \\times 10^6 \\mathrm{~m} \\mathrm{~s}^{-1}$. Calculate the ionization energy of krypton.",
+                "question": "When ultraviolet radiation of wavelength $58.4 \\mathrm{~nm}$ from a helium lamp is directed on to a sample of krypton, electrons are ejected with a speed of $1.59 \\times 10^6 \\mathrm{~m} \\mathrm{~s}^{-1}$. Calculate the ionization energy of krypton. The required unit for the final answer is $\\mathrm{eV}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "14"
             },
             {
-                "question": "Express the van der Waals parameters $b=0.0226 \\mathrm{dm}^3 \\mathrm{~mol}^{-1}$ in SI base units.",
+                "question": "Express the van der Waals parameters $b=0.0226 \\mathrm{dm}^3 \\mathrm{~mol}^{-1}$ in SI base units. The required unit for the final answer is $\\mathrm{~m}^3 \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.0000226"
             },
             {
-                "question": "In a typical model rocket (Estes Alpha III) the Estes C6 solid rocket engine provides a total impulse of $8.5$ N-s. Assume the total rocket mass at launch is $54$ g and that it has a rocket engine of mass $20$ g that burns evenly for $1.5$ s. The rocket diameter is $24$ mm. Assume a constant burn rate of the propellent mass ($11$ g), a rocket exhaust speed $800$ m/s, vertical ascent, and drag coefficient $c_w = 0.75$. Take into account the change of rocket mass with time and omit the effect of gravity. The rocket's speed at burn out is 131 m/s. How far has the rocket traveled at that moment?",
+                "question": "In a typical model rocket (Estes Alpha III) the Estes C6 solid rocket engine provides a total impulse of $8.5$ N-s. Assume the total rocket mass at launch is $54$ g and that it has a rocket engine of mass $20$ g that burns evenly for $1.5$ s. The rocket diameter is $24$ mm. Assume a constant burn rate of the propellent mass ($11$ g), a rocket exhaust speed $800$ m/s, vertical ascent, and drag coefficient $c_w = 0.75$. Take into account the change of rocket mass with time and omit the effect of gravity. The rocket's speed at burn out is 131 m/s. How far has the rocket traveled at that moment? The required unit for the final answer is m. Put only the numerical value in \\boxed{...}.",
                 "answer": "108"
             },
             {
-                "question": "If the coefficient of static friction between the block and plane in the previous example is $\\mu_s=0.4$, at what angle $\\theta$ will the block start sliding if it is initially at rest?",
+                "question": "If the coefficient of static friction between the block and plane in the previous example is $\\mu_s=0.4$, at what angle $\\theta$ will the block start sliding if it is initially at rest? The required unit for the final answer is $^{\\circ}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "22"
             },
             {
-                "question": "Of the charge $Q$ on a tiny sphere, a fraction $\\alpha$ is to be transferred to a second, nearby sphere. The spheres can be treated as particles.  What value of $\\alpha$ maximizes the magnitude $F$ of the electrostatic force between the two spheres?",
+                "question": "Of the charge $Q$ on a tiny sphere, a fraction $\\alpha$ is to be transferred to a second, nearby sphere. The spheres can be treated as particles.  What value of $\\alpha$ maximizes the magnitude $F$ of the electrostatic force between the two spheres? Put only the numerical value in \\boxed{...}.",
                 "answer": "0.5"
             },
             {
-                "question": "In 1976 it was mistakenly believed that the first of the 'superheavy' elements had been discovered in a sample of mica. Its atomic number  was believed to be 126. What is the most probable distance of the innermost electrons from the nucleus of an atom of this element? (In such elements, relativistic effects are very important, but ignore them here.)",
+                "question": "In 1976 it was mistakenly believed that the first of the 'superheavy' elements had been discovered in a sample of mica. Its atomic number  was believed to be 126. What is the most probable distance of the innermost electrons from the nucleus of an atom of this element? (In such elements, relativistic effects are very important, but ignore them here.) The required unit for the final answer is $\\mathrm{pm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.42"
             },
             {
-                "question": "The value of $\\Delta G_f^{\\circ}$ for $\\mathrm{Fe}(g)$ is $370.7 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at $298.15 \\mathrm{~K}$, and $\\Delta H_f^{\\circ}$ for $\\mathrm{Fe}(g)$ is $416.3 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at the same temperature. Assuming that $\\Delta H_f^{\\circ}$ is constant in the interval $250-400 \\mathrm{~K}$, calculate $\\Delta G_f^{\\circ}$ for $\\mathrm{Fe}(g)$ at 400. K.",
+                "question": "The value of $\\Delta G_f^{\\circ}$ for $\\mathrm{Fe}(g)$ is $370.7 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at $298.15 \\mathrm{~K}$, and $\\Delta H_f^{\\circ}$ for $\\mathrm{Fe}(g)$ is $416.3 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at the same temperature. Assuming that $\\Delta H_f^{\\circ}$ is constant in the interval $250-400 \\mathrm{~K}$, calculate $\\Delta G_f^{\\circ}$ for $\\mathrm{Fe}(g)$ at 400. K. The required unit for the final answer is $\\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "355.1"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the change in Gibbs energy of $35 \\mathrm{~g}$ of ethanol (mass density $0.789 \\mathrm{~g} \\mathrm{~cm}^{-3}$ ) when the pressure is increased isothermally from $1 \\mathrm{~atm}$ to $3000 \\mathrm{~atm}$.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the change in Gibbs energy of $35 \\mathrm{~g}$ of ethanol (mass density $0.789 \\mathrm{~g} \\mathrm{~cm}^{-3}$ ) when the pressure is increased isothermally from $1 \\mathrm{~atm}$ to $3000 \\mathrm{~atm}$. The required unit for the final answer is $\\text{kJ}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "12"
             },
             {
-                "question": "The speed of a certain proton is $6.1 \\times 10^6 \\mathrm{~m} \\mathrm{~s}^{-1}$. If the uncertainty in its momentum is to be reduced to 0.0100 per cent, what uncertainty in its location must be tolerated?",
+                "question": "The speed of a certain proton is $6.1 \\times 10^6 \\mathrm{~m} \\mathrm{~s}^{-1}$. If the uncertainty in its momentum is to be reduced to 0.0100 per cent, what uncertainty in its location must be tolerated? The required unit for the final answer is $\\mathrm{pm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "52"
             },
             {
-                "question": "A line in the Lyman series of hydrogen has a wavelength of $1.03 \\times 10^{-7} \\mathrm{~m}$. Find the original energy level of the electron.",
+                "question": "A line in the Lyman series of hydrogen has a wavelength of $1.03 \\times 10^{-7} \\mathrm{~m}$. Find the original energy level of the electron. Put only the numerical value in \\boxed{...}.",
                 "answer": "3"
             },
             {
-                "question": "Calculate the force on an alpha particle passing a gold atomic nucleus at a distance of $0.00300 Å$.",
+                "question": "Calculate the force on an alpha particle passing a gold atomic nucleus at a distance of $0.00300 Å$. The required unit for the final answer is $\\mathrm{~N}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.405"
             },
             {
-                "question": "A constant-volume perfect gas thermometer indicates a pressure of $6.69 \\mathrm{kPa}$ at the triple point temperature of water (273.16 K). What change of pressure indicates a change of $1.00 \\mathrm{~K}$ at this temperature?",
+                "question": "A constant-volume perfect gas thermometer indicates a pressure of $6.69 \\mathrm{kPa}$ at the triple point temperature of water (273.16 K). What change of pressure indicates a change of $1.00 \\mathrm{~K}$ at this temperature? The required unit for the final answer is $\\mathrm{kPa}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.0245"
             },
             {
-                "question": "A particle of mass $1.0 \\mathrm{~g}$ is released near the surface of the Earth, where the acceleration of free fall is $g=8.91 \\mathrm{~m} \\mathrm{~s}^{-2}$. What will be its kinetic energy after  $1.0 \\mathrm{~s}$. Ignore air resistance?",
+                "question": "A particle of mass $1.0 \\mathrm{~g}$ is released near the surface of the Earth, where the acceleration of free fall is $g=8.91 \\mathrm{~m} \\mathrm{~s}^{-2}$. What will be its kinetic energy after  $1.0 \\mathrm{~s}$. Ignore air resistance? The required unit for the final answer is $\\mathrm{~mJ}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "48"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the Carnot efficiency of a modern steam turbine that operates with steam at $300^{\\circ} \\mathrm{C}$ and discharges at $80^{\\circ} \\mathrm{C}$.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the Carnot efficiency of a modern steam turbine that operates with steam at $300^{\\circ} \\mathrm{C}$ and discharges at $80^{\\circ} \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.38"
             },
             {
-                "question": "At $298.15 \\mathrm{~K}, \\Delta G_f^{\\circ}(\\mathrm{C}$, graphite $)=0$, and $\\Delta G_f^{\\circ}(\\mathrm{C}$, diamond $)=2.90 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Therefore, graphite is the more stable solid phase at this temperature at $P=P^{\\circ}=1$ bar. Given that the densities of graphite and diamond are 2.25 and $3.52 \\mathrm{~kg} / \\mathrm{L}$, respectively, at what pressure will graphite and diamond be in equilibrium at $298.15 \\mathrm{~K}$ ?",
+                "question": "At $298.15 \\mathrm{~K}, \\Delta G_f^{\\circ}(\\mathrm{C}$, graphite $)=0$, and $\\Delta G_f^{\\circ}(\\mathrm{C}$, diamond $)=2.90 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Therefore, graphite is the more stable solid phase at this temperature at $P=P^{\\circ}=1$ bar. Given that the densities of graphite and diamond are 2.25 and $3.52 \\mathrm{~kg} / \\mathrm{L}$, respectively, at what pressure will graphite and diamond be in equilibrium at $298.15 \\mathrm{~K}$ ? The required unit for the final answer is $10^4 \\mathrm{bar}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.51"
             },
             {
-                "question": "For the reaction $\\mathrm{C}($ graphite $)+\\mathrm{H}_2 \\mathrm{O}(g) \\rightleftharpoons$ $\\mathrm{CO}(g)+\\mathrm{H}_2(g), \\Delta H_R^{\\circ}=131.28 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at $298.15 \\mathrm{~K}$. Use the values of $C_{P, m}^{\\circ}$ at $298.15 \\mathrm{~K}$ in the data tables to calculate $\\Delta H_R^{\\circ}$ at $125.0^{\\circ} \\mathrm{C}$.",
+                "question": "For the reaction $\\mathrm{C}($ graphite $)+\\mathrm{H}_2 \\mathrm{O}(g) \\rightleftharpoons$ $\\mathrm{CO}(g)+\\mathrm{H}_2(g), \\Delta H_R^{\\circ}=131.28 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at $298.15 \\mathrm{~K}$. Use the values of $C_{P, m}^{\\circ}$ at $298.15 \\mathrm{~K}$ in the data tables to calculate $\\Delta H_R^{\\circ}$ at $125.0^{\\circ} \\mathrm{C}$. The required unit for the final answer is $\\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "132.9"
             },
             {
-                "question": "Include air resistance proportional to the square of the ball's speed in the previous problem. Let the drag coefficient be $c_W=0.5$, the softball radius be $5 \\mathrm{~cm}$ and the mass be $200 \\mathrm{~g}$. Find the initial speed of the softball needed now to clear the fence.",
+                "question": "Include air resistance proportional to the square of the ball's speed in the previous problem. Let the drag coefficient be $c_W=0.5$, the softball radius be $5 \\mathrm{~cm}$ and the mass be $200 \\mathrm{~g}$. Find the initial speed of the softball needed now to clear the fence. The required unit for the final answer is $\\mathrm{~m} \\cdot \\mathrm{s}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "35.2"
             },
             {
-                "question": "Space vehicles traveling through Earth's radiation belts can intercept a significant number of electrons. The resulting charge buildup can damage electronic components and disrupt operations. Suppose a spherical metal satellite $1.3 \\mathrm{~m}$ in diameter accumulates $2.4 \\mu \\mathrm{C}$ of charge in one orbital revolution. Find the resulting surface charge density.",
+                "question": "Space vehicles traveling through Earth's radiation belts can intercept a significant number of electrons. The resulting charge buildup can damage electronic components and disrupt operations. Suppose a spherical metal satellite $1.3 \\mathrm{~m}$ in diameter accumulates $2.4 \\mu \\mathrm{C}$ of charge in one orbital revolution. Find the resulting surface charge density. The required unit for the final answer is $10^{-7} \\mathrm{C} / \\mathrm{m}^2 $. Put only the numerical value in \\boxed{...}.",
                 "answer": "4.5"
             },
             {
-                "question": "To get an idea of the distance dependence of the tunnelling current in STM, suppose that the wavefunction of the electron in the gap between sample and needle is given by $\\psi=B \\mathrm{e}^{-\\kappa x}$, where $\\kappa=\\left\\{2 m_{\\mathrm{e}}(V-E) / \\hbar^2\\right\\}^{1 / 2}$; take $V-E=2.0 \\mathrm{eV}$. By what factor would the current drop if the needle is moved from $L_1=0.50 \\mathrm{~nm}$ to $L_2=0.60 \\mathrm{~nm}$ from the surface?",
+                "question": "To get an idea of the distance dependence of the tunnelling current in STM, suppose that the wavefunction of the electron in the gap between sample and needle is given by $\\psi=B \\mathrm{e}^{-\\kappa x}$, where $\\kappa=\\left\\{2 m_{\\mathrm{e}}(V-E) / \\hbar^2\\right\\}^{1 / 2}$; take $V-E=2.0 \\mathrm{eV}$. By what factor would the current drop if the needle is moved from $L_1=0.50 \\mathrm{~nm}$ to $L_2=0.60 \\mathrm{~nm}$ from the surface? Put only the numerical value in \\boxed{...}.",
                 "answer": "0.23"
             },
             {
-                "question": "Calculate the mass of water vapour present in a room of volume $400 \\mathrm{m}^3$ that contains air at $27^{\\circ} \\mathrm{C}$ on a day when the relative humidity is 60 percent.'",
+                "question": "Calculate the mass of water vapour present in a room of volume $400 \\mathrm{m}^3$ that contains air at $27^{\\circ} \\mathrm{C}$ on a day when the relative humidity is 60 percent.' The required unit for the final answer is $\\text{kg}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "6.2"
             },
             {
-                "question": "Calculate the number of coulombs of positive charge in 250 $\\mathrm{cm}^3$ of (neutral) water. (Hint: A hydrogen atom contains one proton; an oxygen atom contains eight protons.)",
+                "question": "Calculate the number of coulombs of positive charge in 250 $\\mathrm{cm}^3$ of (neutral) water. (Hint: A hydrogen atom contains one proton; an oxygen atom contains eight protons.) The required unit for the final answer is $10^7 \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.3"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the total change in entropy, when a sample of nitrogen gas of mass $14 \\mathrm{~g}$ at $298 \\mathrm{~K}$ and $1.00 \\mathrm{bar}$ doubles its volume in an isothermal reversible expansion.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the total change in entropy, when a sample of nitrogen gas of mass $14 \\mathrm{~g}$ at $298 \\mathrm{~K}$ and $1.00 \\mathrm{bar}$ doubles its volume in an isothermal reversible expansion. Put only the numerical value in \\boxed{...}.",
                 "answer": "0"
             },
             {
-                "question": "What is the minimum escape velocity of a spacecraft from the moon?",
+                "question": "What is the minimum escape velocity of a spacecraft from the moon? The required unit for the final answer is $\\mathrm{~m} / \\mathrm{s}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2380"
             },
             {
-                "question": "How many megacoulombs of positive charge are in $1.00 \\mathrm{~mol}$ of neutral molecular-hydrogen gas $\\left(\\mathrm{H}_2\\right)$ ?",
+                "question": "How many megacoulombs of positive charge are in $1.00 \\mathrm{~mol}$ of neutral molecular-hydrogen gas $\\left(\\mathrm{H}_2\\right)$ ? The required unit for the final answer is $\\mathrm{MC}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.19"
             },
             {
-                "question": "Consider the first stage of a Saturn $V$ rocket used for the Apollo moon program. The initial mass is $2.8 \\times 10^6 \\mathrm{~kg}$, and the mass of the first-stage fuel is $2.1 \\times 10^6$ kg. Assume a mean thrust of $37 \\times 10^6 \\mathrm{~N}$. The exhaust velocity is $2600 \\mathrm{~m} / \\mathrm{s}$. Calculate the final speed of the first stage at burnout.",
+                "question": "Consider the first stage of a Saturn $V$ rocket used for the Apollo moon program. The initial mass is $2.8 \\times 10^6 \\mathrm{~kg}$, and the mass of the first-stage fuel is $2.1 \\times 10^6$ kg. Assume a mean thrust of $37 \\times 10^6 \\mathrm{~N}$. The exhaust velocity is $2600 \\mathrm{~m} / \\mathrm{s}$. Calculate the final speed of the first stage at burnout. The required unit for the final answer is $10^3 \\mathrm{~m} / \\mathrm{s}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2.16"
             },
             {
-                "question": "Gas cylinders of $\\mathrm{CO}_2$ are sold in terms of weight of $\\mathrm{CO}_2$. A cylinder contains $50 \\mathrm{lb}$ (22.7 $\\mathrm{kg}$ ) of $\\mathrm{CO}_2$. How long can this cylinder be used in an experiment that requires flowing $\\mathrm{CO}_2$ at $293 \\mathrm{~K}(\\eta=146 \\mu \\mathrm{P})$ through a 1.00-m-long tube (diameter $\\left.=0.75 \\mathrm{~mm}\\right)$ with an input pressure of $1.05 \\mathrm{~atm}$ and output pressure of $1.00 \\mathrm{~atm}$ ? The flow is measured at the tube output.",
+                "question": "Gas cylinders of $\\mathrm{CO}_2$ are sold in terms of weight of $\\mathrm{CO}_2$. A cylinder contains $50 \\mathrm{lb}$ (22.7 $\\mathrm{kg}$ ) of $\\mathrm{CO}_2$. How long can this cylinder be used in an experiment that requires flowing $\\mathrm{CO}_2$ at $293 \\mathrm{~K}(\\eta=146 \\mu \\mathrm{P})$ through a 1.00-m-long tube (diameter $\\left.=0.75 \\mathrm{~mm}\\right)$ with an input pressure of $1.05 \\mathrm{~atm}$ and output pressure of $1.00 \\mathrm{~atm}$ ? The flow is measured at the tube output. The required unit for the final answer is $10^6 \\mathrm{~s}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "4.49"
             },
             {
-                "question": "Determine the molar standard Gibbs energy for ${ }^{35} \\mathrm{Cl}^{35} \\mathrm{Cl}$ where $\\widetilde{\\nu}=560 . \\mathrm{cm}^{-1}, B=0.244 \\mathrm{~cm}^{-1}$, and the ground electronic state is nondegenerate.",
+                "question": "Determine the molar standard Gibbs energy for ${ }^{35} \\mathrm{Cl}^{35} \\mathrm{Cl}$ where $\\widetilde{\\nu}=560 . \\mathrm{cm}^{-1}, B=0.244 \\mathrm{~cm}^{-1}$, and the ground electronic state is nondegenerate. The required unit for the final answer is $\\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-57.2"
             },
             {
-                "question": "Suppose that the normalized wavefunction for an electron in a carbon nanotube of length $L=10.0 \\mathrm{~nm}$ is: $\\psi=(2 / L)^{1 / 2} \\sin (\\pi x / L)$. Calculate the probability that the electron is between $x=4.95 \\mathrm{~nm}$ and $5.05 \\mathrm{~nm}$.",
+                "question": "Suppose that the normalized wavefunction for an electron in a carbon nanotube of length $L=10.0 \\mathrm{~nm}$ is: $\\psi=(2 / L)^{1 / 2} \\sin (\\pi x / L)$. Calculate the probability that the electron is between $x=4.95 \\mathrm{~nm}$ and $5.05 \\mathrm{~nm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.020"
             },
             {
-                "question": "The power output of a laser is measured in units of watts (W), where one watt is equal to one joule per second. $\\left(1 \\mathrm{~W}=1 \\mathrm{~J} \\cdot \\mathrm{s}^{-1}\\right.$.) What is the number of photons emitted per second by a $1.00 \\mathrm{~mW}$ nitrogen laser? The wavelength emitted by a nitrogen laser is $337 \\mathrm{~nm}$.",
+                "question": "The power output of a laser is measured in units of watts (W), where one watt is equal to one joule per second. $\\left(1 \\mathrm{~W}=1 \\mathrm{~J} \\cdot \\mathrm{s}^{-1}\\right.$.) What is the number of photons emitted per second by a $1.00 \\mathrm{~mW}$ nitrogen laser? The wavelength emitted by a nitrogen laser is $337 \\mathrm{~nm}$. The required unit for the final answer is $\n10^{15} \\text { photon } \\cdot \\mathrm{s}^{-1}\n$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.70"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the molar entropy of a constant-volume sample of neon at $500 \\mathrm{~K}$ given that it is $146.22 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$ at $298 \\mathrm{~K}$.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the molar entropy of a constant-volume sample of neon at $500 \\mathrm{~K}$ given that it is $146.22 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$ at $298 \\mathrm{~K}$. The required unit for the final answer is $\\mathrm{J} \\mathrm{K}^{-1} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "152.67"
             },
             {
-                "question": "In an industrial process, nitrogen is heated to $500 \\mathrm{~K}$ at a constant volume of $1.000 \\mathrm{~m}^3$. The gas enters the container at $300 \\mathrm{~K}$ and $100 \\mathrm{~atm}$. The mass of the gas is $92.4 \\mathrm{~kg}$. Use the van der Waals equation to determine the approximate pressure of the gas at its working temperature of $500 \\mathrm{~K}$. For nitrogen, $a=1.352 \\mathrm{dm}^6 \\mathrm{~atm} \\mathrm{~mol}^{-2}, b=0.0387 \\mathrm{dm}^3 \\mathrm{~mol}^{-1}$.",
+                "question": "In an industrial process, nitrogen is heated to $500 \\mathrm{~K}$ at a constant volume of $1.000 \\mathrm{~m}^3$. The gas enters the container at $300 \\mathrm{~K}$ and $100 \\mathrm{~atm}$. The mass of the gas is $92.4 \\mathrm{~kg}$. Use the van der Waals equation to determine the approximate pressure of the gas at its working temperature of $500 \\mathrm{~K}$. For nitrogen, $a=1.352 \\mathrm{dm}^6 \\mathrm{~atm} \\mathrm{~mol}^{-2}, b=0.0387 \\mathrm{dm}^3 \\mathrm{~mol}^{-1}$. The required unit for the final answer is $\\text{atm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "140"
             },
             {
-                "question": "The initial charges on the three identical metal spheres in Fig. 21-24 are the following: sphere $A, Q$; sphere $B,-Q / 4$; and sphere $C, Q / 2$, where $Q=2.00 \\times 10^{-14}$ C. Spheres $A$ and $B$ are fixed in place, with a center-to-center separation of $d=1.20 \\mathrm{~m}$, which is much larger than the spheres. Sphere $C$ is touched first to sphere $A$ and then to sphere $B$ and is then removed. What then is the magnitude of the electrostatic force between spheres $A$ and $B$ ?",
+                "question": "The initial charges on the three identical metal spheres in Fig. 21-24 are the following: sphere $A, Q$; sphere $B,-Q / 4$; and sphere $C, Q / 2$, where $Q=2.00 \\times 10^{-14}$ C. Spheres $A$ and $B$ are fixed in place, with a center-to-center separation of $d=1.20 \\mathrm{~m}$, which is much larger than the spheres. Sphere $C$ is touched first to sphere $A$ and then to sphere $B$ and is then removed. What then is the magnitude of the electrostatic force between spheres $A$ and $B$ ? The required unit for the final answer is $10^{-19} \\mathrm{~N}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "4.68"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. Concerns over the harmful effects of chlorofluorocarbons on stratospheric ozone have motivated a search for new refrigerants. One such alternative is 2,2-dichloro-1,1,1-trifluoroethane (refrigerant 123). Younglove and McLinden published a compendium of thermophysical properties of this substance (J. Phys. Chem. Ref. Data 23, 7 (1994)), from which properties such as the Joule-Thomson coefficient $\\mu$ can be computed. Compute the temperature change that would accompany adiabatic expansion of $2.0 \\mathrm{~mol}$ of this refrigerant from $1.5 \\mathrm{bar}$ to 0.5 bar at $50^{\\circ} \\mathrm{C}$.",
+                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. Concerns over the harmful effects of chlorofluorocarbons on stratospheric ozone have motivated a search for new refrigerants. One such alternative is 2,2-dichloro-1,1,1-trifluoroethane (refrigerant 123). Younglove and McLinden published a compendium of thermophysical properties of this substance (J. Phys. Chem. Ref. Data 23, 7 (1994)), from which properties such as the Joule-Thomson coefficient $\\mu$ can be computed. Compute the temperature change that would accompany adiabatic expansion of $2.0 \\mathrm{~mol}$ of this refrigerant from $1.5 \\mathrm{bar}$ to 0.5 bar at $50^{\\circ} \\mathrm{C}$. The required unit for the final answer is $\\mathrm{K}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-2.99"
             },
             {
-                "question": "Include air resistance proportional to the square of the ball's speed in the previous problem. Let the drag coefficient be $c_w = 0.5$, the softball radius be $5$ cm and the mass be $200$ g. Given a speed of 35.2 m/s, find the initial elevation angle that allows the ball to most easily clear the fence.",
+                "question": "Include air resistance proportional to the square of the ball's speed in the previous problem. Let the drag coefficient be $c_w = 0.5$, the softball radius be $5$ cm and the mass be $200$ g. Given a speed of 35.2 m/s, find the initial elevation angle that allows the ball to most easily clear the fence. The required unit for the final answer is $^\\circ$. Put only the numerical value in \\boxed{...}.",
                 "answer": "40.7"
             },
             {
-                "question": "An electron in a three-dimensional rectangular box with dimensions of $5.00 Å, 3.00 Å$, and $6.00 Å$ makes a radiative transition from the lowest-lying excited state to the ground state. Calculate the frequency of the photon emitted.",
+                "question": "An electron in a three-dimensional rectangular box with dimensions of $5.00 Å, 3.00 Å$, and $6.00 Å$ makes a radiative transition from the lowest-lying excited state to the ground state. Calculate the frequency of the photon emitted. The required unit for the final answer is $10^{14} \\mathrm{~s}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "7.58"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. A sample of $4.50 \\mathrm{~g}$ of methane occupies $12.7 \\mathrm{dm}^3$ at $310 \\mathrm{~K}$. Calculate the work that would be done if the same expansion occurred reversibly.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. A sample of $4.50 \\mathrm{~g}$ of methane occupies $12.7 \\mathrm{dm}^3$ at $310 \\mathrm{~K}$. Calculate the work that would be done if the same expansion occurred reversibly. The required unit for the final answer is $\\mathrm{J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-167"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. Calculate the work needed for a $65 \\mathrm{~kg}$ person to climb through $4.0 \\mathrm{~m}$ on the surface of the Earth.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. Calculate the work needed for a $65 \\mathrm{~kg}$ person to climb through $4.0 \\mathrm{~m}$ on the surface of the Earth. The required unit for the final answer is $\\mathrm{J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2600"
             },
             {
-                "question": "Two double stars of the same mass as the sun rotate about their common center of mass. Their separation is 4 light years. What is their period of revolution?",
+                "question": "Two double stars of the same mass as the sun rotate about their common center of mass. Their separation is 4 light years. What is their period of revolution? The required unit for the final answer is $10^7 \\mathrm{yr}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "9"
             },
             {
-                "question": "Calculate the Debye-Hückel screening length $1 / \\kappa$ at $298 \\mathrm{~K}$ in a $0.0075 \\mathrm{~m}$ solution of $\\mathrm{K}_3 \\mathrm{PO}_4$.",
+                "question": "Calculate the Debye-Hückel screening length $1 / \\kappa$ at $298 \\mathrm{~K}$ in a $0.0075 \\mathrm{~m}$ solution of $\\mathrm{K}_3 \\mathrm{PO}_4$. The required unit for the final answer is $\\mathrm{~nm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.4"
             },
             {
-                "question": "The temperature of the fireball in a thermonuclear explosion can reach temperatures of approximately $10^7 \\mathrm{~K}$. What value of $\\lambda_{\\max }$ does this correspond to?",
+                "question": "The temperature of the fireball in a thermonuclear explosion can reach temperatures of approximately $10^7 \\mathrm{~K}$. What value of $\\lambda_{\\max }$ does this correspond to? The required unit for the final answer is $10^{-10} \\mathrm{~m}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "3"
             },
             {
-                "question": "Assume that the charge of the proton is distributed uniformly throughout the volume of a sphere of radius $10^{-13} \\mathrm{~cm}$. Use perturbation theory to estimate the shift in the ground-state hydrogen-atom energy due to the finite proton size. The potential energy experienced by the electron when it has penetrated the nucleus and is at distance $r$ from the nuclear center is $-e Q / 4 \\pi \\varepsilon_0 r$, where $Q$ is the amount of proton charge within the sphere of radius $r$. The evaluation of the integral is simplified by noting that the exponential factor in $\\psi$ is essentially equal to 1 within the nucleus.",
+                "question": "Assume that the charge of the proton is distributed uniformly throughout the volume of a sphere of radius $10^{-13} \\mathrm{~cm}$. Use perturbation theory to estimate the shift in the ground-state hydrogen-atom energy due to the finite proton size. The potential energy experienced by the electron when it has penetrated the nucleus and is at distance $r$ from the nuclear center is $-e Q / 4 \\pi \\varepsilon_0 r$, where $Q$ is the amount of proton charge within the sphere of radius $r$. The evaluation of the integral is simplified by noting that the exponential factor in $\\psi$ is essentially equal to 1 within the nucleus. The required unit for the final answer is $10^{-8} \\mathrm{eV}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.2"
             },
             {
-                "question": "Lead has $T_{\\mathrm{c}}=7.19 \\mathrm{~K}$ and $\\mathcal{H}_{\\mathrm{c}}(0)=63.9 \\mathrm{kA} \\mathrm{m}^{-1}$. At what temperature does lead become superconducting in a magnetic field of $20 \\mathrm{kA} \\mathrm{m}^{-1}$ ?",
+                "question": "Lead has $T_{\\mathrm{c}}=7.19 \\mathrm{~K}$ and $\\mathcal{H}_{\\mathrm{c}}(0)=63.9 \\mathrm{kA} \\mathrm{m}^{-1}$. At what temperature does lead become superconducting in a magnetic field of $20 \\mathrm{kA} \\mathrm{m}^{-1}$ ? The required unit for the final answer is $\\mathrm{~K}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "6.0"
             },
             {
-                "question": "Particle 1 of charge $+q$ and particle 2 of charge $+4.00 q$ are held at separation $L=9.00 \\mathrm{~cm}$ on an $x$ axis. If particle 3 of charge $q_3$ is to be located such that the three particles remain in place when released, what must be the $x$ coordinate of particle 3?",
+                "question": "Particle 1 of charge $+q$ and particle 2 of charge $+4.00 q$ are held at separation $L=9.00 \\mathrm{~cm}$ on an $x$ axis. If particle 3 of charge $q_3$ is to be located such that the three particles remain in place when released, what must be the $x$ coordinate of particle 3? The required unit for the final answer is $\\mathrm{~cm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "3.00"
             },
             {
-                "question": "The standard potential of the cell $\\mathrm{Pt}(\\mathrm{s})\\left|\\mathrm{H}_2(\\mathrm{~g})\\right| \\mathrm{HBr}(\\mathrm{aq})|\\operatorname{AgBr}(\\mathrm{s})| \\mathrm{Ag}(\\mathrm{s})$ was measured over a range of temperatures, and the data were found to fit the following polynomial:\r\n$$\r\nE_{\\text {cell }}^{\\bullet} / \\mathrm{V}=0.07131-4.99 \\times 10^{-4}(T / \\mathrm{K}-298)-3.45 \\times 10^{-6}(\\mathrm{~T} / \\mathrm{K}-298)^2\r\n$$\r\nThe cell reaction is $\\operatorname{AgBr}(\\mathrm{s})+\\frac{1}{2} \\mathrm{H}_2(\\mathrm{~g}) \\rightarrow \\mathrm{Ag}(\\mathrm{s})+\\mathrm{HBr}(\\mathrm{aq})$. Evaluate the standard reaction enthalpy at $298 \\mathrm{~K}$.",
+                "question": "The standard potential of the cell $\\mathrm{Pt}(\\mathrm{s})\\left|\\mathrm{H}_2(\\mathrm{~g})\\right| \\mathrm{HBr}(\\mathrm{aq})|\\operatorname{AgBr}(\\mathrm{s})| \\mathrm{Ag}(\\mathrm{s})$ was measured over a range of temperatures, and the data were found to fit the following polynomial:\r\n$$\r\nE_{\\text {cell }}^{\\bullet} / \\mathrm{V}=0.07131-4.99 \\times 10^{-4}(T / \\mathrm{K}-298)-3.45 \\times 10^{-6}(\\mathrm{~T} / \\mathrm{K}-298)^2\r\n$$\r\nThe cell reaction is $\\operatorname{AgBr}(\\mathrm{s})+\\frac{1}{2} \\mathrm{H}_2(\\mathrm{~g}) \\rightarrow \\mathrm{Ag}(\\mathrm{s})+\\mathrm{HBr}(\\mathrm{aq})$. Evaluate the standard reaction enthalpy at $298 \\mathrm{~K}$. The required unit for the final answer is $\\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-21.2"
             },
             {
-                "question": "Estimate the wavelength of electrons that have been accelerated from rest through a potential difference of $40 \\mathrm{kV}$.",
+                "question": "Estimate the wavelength of electrons that have been accelerated from rest through a potential difference of $40 \\mathrm{kV}$. The required unit for the final answer is $10^{-12} \\mathrm{~m}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "6.1"
             },
             {
-                "question": "Nelson, et al. (Science 238, 1670 (1987)) examined several weakly bound gas-phase complexes of ammonia in search of examples in which the $\\mathrm{H}$ atoms in $\\mathrm{NH}_3$ formed hydrogen bonds, but found none. For example, they found that the complex of $\\mathrm{NH}_3$ and $\\mathrm{CO}_2$ has the carbon atom nearest the nitrogen (299 pm away): the $\\mathrm{CO}_2$ molecule is at right angles to the $\\mathrm{C}-\\mathrm{N}$ 'bond', and the $\\mathrm{H}$ atoms of $\\mathrm{NH}_3$ are pointing away from the $\\mathrm{CO}_2$. The magnitude of the permanent dipole moment of this complex is reported as $1.77 \\mathrm{D}$. If the $\\mathrm{N}$ and $\\mathrm{C}$ atoms are the centres of the negative and positive charge distributions, respectively, what is the magnitude of those partial charges (as multiples of $e$ )?",
+                "question": "Nelson, et al. (Science 238, 1670 (1987)) examined several weakly bound gas-phase complexes of ammonia in search of examples in which the $\\mathrm{H}$ atoms in $\\mathrm{NH}_3$ formed hydrogen bonds, but found none. For example, they found that the complex of $\\mathrm{NH}_3$ and $\\mathrm{CO}_2$ has the carbon atom nearest the nitrogen (299 pm away): the $\\mathrm{CO}_2$ molecule is at right angles to the $\\mathrm{C}-\\mathrm{N}$ 'bond', and the $\\mathrm{H}$ atoms of $\\mathrm{NH}_3$ are pointing away from the $\\mathrm{CO}_2$. The magnitude of the permanent dipole moment of this complex is reported as $1.77 \\mathrm{D}$. If the $\\mathrm{N}$ and $\\mathrm{C}$ atoms are the centres of the negative and positive charge distributions, respectively, what is the magnitude of those partial charges (as multiples of $e$ )? Put only the numerical value in \\boxed{...}.",
                 "answer": "0.123"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. For a van der Waals gas, $\\pi_T=a / V_{\\mathrm{m}}^2$. Calculate $\\Delta U_{\\mathrm{m}}$ for the isothermal expansion of nitrogen gas from an initial volume of $1.00 \\mathrm{dm}^3$ to $24.8 \\mathrm{dm}^3$ at $298 \\mathrm{~K}$.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. For a van der Waals gas, $\\pi_T=a / V_{\\mathrm{m}}^2$. Calculate $\\Delta U_{\\mathrm{m}}$ for the isothermal expansion of nitrogen gas from an initial volume of $1.00 \\mathrm{dm}^3$ to $24.8 \\mathrm{dm}^3$ at $298 \\mathrm{~K}$. The required unit for the final answer is $\\mathrm{J} \\mathrm{mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "131"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. A sample consisting of $2.0 \\mathrm{~mol} \\mathrm{CO}_2$ occupies a fixed volume of $15.0 \\mathrm{dm}^3$ at $300 \\mathrm{~K}$. When it is supplied with $2.35 \\mathrm{~kJ}$ of energy as heat its temperature increases to $341 \\mathrm{~K}$. Assume that $\\mathrm{CO}_2$ is described by the van der Waals equation of state, and calculate $\\Delta U$.",
+                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. A sample consisting of $2.0 \\mathrm{~mol} \\mathrm{CO}_2$ occupies a fixed volume of $15.0 \\mathrm{dm}^3$ at $300 \\mathrm{~K}$. When it is supplied with $2.35 \\mathrm{~kJ}$ of energy as heat its temperature increases to $341 \\mathrm{~K}$. Assume that $\\mathrm{CO}_2$ is described by the van der Waals equation of state, and calculate $\\Delta U$. The required unit for the final answer is $\\text{kJ}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "+2.35"
             },
             {
-                "question": "The vapour pressure of benzene is $53.3 \\mathrm{kPa}$ at $60.6^{\\circ} \\mathrm{C}$, but it fell to $51.5 \\mathrm{kPa}$ when $19.0 \\mathrm{~g}$ of an non-volatile organic compound was dissolved in $500 \\mathrm{~g}$ of benzene. Calculate the molar mass of the compound.",
+                "question": "The vapour pressure of benzene is $53.3 \\mathrm{kPa}$ at $60.6^{\\circ} \\mathrm{C}$, but it fell to $51.5 \\mathrm{kPa}$ when $19.0 \\mathrm{~g}$ of an non-volatile organic compound was dissolved in $500 \\mathrm{~g}$ of benzene. Calculate the molar mass of the compound. The required unit for the final answer is $\\mathrm{~g} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "85"
             },
             {
-                "question": "Estimate the molar volume of $\\mathrm{CO}_2$ at $500 \\mathrm{~K}$ and 100 atm by treating it as a van der Waals gas.",
+                "question": "Estimate the molar volume of $\\mathrm{CO}_2$ at $500 \\mathrm{~K}$ and 100 atm by treating it as a van der Waals gas. The required unit for the final answer is $\\mathrm{dm}^3\\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.366"
             },
             {
-                "question": "In this problem, 3.00 mol of liquid mercury is transformed from an initial state characterized by $T_i=300 . \\mathrm{K}$ and $P_i=1.00$ bar to a final state characterized by $T_f=600 . \\mathrm{K}$ and $P_f=3.00$ bar.\r\nCalculate $\\Delta S$ for this process; $\\beta=1.81 \\times 10^{-4} \\mathrm{~K}^{-1}, \\rho=13.54 \\mathrm{~g} \\mathrm{~cm}^{-3}$, and $C_{P, m}$ for $\\mathrm{Hg}(l)=27.98 \\mathrm{~J} \\mathrm{~mol}^{-1} \\mathrm{~K}^{-1}$.",
+                "question": "In this problem, 3.00 mol of liquid mercury is transformed from an initial state characterized by $T_i=300 . \\mathrm{K}$ and $P_i=1.00$ bar to a final state characterized by $T_f=600 . \\mathrm{K}$ and $P_f=3.00$ bar.\r\nCalculate $\\Delta S$ for this process; $\\beta=1.81 \\times 10^{-4} \\mathrm{~K}^{-1}, \\rho=13.54 \\mathrm{~g} \\mathrm{~cm}^{-3}$, and $C_{P, m}$ for $\\mathrm{Hg}(l)=27.98 \\mathrm{~J} \\mathrm{~mol}^{-1} \\mathrm{~K}^{-1}$. The required unit for the final answer is $\\mathrm{~J}\\mathrm{~K}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "58.2"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298 K unless otherwise stated. At $298 \\mathrm{~K}$ the standard enthalpy of combustion of sucrose is $-5797 \\mathrm{~kJ}$ $\\mathrm{mol}^{-1}$ and the standard Gibbs energy of the reaction is $-6333 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$.\r\nEstimate the additional non-expansion work that may be obtained by raising the temperature to blood temperature, $37^{\\circ} \\mathrm{C}$.",
+                "question": "Assume that all gases are perfect and that data refer to 298 K unless otherwise stated. At $298 \\mathrm{~K}$ the standard enthalpy of combustion of sucrose is $-5797 \\mathrm{~kJ}$ $\\mathrm{mol}^{-1}$ and the standard Gibbs energy of the reaction is $-6333 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$.\r\nEstimate the additional non-expansion work that may be obtained by raising the temperature to blood temperature, $37^{\\circ} \\mathrm{C}$. The required unit for the final answer is $\\mathrm{kJ} \\mathrm{mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-21"
             },
             {
-                "question": "A string is set into motion by being struck at a point $L/4$ from one end by a triangular hammer. The initial velocity is greatest at $x = L/4$ and decreases linearly to zero at $x = 0$ and $x = L/2$. The region $L/2 \\leq x \\leq L$ is initially undisturbed. Determine the subsequent motion of the string. How many decibels down from the fundamental are the second harmonics?'",
+                "question": "A string is set into motion by being struck at a point $L/4$ from one end by a triangular hammer. The initial velocity is greatest at $x = L/4$ and decreases linearly to zero at $x = 0$ and $x = L/2$. The region $L/2 \\leq x \\leq L$ is initially undisturbed. Determine the subsequent motion of the string. How many decibels down from the fundamental are the second harmonics?' The required unit for the final answer is dB. Put only the numerical value in \\boxed{...}.",
                 "answer": "4.4"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. A sample consisting of $2.0 \\mathrm{~mol} \\mathrm{CO}_2$ occupies a fixed volume of $15.0 \\mathrm{dm}^3$ at $300 \\mathrm{~K}$. When it is supplied with $2.35 \\mathrm{~kJ}$ of energy as heat its temperature increases to $341 \\mathrm{~K}$. Assume that $\\mathrm{CO}_2$ is described by the van der Waals equation of state, and calculate $\\Delta H$.",
+                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. A sample consisting of $2.0 \\mathrm{~mol} \\mathrm{CO}_2$ occupies a fixed volume of $15.0 \\mathrm{dm}^3$ at $300 \\mathrm{~K}$. When it is supplied with $2.35 \\mathrm{~kJ}$ of energy as heat its temperature increases to $341 \\mathrm{~K}$. Assume that $\\mathrm{CO}_2$ is described by the van der Waals equation of state, and calculate $\\Delta H$. The required unit for the final answer is $\\text{kJ}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "+3.03"
             },
             {
-                "question": "Calculate the pressure exerted by $1.0 \\mathrm{~mol} \\mathrm{Xe}$ when it is confined to $1.0 \\mathrm{dm}^3$ at $25^{\\circ} \\mathrm{C}$.",
+                "question": "Calculate the pressure exerted by $1.0 \\mathrm{~mol} \\mathrm{Xe}$ when it is confined to $1.0 \\mathrm{dm}^3$ at $25^{\\circ} \\mathrm{C}$. The required unit for the final answer is $\\mathrm{atm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "21"
             },
             {
-                "question": "Two charged concentric spherical shells have radii $10.0 \\mathrm{~cm}$ and $15.0 \\mathrm{~cm}$. The charge on the inner shell is $4.00 \\times 10^{-8} \\mathrm{C}$, and that on the outer shell is $2.00 \\times 10^{-8} \\mathrm{C}$. Find the electric field at $r=12.0 \\mathrm{~cm}$.",
+                "question": "Two charged concentric spherical shells have radii $10.0 \\mathrm{~cm}$ and $15.0 \\mathrm{~cm}$. The charge on the inner shell is $4.00 \\times 10^{-8} \\mathrm{C}$, and that on the outer shell is $2.00 \\times 10^{-8} \\mathrm{C}$. Find the electric field at $r=12.0 \\mathrm{~cm}$. The required unit for the final answer is $10^4 \\mathrm{~N} / \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2.50"
             },
             {
-                "question": "Three charged particles form a triangle: particle 1 with charge $Q_1=80.0 \\mathrm{nC}$ is at $x y$ coordinates $(0,3.00 \\mathrm{~mm})$, particle 2 with charge $Q_2$ is at $(0,-3.00 \\mathrm{~mm})$, and particle 3 with charge $q=18.0$ $\\mathrm{nC}$ is at $(4.00 \\mathrm{~mm}, 0)$. In unit-vector notation, what is the electrostatic force on particle 3 due to the other two particles if $Q_2$ is equal to $80.0 \\mathrm{nC}$?",
+                "question": "Three charged particles form a triangle: particle 1 with charge $Q_1=80.0 \\mathrm{nC}$ is at $x y$ coordinates $(0,3.00 \\mathrm{~mm})$, particle 2 with charge $Q_2$ is at $(0,-3.00 \\mathrm{~mm})$, and particle 3 with charge $q=18.0$ $\\mathrm{nC}$ is at $(4.00 \\mathrm{~mm}, 0)$. In unit-vector notation, what is the electrostatic force on particle 3 due to the other two particles if $Q_2$ is equal to $80.0 \\mathrm{nC}$? The required unit for the final answer is $\\mathrm{~N} \\hat{\\mathrm{i}}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.829"
             },
             {
-                "question": "It turns out that the solution of the Schrödinger equation for the Morse potential can be expressed as\r\n$$\r\nG(v)=\\tilde{\\omega}_{\\mathrm{e}}\\left(v+\\frac{1}{2}\\right)-\\tilde{\\omega}_{\\mathrm{e}} \\tilde{x}_{\\mathrm{e}}\\left(v+\\frac{1}{2}\\right)^2\r\n$$\r\nThe Harmonic Oscillator and Vibrational Spectroscopy\r\nwhere\r\n$$\r\n\\tilde{x}_{\\mathrm{e}}=\\frac{h c \\tilde{\\omega}_{\\mathrm{e}}}{4 D}\r\n$$\r\nGiven that $\\tilde{\\omega}_{\\mathrm{e}}=2886 \\mathrm{~cm}^{-1}$ and $D=440.2 \\mathrm{~kJ} \\cdot \\mathrm{mol}^{-1}$ for $\\mathrm{H}^{35} \\mathrm{Cl}$, calculate $\\tilde{x}_{\\mathrm{e}}$.",
+                "question": "It turns out that the solution of the Schrödinger equation for the Morse potential can be expressed as\r\n$$\r\nG(v)=\\tilde{\\omega}_{\\mathrm{e}}\\left(v+\\frac{1}{2}\\right)-\\tilde{\\omega}_{\\mathrm{e}} \\tilde{x}_{\\mathrm{e}}\\left(v+\\frac{1}{2}\\right)^2\r\n$$\r\nThe Harmonic Oscillator and Vibrational Spectroscopy\r\nwhere\r\n$$\r\n\\tilde{x}_{\\mathrm{e}}=\\frac{h c \\tilde{\\omega}_{\\mathrm{e}}}{4 D}\r\n$$\r\nGiven that $\\tilde{\\omega}_{\\mathrm{e}}=2886 \\mathrm{~cm}^{-1}$ and $D=440.2 \\mathrm{~kJ} \\cdot \\mathrm{mol}^{-1}$ for $\\mathrm{H}^{35} \\mathrm{Cl}$, calculate $\\tilde{x}_{\\mathrm{e}}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.01961"
             },
             {
-                "question": "Given that $D_e=4.75 \\mathrm{eV}$ and $R_e=0.741 Å$ for the ground electronic state of $\\mathrm{H}_2$, find $U\\left(R_e\\right)$ for this state.",
+                "question": "Given that $D_e=4.75 \\mathrm{eV}$ and $R_e=0.741 Å$ for the ground electronic state of $\\mathrm{H}_2$, find $U\\left(R_e\\right)$ for this state. The required unit for the final answer is $\\mathrm{eV}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-31.95"
             },
             {
-                "question": "$$\r\n\\text { If we locate an electron to within } 20 \\mathrm{pm} \\text {, then what is the uncertainty in its speed? }\r\n$$",
+                "question": "$$\r\n\\text { If we locate an electron to within } 20 \\mathrm{pm} \\text {, then what is the uncertainty in its speed? }\r\n$$ The required unit for the final answer is $10^7 \\mathrm{~m} \\cdot \\mathrm{s}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "3.7"
             },
             {
-                "question": "Approximately how many oxygen molecules arrive each second at the mitochondrion of an active person with a mass of $84 \\mathrm{~kg}$ ? The following data are available: Oxygen consumption is about $40 . \\mathrm{mL}$ of $\\mathrm{O}_2$ per minute per kilogram of body weight, measured at $T=300 . \\mathrm{K}$ and $P=1.00 \\mathrm{~atm}$. In an adult there are about $1.6 \\times 10^{10}$ cells per kg body mass. Each cell contains about 800 . mitochondria.",
+                "question": "Approximately how many oxygen molecules arrive each second at the mitochondrion of an active person with a mass of $84 \\mathrm{~kg}$ ? The following data are available: Oxygen consumption is about $40 . \\mathrm{mL}$ of $\\mathrm{O}_2$ per minute per kilogram of body weight, measured at $T=300 . \\mathrm{K}$ and $P=1.00 \\mathrm{~atm}$. In an adult there are about $1.6 \\times 10^{10}$ cells per kg body mass. Each cell contains about 800 . mitochondria. The required unit for the final answer is $10^6$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.27"
             },
             {
-                "question": "A car tyre (i.e. an automobile tire) was inflated to a pressure of $24 \\mathrm{lb} \\mathrm{in}^{-2}$ $(1.00 \\mathrm{atm}=14.7 \\mathrm{lb} \\mathrm{in}^{-2})$ on a winter's day when the temperature was $-5^{\\circ} \\mathrm{C}$. What pressure will be found, assuming no leaks have occurred and that the volume is constant, on a subsequent summer's day when the temperature is $35^{\\circ} \\mathrm{C}$?",
+                "question": "A car tyre (i.e. an automobile tire) was inflated to a pressure of $24 \\mathrm{lb} \\mathrm{in}^{-2}$ $(1.00 \\mathrm{atm}=14.7 \\mathrm{lb} \\mathrm{in}^{-2})$ on a winter's day when the temperature was $-5^{\\circ} \\mathrm{C}$. What pressure will be found, assuming no leaks have occurred and that the volume is constant, on a subsequent summer's day when the temperature is $35^{\\circ} \\mathrm{C}$? The required unit for the final answer is $\\mathrm{lb} \\mathrm{in}^{-2}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "30"
             },
             {
-                "question": "A camper stranded in snowy weather loses heat by wind convection. The camper is packing emergency rations consisting of $58 \\%$ sucrose, $31 \\%$ fat, and $11 \\%$ protein by weight. Using the data provided in Problem P4.32 and assuming the fat content of the rations can be treated with palmitic acid data and the protein content similarly by the protein data in Problem P4.32, how much emergency rations must the camper consume in order to compensate for a reduction in body temperature of $3.5 \\mathrm{~K}$ ? Assume the heat capacity of the body equals that of water. Assume the camper weighs $67 \\mathrm{~kg}$.",
+                "question": "A camper stranded in snowy weather loses heat by wind convection. The camper is packing emergency rations consisting of $58 \\%$ sucrose, $31 \\%$ fat, and $11 \\%$ protein by weight. Using the data provided in Problem P4.32 and assuming the fat content of the rations can be treated with palmitic acid data and the protein content similarly by the protein data in Problem P4.32, how much emergency rations must the camper consume in order to compensate for a reduction in body temperature of $3.5 \\mathrm{~K}$ ? Assume the heat capacity of the body equals that of water. Assume the camper weighs $67 \\mathrm{~kg}$. The required unit for the final answer is $\\mathrm{~g}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "49"
             },
             {
-                "question": "The volatile liquids $A$ and $\\mathrm{B}$, for which $P_A^*=165$ Torr and $P_B^*=85.1$ Torr are confined to a piston and cylinder assembly. Initially, only the liquid phase is present. As the pressure is reduced, the first vapor is observed at a total pressure of 110 . Torr. Calculate $x_{\\mathrm{A}}$",
+                "question": "The volatile liquids $A$ and $\\mathrm{B}$, for which $P_A^*=165$ Torr and $P_B^*=85.1$ Torr are confined to a piston and cylinder assembly. Initially, only the liquid phase is present. As the pressure is reduced, the first vapor is observed at a total pressure of 110 . Torr. Calculate $x_{\\mathrm{A}}$ Put only the numerical value in \\boxed{...}.",
                 "answer": "0.312"
             },
             {
-                "question": "What equal positive charges would have to be placed on Earth and on the Moon to neutralize their gravitational attraction?",
+                "question": "What equal positive charges would have to be placed on Earth and on the Moon to neutralize their gravitational attraction? The required unit for the final answer is $10^{13} \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "5.7"
             },
             {
-                "question": "The flux of visible photons reaching Earth from the North Star is about $4 \\times 10^3 \\mathrm{~mm}^{-2} \\mathrm{~s}^{-1}$. Of these photons, 30 per cent are absorbed or scattered by the atmosphere and 25 per cent of the surviving photons are scattered by the surface of the cornea of the eye. A further 9 per cent are absorbed inside the cornea. The area of the pupil at night is about $40 \\mathrm{~mm}^2$ and the response time of the eye is about $0.1 \\mathrm{~s}$. Of the photons passing through the pupil, about 43 per cent are absorbed in the ocular medium. How many photons from the North Star are focused onto the retina in $0.1 \\mathrm{~s}$ ?",
+                "question": "The flux of visible photons reaching Earth from the North Star is about $4 \\times 10^3 \\mathrm{~mm}^{-2} \\mathrm{~s}^{-1}$. Of these photons, 30 per cent are absorbed or scattered by the atmosphere and 25 per cent of the surviving photons are scattered by the surface of the cornea of the eye. A further 9 per cent are absorbed inside the cornea. The area of the pupil at night is about $40 \\mathrm{~mm}^2$ and the response time of the eye is about $0.1 \\mathrm{~s}$. Of the photons passing through the pupil, about 43 per cent are absorbed in the ocular medium. How many photons from the North Star are focused onto the retina in $0.1 \\mathrm{~s}$ ? The required unit for the final answer is $10^3$. Put only the numerical value in \\boxed{...}.",
                 "answer": "4.4"
             },
             {
-                "question": "A skier weighing $90$ kg starts from rest down a hill inclined at $17^\\circ$. He skis 100 m down the hill and then coasts for 70 m along level snow until he stops. Given a coefficient of kinetic friction of $\\mu_k = 0.18$, what velocity does the skier have at the bottom of the hill?",
+                "question": "A skier weighing $90$ kg starts from rest down a hill inclined at $17^\\circ$. He skis 100 m down the hill and then coasts for 70 m along level snow until he stops. Given a coefficient of kinetic friction of $\\mu_k = 0.18$, what velocity does the skier have at the bottom of the hill? The required unit for the final answer is $m/s$. Put only the numerical value in \\boxed{...}.",
                 "answer": "15.6"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. The standard enthalpy of decomposition of the yellow complex $\\mathrm{H}_3 \\mathrm{NSO}_2$ into $\\mathrm{NH}_3$ and $\\mathrm{SO}_2$ is $+40 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Calculate the standard enthalpy of formation of $\\mathrm{H}_3 \\mathrm{NSO}_2$.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. The standard enthalpy of decomposition of the yellow complex $\\mathrm{H}_3 \\mathrm{NSO}_2$ into $\\mathrm{NH}_3$ and $\\mathrm{SO}_2$ is $+40 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Calculate the standard enthalpy of formation of $\\mathrm{H}_3 \\mathrm{NSO}_2$. The required unit for the final answer is $\\mathrm{kJ} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-383"
             },
             {
-                "question": "In an elastic collision of two particles with masses $m_1$ and $m_2$, the initial velocities are $\\mathbf{u}_1$ and $\\mathbf{u}_2=\\alpha \\mathbf{u}_1$. If the initial kinetic energies of the two particles are equal, find the conditions on $u_1 / u_2$ such that $m_1$ is at rest after the collision and $\\alpha$ is positive.",
+                "question": "In an elastic collision of two particles with masses $m_1$ and $m_2$, the initial velocities are $\\mathbf{u}_1$ and $\\mathbf{u}_2=\\alpha \\mathbf{u}_1$. If the initial kinetic energies of the two particles are equal, find the conditions on $u_1 / u_2$ such that $m_1$ is at rest after the collision and $\\alpha$ is positive. Put only the numerical value in \\boxed{...}.",
                 "answer": "5.828427125"
             },
             {
-                "question": "A uniformly charged conducting sphere of $1.2 \\mathrm{~m}$ diameter has surface charge density $8.1 \\mu \\mathrm{C} / \\mathrm{m}^2$. Find the net charge on the sphere.",
+                "question": "A uniformly charged conducting sphere of $1.2 \\mathrm{~m}$ diameter has surface charge density $8.1 \\mu \\mathrm{C} / \\mathrm{m}^2$. Find the net charge on the sphere. The required unit for the final answer is $\\mu \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "37"
             },
             {
-                "question": "A steel ball of velocity $5 \\mathrm{~m} / \\mathrm{s}$ strikes a smooth, heavy steel plate at an angle of $30^{\\circ}$ from the normal. If the coefficient of restitution is 0.8 , at what velocity does the steel ball bounce off the plate?",
+                "question": "A steel ball of velocity $5 \\mathrm{~m} / \\mathrm{s}$ strikes a smooth, heavy steel plate at an angle of $30^{\\circ}$ from the normal. If the coefficient of restitution is 0.8 , at what velocity does the steel ball bounce off the plate? The required unit for the final answer is $\\mathrm{~m} / \\mathrm{s}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "4.3"
             },
             {
-                "question": "Point charges of $+6.0 \\mu \\mathrm{C}$ and $-4.0 \\mu \\mathrm{C}$ are placed on an $x$ axis, at $x=8.0 \\mathrm{~m}$ and $x=16 \\mathrm{~m}$, respectively. What charge must be placed at $x=24 \\mathrm{~m}$ so that any charge placed at the origin would experience no electrostatic force?",
+                "question": "Point charges of $+6.0 \\mu \\mathrm{C}$ and $-4.0 \\mu \\mathrm{C}$ are placed on an $x$ axis, at $x=8.0 \\mathrm{~m}$ and $x=16 \\mathrm{~m}$, respectively. What charge must be placed at $x=24 \\mathrm{~m}$ so that any charge placed at the origin would experience no electrostatic force? The required unit for the final answer is $\\mu \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-45"
             },
             {
-                "question": "When a particle of mass $9.1 \\times 10^{-28} \\mathrm{~g}$ in a certain one-dimensional box goes from the $n=5$ level to the $n=2$ level, it emits a photon of frequency $6.0 \\times 10^{14} \\mathrm{~s}^{-1}$. Find the length of the box.",
+                "question": "When a particle of mass $9.1 \\times 10^{-28} \\mathrm{~g}$ in a certain one-dimensional box goes from the $n=5$ level to the $n=2$ level, it emits a photon of frequency $6.0 \\times 10^{14} \\mathrm{~s}^{-1}$. Find the length of the box. The required unit for the final answer is $\\mathrm{~nm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.8"
             },
             {
-                "question": "The vibrational frequency of $I_2$ is $208 \\mathrm{~cm}^{-1}$. At what temperature will the population in the first excited state be half that of the ground state?",
+                "question": "The vibrational frequency of $I_2$ is $208 \\mathrm{~cm}^{-1}$. At what temperature will the population in the first excited state be half that of the ground state? The required unit for the final answer is $\\mathrm{~K}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "432"
             },
             {
-                "question": "An electron on the axis of an electric dipole is $25 \\mathrm{~nm}$ from the center of the dipole. What is the magnitude of the electrostatic force on the electron if the dipole moment is $3.6 \\times 10^{-29} \\mathrm{C} \\cdot \\mathrm{m}$ ? Assume that $25 \\mathrm{~nm}$ is much larger than the separation of the charged particles that form the dipole.",
+                "question": "An electron on the axis of an electric dipole is $25 \\mathrm{~nm}$ from the center of the dipole. What is the magnitude of the electrostatic force on the electron if the dipole moment is $3.6 \\times 10^{-29} \\mathrm{C} \\cdot \\mathrm{m}$ ? Assume that $25 \\mathrm{~nm}$ is much larger than the separation of the charged particles that form the dipole. The required unit for the final answer is $10^{-15} \\mathrm{~N}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "6.6"
             },
             {
-                "question": "In the radioactive decay of Eq. 21-13, $\\mathrm{a}^{238} \\mathrm{U}$ nucleus transforms to ${ }^{234} \\mathrm{Th}$ and an ejected ${ }^4 \\mathrm{He}$. (These are nuclei, not atoms, and thus electrons are not involved.) When the separation between ${ }^{234} \\mathrm{Th}$ and ${ }^4 \\mathrm{He}$ is $9.0 \\times 10^{-15} \\mathrm{~m}$, what are the magnitudes of the electrostatic force between them?",
+                "question": "In the radioactive decay of Eq. 21-13, $\\mathrm{a}^{238} \\mathrm{U}$ nucleus transforms to ${ }^{234} \\mathrm{Th}$ and an ejected ${ }^4 \\mathrm{He}$. (These are nuclei, not atoms, and thus electrons are not involved.) When the separation between ${ }^{234} \\mathrm{Th}$ and ${ }^4 \\mathrm{He}$ is $9.0 \\times 10^{-15} \\mathrm{~m}$, what are the magnitudes of the electrostatic force between them? The required unit for the final answer is $10^2 \\mathrm{~N}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "5.1"
             },
             {
-                "question": "Determine the equilibrium constant for the dissociation of sodium at $298 \\mathrm{~K}: \\mathrm{Na}_2(g) \\rightleftharpoons 2 \\mathrm{Na}(g)$. For $\\mathrm{Na}_2$, $B=0.155 \\mathrm{~cm}^{-1}, \\widetilde{\\nu}=159 \\mathrm{~cm}^{-1}$, the dissociation energy is $70.4 \\mathrm{~kJ} / \\mathrm{mol}$, and the ground-state electronic degeneracy for $\\mathrm{Na}$ is 2 .",
+                "question": "Determine the equilibrium constant for the dissociation of sodium at $298 \\mathrm{~K}: \\mathrm{Na}_2(g) \\rightleftharpoons 2 \\mathrm{Na}(g)$. For $\\mathrm{Na}_2$, $B=0.155 \\mathrm{~cm}^{-1}, \\widetilde{\\nu}=159 \\mathrm{~cm}^{-1}$, the dissociation energy is $70.4 \\mathrm{~kJ} / \\mathrm{mol}$, and the ground-state electronic degeneracy for $\\mathrm{Na}$ is 2 . The required unit for the final answer is $10^{-9}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2.25"
             },
             {
-                "question": "A clown is juggling four balls simultaneously. Students use a video tape to determine that it takes the clown $0.9 \\mathrm{~s}$ to cycle each ball through his hands (including catching, transferring, and throwing) and to be ready to catch the next ball. What is the minimum vertical speed the clown must throw up each ball?",
+                "question": "A clown is juggling four balls simultaneously. Students use a video tape to determine that it takes the clown $0.9 \\mathrm{~s}$ to cycle each ball through his hands (including catching, transferring, and throwing) and to be ready to catch the next ball. What is the minimum vertical speed the clown must throw up each ball? The required unit for the final answer is $\\mathrm{~m} \\cdot \\mathrm{s}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "13.2"
             },
             {
-                "question": "A deuteron (nucleus of deuterium atom consisting of a proton and a neutron) with speed $14.9$ km / s collides elastically with a neutron at rest. Use the approximation that the deuteron is twice the mass of the neutron. If the deuteron is scattered through a LAB angle $\\psi = 10^\\circ$, the final speed of the deuteron is $v_d = 14.44$ km / s and the final speed of the neutron is $v_n = 5.18$ km / s. Another set of solutions for the final speed is $v_d = 5.12$ km / s for the deuteron and $v_n = 19.79$ km / s for the neutron. What is the maximum possible scattering angle of the deuteron?",
+                "question": "A deuteron (nucleus of deuterium atom consisting of a proton and a neutron) with speed $14.9$ km / s collides elastically with a neutron at rest. Use the approximation that the deuteron is twice the mass of the neutron. If the deuteron is scattered through a LAB angle $\\psi = 10^\\circ$, the final speed of the deuteron is $v_d = 14.44$ km / s and the final speed of the neutron is $v_n = 5.18$ km / s. Another set of solutions for the final speed is $v_d = 5.12$ km / s for the deuteron and $v_n = 19.79$ km / s for the neutron. What is the maximum possible scattering angle of the deuteron? The required unit for the final answer is $^\\circ$. Put only the numerical value in \\boxed{...}.",
                 "answer": "30"
             },
             {
-                "question": "Benzoic acid, $1.35 \\mathrm{~g}$, is reacted with oxygen in a constant volume calorimeter to form $\\mathrm{H}_2 \\mathrm{O}(l)$ and $\\mathrm{CO}_2(g)$ at $298 \\mathrm{~K}$. The mass of the water in the inner bath is $1.55 \\times$ $10^3 \\mathrm{~g}$. The temperature of the calorimeter and its contents rises $2.76 \\mathrm{~K}$ as a result of this reaction. Calculate the calorimeter constant.",
+                "question": "Benzoic acid, $1.35 \\mathrm{~g}$, is reacted with oxygen in a constant volume calorimeter to form $\\mathrm{H}_2 \\mathrm{O}(l)$ and $\\mathrm{CO}_2(g)$ at $298 \\mathrm{~K}$. The mass of the water in the inner bath is $1.55 \\times$ $10^3 \\mathrm{~g}$. The temperature of the calorimeter and its contents rises $2.76 \\mathrm{~K}$ as a result of this reaction. Calculate the calorimeter constant. The required unit for the final answer is $10^3 \\mathrm{~J}^{\\circ} \\mathrm{C}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "6.64"
             },
             {
-                "question": "The barometric formula relates the pressure of a gas of molar mass $M$ at an altitude $h$ to its pressure $p_0$ at sea level. Derive this relation by showing that the change in pressure $\\mathrm{d} p$ for an infinitesimal change in altitude $\\mathrm{d} h$ where the density is $\\rho$ is $\\mathrm{d} p=-\\rho g \\mathrm{~d} h$. Remember that $\\rho$ depends on the pressure. Evaluate the external atmospheric pressure at a typical cruising altitude of an aircraft (11 km) when the pressure at ground level is 1.0 atm.",
+                "question": "The barometric formula relates the pressure of a gas of molar mass $M$ at an altitude $h$ to its pressure $p_0$ at sea level. Derive this relation by showing that the change in pressure $\\mathrm{d} p$ for an infinitesimal change in altitude $\\mathrm{d} h$ where the density is $\\rho$ is $\\mathrm{d} p=-\\rho g \\mathrm{~d} h$. Remember that $\\rho$ depends on the pressure. Evaluate the external atmospheric pressure at a typical cruising altitude of an aircraft (11 km) when the pressure at ground level is 1.0 atm. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.72"
             },
             {
-                "question": "A household lightbulb is a blackbody radiator. Many lightbulbs use tungsten filaments that are heated by an electric current. What temperature is needed so that $\\lambda_{\\max }=550 \\mathrm{~nm}$ ?",
+                "question": "A household lightbulb is a blackbody radiator. Many lightbulbs use tungsten filaments that are heated by an electric current. What temperature is needed so that $\\lambda_{\\max }=550 \\mathrm{~nm}$ ? The required unit for the final answer is $\\mathrm{~K}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "5300"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. The enthalpy of vaporization of chloroform $\\left(\\mathrm{CHCl}_3\\right)$ is $29.4 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at its normal boiling point of $334.88 \\mathrm{~K}$. Calculate the entropy change of the surroundings.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. The enthalpy of vaporization of chloroform $\\left(\\mathrm{CHCl}_3\\right)$ is $29.4 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$ at its normal boiling point of $334.88 \\mathrm{~K}$. Calculate the entropy change of the surroundings. The required unit for the final answer is $\\mathrm{J} \\mathrm{K}^{-1} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-87.8"
             },
             {
-                "question": "Calculate the energy associated with an $\\alpha$ particle that has fallen through a potential difference of $4.0 \\mathrm{~V}$. Take the mass of an $\\alpha$ particle to be $6.64 \\times 10^{-27} \\mathrm{~kg}$.",
+                "question": "Calculate the energy associated with an $\\alpha$ particle that has fallen through a potential difference of $4.0 \\mathrm{~V}$. Take the mass of an $\\alpha$ particle to be $6.64 \\times 10^{-27} \\mathrm{~kg}$. The required unit for the final answer is $10^{-18} \\mathrm{~J} / \\alpha \\text {-particle}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.3"
             },
             {
-                "question": "Express the van der Waals parameters $a=0.751 \\mathrm{~atm} \\mathrm{dm}^6 \\mathrm{~mol}^{-2}$ in SI base units.",
+                "question": "Express the van der Waals parameters $a=0.751 \\mathrm{~atm} \\mathrm{dm}^6 \\mathrm{~mol}^{-2}$ in SI base units. The required unit for the final answer is $\\mathrm{kg} \\mathrm{~m}^5 \\mathrm{~s}^{-2} \\mathrm{~mol}^{-2}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.0761"
             },
             {
-                "question": "When an electron in a certain excited energy level in a one-dimensional box of length $2.00  Å$ makes a transition to the ground state, a photon of wavelength $8.79 \\mathrm{~nm}$ is emitted. Find the quantum number of the initial state.",
+                "question": "When an electron in a certain excited energy level in a one-dimensional box of length $2.00  Å$ makes a transition to the ground state, a photon of wavelength $8.79 \\mathrm{~nm}$ is emitted. Find the quantum number of the initial state. Put only the numerical value in \\boxed{...}.",
                 "answer": "4"
             },
             {
-                "question": "Using the perfect gas equation\r\nCalculate the pressure in kilopascals exerted by $1.25 \\mathrm{~g}$ of nitrogen gas in a flask of volume $250 \\mathrm{~cm}^3$ at $20^{\\circ} \\mathrm{C}$.",
+                "question": "Using the perfect gas equation\r\nCalculate the pressure in kilopascals exerted by $1.25 \\mathrm{~g}$ of nitrogen gas in a flask of volume $250 \\mathrm{~cm}^3$ at $20^{\\circ} \\mathrm{C}$. The required unit for the final answer is $\\mathrm{kPa}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "435"
             },
             {
-                "question": "A charged cloud system produces an electric field in the air near Earth's surface. A particle of charge $-2.0 \\times 10^{-9} \\mathrm{C}$ is acted on by a downward electrostatic force of $3.0 \\times 10^{-6} \\mathrm{~N}$ when placed in this field. What is the magnitude of the electric field?",
+                "question": "A charged cloud system produces an electric field in the air near Earth's surface. A particle of charge $-2.0 \\times 10^{-9} \\mathrm{C}$ is acted on by a downward electrostatic force of $3.0 \\times 10^{-6} \\mathrm{~N}$ when placed in this field. What is the magnitude of the electric field? The required unit for the final answer is $10^3 \\mathrm{~N} / \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.5"
             },
             {
-                "question": "A mass of $34.05 \\mathrm{~g}$ of $\\mathrm{H}_2 \\mathrm{O}(s)$ at $273 \\mathrm{~K}$ is dropped into $185 \\mathrm{~g}$ of $\\mathrm{H}_2 \\mathrm{O}(l)$ at $310 . \\mathrm{K}$ in an insulated container at 1 bar of pressure. Calculate the temperature of the system once equilibrium has been reached. Assume that $C_{P, m}$ for $\\mathrm{H}_2 \\mathrm{O}(l)$ is constant at its values for $298 \\mathrm{~K}$ throughout the temperature range of interest.",
+                "question": "A mass of $34.05 \\mathrm{~g}$ of $\\mathrm{H}_2 \\mathrm{O}(s)$ at $273 \\mathrm{~K}$ is dropped into $185 \\mathrm{~g}$ of $\\mathrm{H}_2 \\mathrm{O}(l)$ at $310 . \\mathrm{K}$ in an insulated container at 1 bar of pressure. Calculate the temperature of the system once equilibrium has been reached. Assume that $C_{P, m}$ for $\\mathrm{H}_2 \\mathrm{O}(l)$ is constant at its values for $298 \\mathrm{~K}$ throughout the temperature range of interest. The required unit for the final answer is $\\mathrm{~K}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "292"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. A sample of $4.50 \\mathrm{~g}$ of methane occupies $12.7 \\mathrm{dm}^3$ at $310 \\mathrm{~K}$. Calculate the work done when the gas expands isothermally against a constant external pressure of 200 Torr until its volume has increased by\r\n$3.3 \\mathrm{dm}^3$.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. A sample of $4.50 \\mathrm{~g}$ of methane occupies $12.7 \\mathrm{dm}^3$ at $310 \\mathrm{~K}$. Calculate the work done when the gas expands isothermally against a constant external pressure of 200 Torr until its volume has increased by\r\n$3.3 \\mathrm{dm}^3$. The required unit for the final answer is $\\mathrm{J}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-88"
             },
             {
-                "question": "Using the explicit formulas for the Hermite polynomials given in Table 5.3 as below $$\n\\begin{array}{ll}\nH_0(\\xi)=1 & H_1(\\xi)=2 \\xi \\\\\nH_2(\\xi)=4 \\xi^2-2 & H_3(\\xi)=8 \\xi^3-12 \\xi \\\\\nH_4(\\xi)=16 \\xi^4-48 \\xi^2+12 & H_5(\\xi)=32 \\xi^5-160 \\xi^3+120 \\xi\n\\end{array}\n$$, show that a $0 \\rightarrow 1$ vibrational transition is allowed and that a $0 \\rightarrow 2$ transition is forbidden.",
+                "question": "Using the explicit formulas for the Hermite polynomials given in Table 5.3 as below $$\n\\begin{array}{ll}\nH_0(\\xi)=1 & H_1(\\xi)=2 \\xi \\\\\nH_2(\\xi)=4 \\xi^2-2 & H_3(\\xi)=8 \\xi^3-12 \\xi \\\\\nH_4(\\xi)=16 \\xi^4-48 \\xi^2+12 & H_5(\\xi)=32 \\xi^5-160 \\xi^3+120 \\xi\n\\end{array}\n$$, show that a $0 \\rightarrow 1$ vibrational transition is allowed and that a $0 \\rightarrow 2$ transition is forbidden. Put only the numerical value in \\boxed{...}.",
                 "answer": "0"
             },
             {
-                "question": "What is the total charge in coulombs of $75.0 \\mathrm{~kg}$ of electrons?",
+                "question": "What is the total charge in coulombs of $75.0 \\mathrm{~kg}$ of electrons? The required unit for the final answer is $10^{13} \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-1.32"
             },
             {
-                "question": "Using the Bohr theory, calculate the ionization energy (in electron volts and in $\\mathrm{kJ} \\cdot \\mathrm{mol}^{-1}$ ) of singly ionized helium.",
+                "question": "Using the Bohr theory, calculate the ionization energy (in electron volts and in $\\mathrm{kJ} \\cdot \\mathrm{mol}^{-1}$ ) of singly ionized helium. The required unit for the final answer is $\\mathrm{eV}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "54.394"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. The standard enthalpy of formation of the metallocene bis(benzene)chromium was measured in a calorimeter. It was found for the reaction $\\mathrm{Cr}\\left(\\mathrm{C}_6 \\mathrm{H}_6\\right)_2(\\mathrm{~s}) \\rightarrow \\mathrm{Cr}(\\mathrm{s})+2 \\mathrm{C}_6 \\mathrm{H}_6(\\mathrm{~g})$ that $\\Delta_{\\mathrm{r}} U^{\\bullet}(583 \\mathrm{~K})=+8.0 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Estimate the standard enthalpy of formation of the compound at $583 \\mathrm{~K}$. The constant-pressure molar heat capacity of benzene is $136.1 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$ in its liquid range and $81.67 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$ as a gas.",
+                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. The standard enthalpy of formation of the metallocene bis(benzene)chromium was measured in a calorimeter. It was found for the reaction $\\mathrm{Cr}\\left(\\mathrm{C}_6 \\mathrm{H}_6\\right)_2(\\mathrm{~s}) \\rightarrow \\mathrm{Cr}(\\mathrm{s})+2 \\mathrm{C}_6 \\mathrm{H}_6(\\mathrm{~g})$ that $\\Delta_{\\mathrm{r}} U^{\\bullet}(583 \\mathrm{~K})=+8.0 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Estimate the standard enthalpy of formation of the compound at $583 \\mathrm{~K}$. The constant-pressure molar heat capacity of benzene is $136.1 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$ in its liquid range and $81.67 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$ as a gas. The required unit for the final answer is $\\mathrm{kJ} \\mathrm{mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "+116.0"
             },
             {
-                "question": "A thermodynamic study of $\\mathrm{DyCl}_3$ (E.H.P. Cordfunke, et al., J. Chem. Thermodynamics 28, 1387 (1996)) determined its standard enthalpy of formation from the following information\r\n(1) $\\mathrm{DyCl}_3(\\mathrm{~s}) \\rightarrow \\mathrm{DyCl}_3(\\mathrm{aq}$, in $4.0 \\mathrm{M} \\mathrm{HCl}) \\quad \\Delta_{\\mathrm{r}} H^{\\ominus}=-180.06 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\n(2) $\\mathrm{Dy}(\\mathrm{s})+3 \\mathrm{HCl}(\\mathrm{aq}, 4.0 \\mathrm{~m}) \\rightarrow \\mathrm{DyCl}_3(\\mathrm{aq}$, in $4.0 \\mathrm{M} \\mathrm{HCl}(\\mathrm{aq}))+\\frac{3}{2} \\mathrm{H}_2(\\mathrm{~g})$ $\\Delta_{\\mathrm{r}} H^{\\ominus}=-699.43 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\n(3) $\\frac{1}{2} \\mathrm{H}_2(\\mathrm{~g})+\\frac{1}{2} \\mathrm{Cl}_2(\\mathrm{~g}) \\rightarrow \\mathrm{HCl}(\\mathrm{aq}, 4.0 \\mathrm{M}) \\quad \\Delta_{\\mathrm{r}} H^{\\ominus}=-158.31 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\nDetermine $\\Delta_{\\mathrm{f}} H^{\\ominus}\\left(\\mathrm{DyCl}_3, \\mathrm{~s}\\right)$ from these data.",
+                "question": "A thermodynamic study of $\\mathrm{DyCl}_3$ (E.H.P. Cordfunke, et al., J. Chem. Thermodynamics 28, 1387 (1996)) determined its standard enthalpy of formation from the following information\r\n(1) $\\mathrm{DyCl}_3(\\mathrm{~s}) \\rightarrow \\mathrm{DyCl}_3(\\mathrm{aq}$, in $4.0 \\mathrm{M} \\mathrm{HCl}) \\quad \\Delta_{\\mathrm{r}} H^{\\ominus}=-180.06 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\n(2) $\\mathrm{Dy}(\\mathrm{s})+3 \\mathrm{HCl}(\\mathrm{aq}, 4.0 \\mathrm{~m}) \\rightarrow \\mathrm{DyCl}_3(\\mathrm{aq}$, in $4.0 \\mathrm{M} \\mathrm{HCl}(\\mathrm{aq}))+\\frac{3}{2} \\mathrm{H}_2(\\mathrm{~g})$ $\\Delta_{\\mathrm{r}} H^{\\ominus}=-699.43 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\n(3) $\\frac{1}{2} \\mathrm{H}_2(\\mathrm{~g})+\\frac{1}{2} \\mathrm{Cl}_2(\\mathrm{~g}) \\rightarrow \\mathrm{HCl}(\\mathrm{aq}, 4.0 \\mathrm{M}) \\quad \\Delta_{\\mathrm{r}} H^{\\ominus}=-158.31 \\mathrm{~kJ} \\mathrm{~mol}^{-1}$\r\nDetermine $\\Delta_{\\mathrm{f}} H^{\\ominus}\\left(\\mathrm{DyCl}_3, \\mathrm{~s}\\right)$ from these data. The required unit for the final answer is $\\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-994.3"
             },
             {
-                "question": "Calculate the melting point of ice under a pressure of 50 bar. Assume that the density of ice under these conditions is approximately $0.92 \\mathrm{~g} \\mathrm{~cm}^{-3}$ and that of liquid water is $1.00 \\mathrm{~g} \\mathrm{~cm}^{-3}$.",
+                "question": "Calculate the melting point of ice under a pressure of 50 bar. Assume that the density of ice under these conditions is approximately $0.92 \\mathrm{~g} \\mathrm{~cm}^{-3}$ and that of liquid water is $1.00 \\mathrm{~g} \\mathrm{~cm}^{-3}$. The required unit for the final answer is $\\mathrm{K}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "272.8"
             },
             {
-                "question": "A container is divided into two equal compartments. One contains $3.0 \\mathrm{~mol} \\mathrm{H}_2(\\mathrm{~g})$ at $25^{\\circ} \\mathrm{C}$; the other contains $1.0 \\mathrm{~mol} \\mathrm{~N}_2(\\mathrm{~g})$ at $25^{\\circ} \\mathrm{C}$. Calculate the Gibbs energy of mixing when the partition is removed. Assume perfect behaviour.",
+                "question": "A container is divided into two equal compartments. One contains $3.0 \\mathrm{~mol} \\mathrm{H}_2(\\mathrm{~g})$ at $25^{\\circ} \\mathrm{C}$; the other contains $1.0 \\mathrm{~mol} \\mathrm{~N}_2(\\mathrm{~g})$ at $25^{\\circ} \\mathrm{C}$. Calculate the Gibbs energy of mixing when the partition is removed. Assume perfect behaviour. The required unit for the final answer is $\\mathrm{~kJ}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-6.9"
             },
             {
-                "question": "Calculate the change in Gibbs energy of $35 \\mathrm{~g}$ of ethanol (mass density $0.789 \\mathrm{~g} \\mathrm{~cm}^{-3}$ ) when the pressure is increased isothermally from 1 atm to 3000 atm.",
+                "question": "Calculate the change in Gibbs energy of $35 \\mathrm{~g}$ of ethanol (mass density $0.789 \\mathrm{~g} \\mathrm{~cm}^{-3}$ ) when the pressure is increased isothermally from 1 atm to 3000 atm. The required unit for the final answer is $\\mathrm{~kJ}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "12"
             },
             {
-                "question": "During a storm, a crate of crepe is sliding across a slick, oily parking lot through a displacement $\\vec{d}=(-3.0 \\mathrm{~m}) \\hat{\\mathrm{i}}$ while a steady wind pushes against the crate with a force $\\vec{F}=(2.0 \\mathrm{~N}) \\hat{\\mathrm{i}}+(-6.0 \\mathrm{~N}) \\hat{\\mathrm{j}}$. If the crate has a kinetic energy of $10 \\mathrm{~J}$ at the beginning of displacement $\\vec{d}$, what is its kinetic energy at the end of $\\vec{d}$ ?",
+                "question": "During a storm, a crate of crepe is sliding across a slick, oily parking lot through a displacement $\\vec{d}=(-3.0 \\mathrm{~m}) \\hat{\\mathrm{i}}$ while a steady wind pushes against the crate with a force $\\vec{F}=(2.0 \\mathrm{~N}) \\hat{\\mathrm{i}}+(-6.0 \\mathrm{~N}) \\hat{\\mathrm{j}}$. If the crate has a kinetic energy of $10 \\mathrm{~J}$ at the beginning of displacement $\\vec{d}$, what is its kinetic energy at the end of $\\vec{d}$ ? The required unit for the final answer is J. Put only the numerical value in \\boxed{...}.",
                 "answer": "4.0"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. The volume of a certain liquid varies with temperature as\r\n$$\r\nV=V^{\\prime}\\left\\{0.75+3.9 \\times 10^{-4}(T / \\mathrm{K})+1.48 \\times 10^{-6}(T / \\mathrm{K})^2\\right\\}\r\n$$\r\nwhere $V^{\\prime}$ is its volume at $300 \\mathrm{~K}$. Calculate its expansion coefficient, $\\alpha$, at $320 \\mathrm{~K}$.",
+                "question": "Assume all gases are perfect unless stated otherwise. Unless otherwise stated, thermodynamic data are for 298.15 K. The volume of a certain liquid varies with temperature as\r\n$$\r\nV=V^{\\prime}\\left\\{0.75+3.9 \\times 10^{-4}(T / \\mathrm{K})+1.48 \\times 10^{-6}(T / \\mathrm{K})^2\\right\\}\r\n$$\r\nwhere $V^{\\prime}$ is its volume at $300 \\mathrm{~K}$. Calculate its expansion coefficient, $\\alpha$, at $320 \\mathrm{~K}$. The required unit for the final answer is $\\mathrm{~K}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.00131"
             },
             {
-                "question": "The world’s largest ball of string is about 2 m in radius. To the nearest order of magnitude, what is the total length L of the string in the ball?",
+                "question": "The world’s largest ball of string is about 2 m in radius. To the nearest order of magnitude, what is the total length L of the string in the ball? The required unit for the final answer is $10^6$ m. Put only the numerical value in \\boxed{...}.",
                 "answer": "2"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the maximum non-expansion work per mole that may be obtained from a fuel cell in which the chemical reaction is the combustion of methane at $298 \\mathrm{~K}$.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. Calculate the maximum non-expansion work per mole that may be obtained from a fuel cell in which the chemical reaction is the combustion of methane at $298 \\mathrm{~K}$. The required unit for the final answer is $\\mathrm{kJ} \\mathrm{mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "817.90"
             },
             {
-                "question": "Two narrow slits are illuminated with red light of wavelength $694.3 \\mathrm{~nm}$ from a laser, producing a set of evenly placed bright bands on a screen located $3.00 \\mathrm{~m}$ beyond the slits. If the distance between the bands is $1.50 \\mathrm{~cm}$, then what is the distance between the slits?",
+                "question": "Two narrow slits are illuminated with red light of wavelength $694.3 \\mathrm{~nm}$ from a laser, producing a set of evenly placed bright bands on a screen located $3.00 \\mathrm{~m}$ beyond the slits. If the distance between the bands is $1.50 \\mathrm{~cm}$, then what is the distance between the slits? The required unit for the final answer is mm. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.139"
             },
             {
-                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. An average human produces about $10 \\mathrm{MJ}$ of heat each day through metabolic activity. If a human body were an isolated system of mass $65 \\mathrm{~kg}$ with the heat capacity of water, what temperature rise would the body experience?",
+                "question": "Assume all gases are perfect unless stated otherwise. Note that 1 atm = 1.013 25 bar. Unless otherwise stated, thermochemical data are for 298.15 K. An average human produces about $10 \\mathrm{MJ}$ of heat each day through metabolic activity. If a human body were an isolated system of mass $65 \\mathrm{~kg}$ with the heat capacity of water, what temperature rise would the body experience? The required unit for the final answer is $\\text{K}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "+37"
             },
             {
-                "question": "Calculate the de Broglie wavelength of an electron moving at 1/137th the speed of light. (At this speed, the relativistic correction to the mass is negligible.)",
+                "question": "Calculate the de Broglie wavelength of an electron moving at 1/137th the speed of light. (At this speed, the relativistic correction to the mass is negligible.) The required unit for the final answer is $\\mathrm{~nm}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.332"
             },
             {
-                "question": "Calculate the uncertainty $\\Delta L_z$ for the hydrogen-atom stationary state: $2 p_z$.",
+                "question": "Calculate the uncertainty $\\Delta L_z$ for the hydrogen-atom stationary state: $2 p_z$. Put only the numerical value in \\boxed{...}.",
                 "answer": "0"
             },
             {
-                "question": "Calculate the degree of dissociation of $\\mathrm{N}_2 \\mathrm{O}_4$ in the reaction $\\mathrm{N}_2 \\mathrm{O}_4(g) \\rightleftharpoons 2 \\mathrm{NO}_2(g)$ at 300 . $\\mathrm{K}$ and a total pressure of 1.50 bar. Do you expect the degree of dissociation to increase or decrease as the temperature is increased to 550 . K? Assume that $\\Delta H_R^{\\circ}$ is independent of temperature.",
+                "question": "Calculate the degree of dissociation of $\\mathrm{N}_2 \\mathrm{O}_4$ in the reaction $\\mathrm{N}_2 \\mathrm{O}_4(g) \\rightleftharpoons 2 \\mathrm{NO}_2(g)$ at 300 . $\\mathrm{K}$ and a total pressure of 1.50 bar. Do you expect the degree of dissociation to increase or decrease as the temperature is increased to 550 . K? Assume that $\\Delta H_R^{\\circ}$ is independent of temperature. Put only the numerical value in \\boxed{...}.",
                 "answer": "0.241"
             },
             {
-                "question": "Calculate the moment of inertia of an $\\mathrm{H}_2 \\mathrm{O}$ molecule around the axis defined by the bisector of the $\\mathrm{HOH}$ angle (3). The $\\mathrm{HOH}$ bond angle is $104.5^{\\circ}$ and the bond length is $95.7 \\mathrm{pm}$.",
+                "question": "Calculate the moment of inertia of an $\\mathrm{H}_2 \\mathrm{O}$ molecule around the axis defined by the bisector of the $\\mathrm{HOH}$ angle (3). The $\\mathrm{HOH}$ bond angle is $104.5^{\\circ}$ and the bond length is $95.7 \\mathrm{pm}$. The required unit for the final answer is $10^{-47} \\mathrm{~kg} \\mathrm{~m}^2$. Put only the numerical value in \\boxed{...}.",
                 "answer": "1.91"
             },
             {
-                "question": "An astronaut travels to the nearest star system, 4 light years away, and returns at a speed $0.3c$. How much has the astronaut aged relative to those people remaining on Earth?",
+                "question": "An astronaut travels to the nearest star system, 4 light years away, and returns at a speed $0.3c$. How much has the astronaut aged relative to those people remaining on Earth? The required unit for the final answer is years. Put only the numerical value in \\boxed{...}.",
                 "answer": "25.4"
             },
             {
-                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. A sample consisting of $3.00 \\mathrm{~mol}$ of diatomic perfect gas molecules at $200 \\mathrm{~K}$ is compressed reversibly and adiabatically until its temperature reaches $250 \\mathrm{~K}$. Given that $C_{V, \\mathrm{~m}}=27.5 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$, calculate $\\Delta U$.",
+                "question": "Assume that all gases are perfect and that data refer to 298.15 K unless otherwise stated. A sample consisting of $3.00 \\mathrm{~mol}$ of diatomic perfect gas molecules at $200 \\mathrm{~K}$ is compressed reversibly and adiabatically until its temperature reaches $250 \\mathrm{~K}$. Given that $C_{V, \\mathrm{~m}}=27.5 \\mathrm{~J} \\mathrm{~K}^{-1} \\mathrm{~mol}^{-1}$, calculate $\\Delta U$. The required unit for the final answer is $\\text{kJ}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "+4.1"
             },
             {
-                "question": "The ground level of $\\mathrm{Cl}$ is ${ }^2 \\mathrm{P}_{3 / 2}$ and a ${ }^2 \\mathrm{P}_{1 / 2}$ level lies $881 \\mathrm{~cm}^{-1}$ above it. Calculate the electronic contribution to the molar Gibbs energy of $\\mathrm{Cl}$ atoms at  $500 \\mathrm{~K}$.",
+                "question": "The ground level of $\\mathrm{Cl}$ is ${ }^2 \\mathrm{P}_{3 / 2}$ and a ${ }^2 \\mathrm{P}_{1 / 2}$ level lies $881 \\mathrm{~cm}^{-1}$ above it. Calculate the electronic contribution to the molar Gibbs energy of $\\mathrm{Cl}$ atoms at  $500 \\mathrm{~K}$. The required unit for the final answer is $\\mathrm{~kJ} \\mathrm{~mol}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-6.42"
             },
             {
-                "question": "The force constant of ${ }^{35} \\mathrm{Cl}^{35} \\mathrm{Cl}$ is $319 \\mathrm{~N} \\cdot \\mathrm{m}^{-1}$. Calculate the fundamental vibrational frequency",
+                "question": "The force constant of ${ }^{35} \\mathrm{Cl}^{35} \\mathrm{Cl}$ is $319 \\mathrm{~N} \\cdot \\mathrm{m}^{-1}$. Calculate the fundamental vibrational frequency The required unit for the final answer is $\\mathrm{~cm}^{-1}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "556"
             },
             {
-                "question": "While you are operating a Rotor (a large, vertical, rotating cylinder found in amusement parks), you spot a passenger in acute distress and decrease the angular velocity of the cylinder from $3.40 \\mathrm{rad} / \\mathrm{s}$ to $2.00 \\mathrm{rad} / \\mathrm{s}$ in $20.0 \\mathrm{rev}$, at constant angular acceleration. (The passenger is obviously more of a \"translation person\" than a \"rotation person.\")\r\nWhat is the constant angular acceleration during this decrease in angular speed?",
+                "question": "While you are operating a Rotor (a large, vertical, rotating cylinder found in amusement parks), you spot a passenger in acute distress and decrease the angular velocity of the cylinder from $3.40 \\mathrm{rad} / \\mathrm{s}$ to $2.00 \\mathrm{rad} / \\mathrm{s}$ in $20.0 \\mathrm{rev}$, at constant angular acceleration. (The passenger is obviously more of a \"translation person\" than a \"rotation person.\")\r\nWhat is the constant angular acceleration during this decrease in angular speed? The required unit for the final answer is $\\mathrm{rad} / \\mathrm{s}^2$. Put only the numerical value in \\boxed{...}.",
                 "answer": "-0.0301"
             },
             {
-                "question": "A charge of $20 \\mathrm{nC}$ is uniformly distributed along a straight rod of length $4.0 \\mathrm{~m}$ that is bent into a circular arc with a radius of $2.0 \\mathrm{~m}$. What is the magnitude of the electric field at the center of curvature of the arc?",
+                "question": "A charge of $20 \\mathrm{nC}$ is uniformly distributed along a straight rod of length $4.0 \\mathrm{~m}$ that is bent into a circular arc with a radius of $2.0 \\mathrm{~m}$. What is the magnitude of the electric field at the center of curvature of the arc? The required unit for the final answer is $\\mathrm{~N} / \\mathrm{C}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "38"
             },
             {
-                "question": "Imagine tossing a coin 50 times. What are the probabilities of observing heads 25 times (i.e., 25 successful experiments)?",
+                "question": "Imagine tossing a coin 50 times. What are the probabilities of observing heads 25 times (i.e., 25 successful experiments)? Put only the numerical value in \\boxed{...}.",
                 "answer": "0.11"
             },
             {
-                "question": "A uniform electric field exists in a region between two oppositely charged plates. An electron is released from rest at the surface of the negatively charged plate and strikes the surface of the opposite plate, $2.0 \\mathrm{~cm}$ away, in a time $1.5 \\times 10^{-8} \\mathrm{~s}$. What is the speed of the electron as it strikes the second plate?",
+                "question": "A uniform electric field exists in a region between two oppositely charged plates. An electron is released from rest at the surface of the negatively charged plate and strikes the surface of the opposite plate, $2.0 \\mathrm{~cm}$ away, in a time $1.5 \\times 10^{-8} \\mathrm{~s}$. What is the speed of the electron as it strikes the second plate? The required unit for the final answer is $10^6$. Put only the numerical value in \\boxed{...}.",
                 "answer": "2.7"
             },
             {
-                "question": "A deuteron (nucleus of deuterium atom consisting of a proton and a neutron) with speed $14.9 \\mathrm{~km} / \\mathrm{s}$ collides elastically with a neutron at rest. Use the approximation that the deuteron is twice the mass of the neutron. If the deuteron is scattered through a $\\mathrm{LAB}$ angle $\\psi=10^{\\circ}$, what is the final speed of the deuteron?",
+                "question": "A deuteron (nucleus of deuterium atom consisting of a proton and a neutron) with speed $14.9 \\mathrm{~km} / \\mathrm{s}$ collides elastically with a neutron at rest. Use the approximation that the deuteron is twice the mass of the neutron. If the deuteron is scattered through a $\\mathrm{LAB}$ angle $\\psi=10^{\\circ}$, what is the final speed of the deuteron? The required unit for the final answer is $\\mathrm{~km} / \\mathrm{s}$. Put only the numerical value in \\boxed{...}.",
                 "answer": "14.44"
             }
         ]

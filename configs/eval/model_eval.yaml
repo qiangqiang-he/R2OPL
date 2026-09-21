@@ -2,11 +2,8 @@
 #
 # Launch:  bash scripts/start_eval.sh configs/eval/model_eval.yaml
 #
-# Paths are resolved against the project root; the five models below also
-# exist under the local WSL ./models directory.  On the server, either place
-# the models under ./models or replace the paths with the absolute
-# /mnt/cephfs/LLM_MODEL_HUB locations (known: qwen/Qwen3-1.7B, qwen/Qwen3-4B,
-# gemma/gemma-4-E2B-it, gemma/gemma-4-12B-it).
+# The listed paths are the formal server model locations. Local test-only
+# configurations live under tests/configs/eval and use the WSL ./models paths.
 run_name: model_eval
 
 model_source:
@@ -59,7 +56,7 @@ runtime:
   # model loads.  gemma-4-12B-it needs one full replica per H100 (bf16).
   gpus: [0, 1, 2, 3, 4, 5, 6, 7]
   tensor_parallel_size: 1
-  # Exactly 256 rollouts per GPU generate call (16 questions x n=16).
+  # Up to 256 rollouts per GPU call; smaller batches also spread across GPUs.
   rollouts_per_gpu_batch: 256
   # Refuse to load when less than this much GPU memory would stay free.
   min_free_gib: 5.0
@@ -73,24 +70,32 @@ engine:
   enable_prefix_caching: true
 
 ersr:
-  # student_action scores CORRECT trajectories and needs no Teacher, so it is
-  # valid for both model families in this shared config.  teacher_replace
-  # (incorrect trajectories) requires a same-tokenizer-family Teacher and
-  # therefore belongs in per-family configs: Qwen3-4B-Instruct-2507 for the
-  # qwen3 models, gemma-4-12B-it for the gemma models.
+  # Each model completes base metrics, Teacher replacement, and Student MC
+  # before the next model starts. Token-exact replacement needs a compatible
+  # Teacher vocabulary, so mixed families specify their Teachers separately.
   enabled: true
-  actions: [student_action]
+  # Teachers run in their own vLLM phase; Student engine memory stays unchanged.
+  gpu_memory_utilization: 0.85
+  actions: [student_action, teacher_replace]
   datasets: [AMC23, AIME24, SciBench, LogicBench]
-  max_steps_per_dataset: 500
+  # Up to 200 non-final reasoning steps per dataset PER ACTION.
+  max_steps_per_dataset: 200
   mc_k: 2
   max_teacher_step_tokens: 2048
   temperature: 0.6
   top_p: 0.95
   top_k: -1
   seed: 42
+  teachers:
+    qwen3:
+      name: Qwen3-4B-Instruct-2507
+      path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B-Instruct-2507
+    gemini4:
+      name: gemma-4-12B-it
+      path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-12B-it
 
 report:
-  save_rollouts: false
+  save_rollouts: true
 
 # Results:
 #   ./eval_results/model_eval/<model_name>.json

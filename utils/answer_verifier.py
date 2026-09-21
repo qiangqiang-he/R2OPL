@@ -444,6 +444,52 @@ def verify_response_answer(response: str, answer: str) -> float:
     return float(answers_equivalent(prediction, str(answer)))
 
 
+def _scibench_numeric_value(answer: object) -> float | None:
+    """Parse the scalar using the official SciBench evaluator's rules.
+
+    SciBench tells the model which unit to use in the question, so its gold
+    answer is the numerical coefficient in that unit. The benchmark tries the
+    complete payload and then its first whitespace-delimited token. It does not
+    infer units or evaluate LaTeX expressions.
+    """
+
+    value = _repair(answer).replace(",", "").strip()
+    candidates = [value]
+    if value.split():
+        candidates.append(value.split()[0])
+    for candidate in candidates:
+        try:
+            parsed = float(candidate)
+            if math.isfinite(parsed):
+                return parsed
+        except ValueError:
+            continue
+    return None
+
+
+def verify_scibench_response_answer(response: str, answer: str) -> float:
+    """Score a SciBench response with its official 5% relative tolerance."""
+
+    prediction, valid_format = extract_final_answer(response)
+    if not valid_format:
+        return 0.0
+    predicted_value = _scibench_numeric_value(prediction)
+    target_value = _scibench_numeric_value(answer)
+    if predicted_value is None or target_value is None:
+        return 0.0
+    return float(math.isclose(predicted_value, target_value, rel_tol=0.05))
+
+
+def verify_dataset_response_answer(
+    response: str, answer: str, data_source: str
+) -> float:
+    """Route only SciBench to its benchmark-specific numerical verifier."""
+
+    if str(data_source).strip().casefold() == "scibench":
+        return verify_scibench_response_answer(response, answer)
+    return verify_response_answer(response, answer)
+
+
 __all__ = [
     "answers_equivalent",
     "choice_labels",
@@ -451,5 +497,7 @@ __all__ = [
     "extract_boxed_answers",
     "extract_final_answer",
     "inspect_answer_format",
+    "verify_dataset_response_answer",
     "verify_response_answer",
+    "verify_scibench_response_answer",
 ]

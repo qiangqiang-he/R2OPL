@@ -88,10 +88,49 @@ Qwen3 is the default model family. Gemini 4 is enabled by overriding both
 family fields and the two model paths together; mixed tokenizer families are
 rejected because PG-OPD must score the Student's original sampled token IDs.
 
+## Evaluation
+
+`bash scripts/start_eval.sh configs/eval/<config>.yaml` runs standalone
+vLLM evaluations that are independent of the training stack.  Every config
+under `configs/eval/` is fully self-contained (there is no shared
+`eval_base.yaml`).  Two model sources are supported: `training_output`
+discovers every `global_step_*` checkpoint of a VERL run (merging FSDP actor
+shards on demand) and `model_source: hf_models` evaluates explicit local
+model directories.  On the formal 8-GPU server each GPU loads one complete
+model replica and dynamically takes question batches of up to 256 rollouts
+per generate call by default; an optional `ersr` block adds Expected
+Reasoning-Step Return with the same seed arithmetic as training-time ERSR.
+`prompt_template` selects `explicit_step_prompt` (default) or
+`cross_domain_prompt` from `utils/prompts.py`.  Results land under
+`eval_results/` as JSON (Avg@n, Pass@n, mean_length, truncation_rate at every
+configured token limit, plus per-sample Avg@n and the ERSR report).
+`--validate-only` checks the whole contract on CPU.
+
+SciBench uses numerical grading with 5% relative tolerance, including ERSR
+continuations; other datasets retain exact math/choice grading. SciBench
+questions must specify the required unit; the scorer does not convert units.
+Training rewards are unchanged.
+
+ERSR defaults to at most 200 non-final reasoning steps **per dataset and per
+action** (`max_steps_per_dataset`). `teacher_replace` requires `ersr.teacher`;
+mixed-family model lists can instead use `ersr.teachers.qwen3` and
+`ersr.teachers.gemini4`, each with `name` and `path`. Teacher and Student
+token-to-ID vocabularies are checked before generation.
+
+Checkpoint evaluation finishes and saves all base metrics first, runs one
+Teacher phase for all selected checkpoints, releases the Teacher, then runs
+Student MC continuations checkpoint by checkpoint. All phases use every GPU
+in `runtime.gpus` (set `[0]` for local testing). FSDP actor shards are merged
+once on CPU; temporary merged weights remain on disk until their Student
+phase finishes and are removed on success or failure. Direct HF model lists
+complete these phases separately for each model. Raw rollouts are saved when
+`report.save_rollouts: true`; checkpoint results are saved after each phase.
+
 ## Test boundary
 
-Local migration tests are under `tests/` and are CPU-only. They validate the
-prompt contract, both JSON layouts, boxed-answer rewards, signed advantages,
-padding masks, Hydra composition, and the formal 4+4 resource-pool plan. Full
-rollout, Teacher forward, backward, and distributed execution remain server
-tests.
+Local tests are under `tests/`, including CPU regressions and single-GPU
+evaluation smoke tests through `start_eval.sh`. They cover model lists,
+FSDP checkpoint merging, staged ERSR, dataset grading, and memory headroom.
+The evaluation smoke configs are `tests/configs/eval/phase_models_single_gpu.yaml`
+and `phase_checkpoints_single_gpu.yaml`. Full eight-GPU execution still
+requires the server; local checkpoint fixtures use eight CPU DTensor ranks.
