@@ -24,7 +24,7 @@ distillation:
   nnodes: 1
   teacher_models:
     teacher_model:
-      model_path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
+      model_path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B-Instruct-2507
       inference:
         name: vllm
         dtype: bfloat16

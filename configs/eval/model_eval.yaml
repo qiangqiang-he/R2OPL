@@ -1,0 +1,98 @@
+# Shared multi-model evaluation: every listed model runs on every dataset.
+#
+# Launch:  bash scripts/start_eval.sh configs/eval/model_eval.yaml
+#
+# Paths are resolved against the project root; the five models below also
+# exist under the local WSL ./models directory.  On the server, either place
+# the models under ./models or replace the paths with the absolute
+# /mnt/cephfs/LLM_MODEL_HUB locations (known: qwen/Qwen3-1.7B, qwen/Qwen3-4B,
+# gemma/gemma-4-E2B-it, gemma/gemma-4-31B).
+run_name: model_eval
+
+model_source:
+  type: hf_models
+  models:
+    - name: Qwen3-1.7B
+      path: ./models/Qwen3-1.7B
+    - name: Qwen3-4B
+      path: ./models/Qwen3-4B
+    - name: Qwen3-4B-Instruct-2507
+      path: ./models/Qwen3-4B-Instruct-2507
+    - name: gemma-4-E2B-it
+      path: ./models/gemma-4-E2B-it
+    - name: gemma-4-31B-it
+      path: ./models/gemma-4-31B-it
+      # The family is derived automatically (qwen3 / gemini4); add an explicit
+      # `family:` field only if autodetection ever fails.
+
+data:
+  val_files: ["./data/MSL_Eval.json"]
+  val_datasets:
+    - AMC23
+    - AIME24
+    - AIME25
+    - MATH-500
+    - GPQA-D
+    - SciBench
+    - LogicBench
+    - LogiQA2.0
+
+# utils/prompts.py templates: explicit_step_prompt (project default) or
+# cross_domain_prompt.
+prompt_template: explicit_step_prompt
+seed: 42
+
+sampling:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  n: 16
+  max_new_tokens: 20480
+
+# Generate once at sampling.max_new_tokens, then re-score each token prefix
+# at every limit below (unique, ascending, ending at max_new_tokens).
+length_control: [8192, 16384, 20480]
+
+runtime:
+  # Eight independent workers; every GPU loads one complete model replica.
+  # Models run strictly sequentially; a model's workers exit before the next
+  # model loads.  gemma-4-31B-it needs one full replica per H100 (bf16).
+  gpus: [0, 1, 2, 3, 4, 5, 6, 7]
+  tensor_parallel_size: 1
+  # Exactly 256 rollouts per GPU generate call (16 questions x n=16).
+  rollouts_per_gpu_batch: 256
+  # Refuse to load when less than this much GPU memory would stay free.
+  min_free_gib: 5.0
+
+engine:
+  dtype: bfloat16
+  trust_remote_code: true
+  gpu_memory_utilization: 0.90
+  # 2048-token prompt budget + 20480 generated tokens.
+  max_model_len: 22528
+  enable_prefix_caching: true
+
+ersr:
+  # student_action scores CORRECT trajectories and needs no Teacher, so it is
+  # valid for both model families in this shared config.  teacher_replace
+  # (incorrect trajectories) requires a same-tokenizer-family Teacher and
+  # therefore belongs in per-family configs: Qwen3-4B-Instruct-2507 for the
+  # qwen3 models, gemma-4-31B-it for the gemma models.
+  enabled: true
+  actions: [student_action]
+  datasets: [AMC23, AIME24, SciBench, LogicBench]
+  max_steps_per_dataset: 500
+  mc_k: 2
+  max_teacher_step_tokens: 2048
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  seed: 42
+
+report:
+  save_rollouts: false
+
+# Results:
+#   ./eval_results/model_eval/<model_name>.json
+#   ./eval_results/model_eval/summary.json
+result_dir: ./eval_results

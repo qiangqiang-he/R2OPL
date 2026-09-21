@@ -1,0 +1,83 @@
+# Evaluate every checkpoint of one PG-OPD training output on the formal
+# 8-GPU server.  Each GPU loads one complete Student replica (tensor
+# parallelism stays 1) and dynamically takes question batches; models are
+# evaluated strictly sequentially, one checkpoint after another.
+#
+# FSDP actor shards (model_world_size_N_rank_K.pt) are merged with
+# verl.model_merger into a temporary directory inside training_output and
+# deleted right after that checkpoint finishes.  Checkpoints that already
+# contain a complete Hugging Face model directory are loaded directly.
+#
+# Paths are resolved relative to the project root.
+training_output: ./outputs/pg_opd_qwen3_4b_instruct_2507_to_4b_no_thinking_100steps
+
+data:
+  val_files: ["./data/MSL_Eval.json"]
+  val_datasets:
+    - AMC23
+    - AIME24
+    - AIME25
+    - MATH-500
+    - GPQA-D
+    - SciBench
+    - LogicBench
+    - LogiQA2.0
+
+# utils/prompts.py templates: explicit_step_prompt (project default) or
+# cross_domain_prompt.
+prompt_template: explicit_step_prompt
+seed: 42
+
+sampling:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  n: 16
+  max_new_tokens: 20480
+
+# Generate once at sampling.max_new_tokens, then re-score each token prefix
+# at every limit below.  Values must be unique, ascending, and end at
+# sampling.max_new_tokens.
+length_control: [8192, 16384, 20480]
+
+runtime:
+  # Eight independent single-GPU workers; every GPU holds one full model.
+  gpus: [0, 1, 2, 3, 4, 5, 6, 7]
+  tensor_parallel_size: 1
+  # Exactly 256 rollouts per GPU generate call (16 questions x n=16).
+  rollouts_per_gpu_batch: 256
+  # Refuse to load when less than this much GPU memory would stay free.
+  min_free_gib: 5.0
+
+engine:
+  dtype: bfloat16
+  trust_remote_code: true
+  gpu_memory_utilization: 0.90
+  # 2048-token prompt budget + 20480 generated tokens.
+  max_model_len: 22528
+  enable_prefix_caching: true
+
+ersr:
+  enabled: true
+  # student_action scores correct trajectories, teacher_replace scores
+  # incorrect ones (hybrid semantics, like R^2OPL-base validation).
+  actions: [student_action, teacher_replace]
+  # Must be a subset of data.val_datasets.
+  datasets: [AMC23, AIME24, SciBench, LogicBench]
+  max_steps_per_dataset: 500
+  mc_k: 2
+  max_teacher_step_tokens: 2048
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  seed: 42
+  teacher:
+    name: Qwen3-4B-Instruct-2507
+    path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B-Instruct-2507
+
+report:
+  # Also write the ERSR-eligible raw rollouts (text + token IDs) as JSONL.
+  save_rollouts: true
+
+# Final JSON: ./eval_results/<training_output name>.json
+result_dir: ./eval_results
