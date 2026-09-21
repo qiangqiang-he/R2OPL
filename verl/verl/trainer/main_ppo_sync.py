@@ -2001,28 +2001,23 @@ class PPOTrainer:
         if self._dump_executor._shutdown:
             self._init_dump_executor()
 
-        # Restore the training checkpoint before creating the WandB run.  This
-        # gives Tracking the exact resumed step and prevents it from attaching
-        # stale output metadata to a fresh training run.
-        self._load_checkpoint()
-
         self.logger = Tracking(
             project_name=self.config.trainer.project_name,
             experiment_name=self.config.trainer.experiment_name,
             default_backend=self.config.trainer.logger,
             config=OmegaConf.to_container(self.config, resolve=True),
-            resume_step=self.global_steps,
         )
         self.validation_generations_logger = ValidationGenerationsLogger(
             project_name=self.config.trainer.project_name,
             experiment_name=self.config.trainer.experiment_name,
         )
 
+        # load checkpoint and update weights before doing anything
+        self._load_checkpoint()
         self.checkpoint_manager.update_weights()
 
         # perform validation before training
-        skip_initial_validation = self.logger.should_skip_initial_validation(self.global_steps)
-        if self.config.trainer.get("val_before_train", True) and not skip_initial_validation:
+        if self.config.trainer.get("val_before_train", True):
             val_metrics = self._validate()
             assert val_metrics, f"{val_metrics=}"
             pprint(f"Initial validation metrics: {val_metrics}")
@@ -2030,12 +2025,6 @@ class PPOTrainer:
             if self.config.trainer.get("val_only", False):
                 self._shutdown_dump_executor()
                 return
-        elif skip_initial_validation:
-            logger.info("Skipping initial validation because training and WandB are both being resumed")
-            if self.config.trainer.get("val_only", False):
-                self._shutdown_dump_executor()
-                return
-
         current_epoch = self.global_steps // len(self.train_dataloader)
         progress_bar = tqdm(total=self.total_training_steps, initial=self.global_steps, desc="Training Progress")
 

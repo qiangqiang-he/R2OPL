@@ -189,14 +189,6 @@ trainer:
   # Path to resume training from (only used when resume_mode is "resume_path")
   resume_from_path: null
 
-  # Optional WandB run ID for importing a pre-existing run during checkpoint resume.
-  # When omitted, the run ID saved in default_local_dir/wandb_state.json is used.
-  wandb_run_id: null
-
-  # Optional override for the last step already uploaded to the imported WandB run.
-  # Normally this is discovered automatically from WandB and local state metadata.
-  wandb_last_logged_step: null
-
   # Fully qualified class name of a user-defined checkpoint callback,
   # e.g. "my_pkg.callbacks.MyCheckpointCallback". Instantiated on the driver with the
   # full trainer config; its on_save hook is called after each checkpoint save,
