@@ -1450,6 +1450,18 @@ class AgentLoopWorker:
                         f"prompt capacity: {len(sol_unprivileged_teacher_prompt_ids)} "
                         f"> {teacher_prompt_length}."
                     )
+            elif algorithm_name in {"pg_opd", "opdvr", "eopd", "r2opl_base"}:
+                # The dataset renders and encodes the Teacher's native template
+                # independently. Never re-encode or truncate it with the
+                # Student tokenizer/prompt limit here.
+                if "teacher_prompt_ids" not in sample_kwargs:
+                    raise RuntimeError(
+                        f"{algorithm_name} requires native teacher_prompt_ids from the dataset; "
+                        "rebuild the dataset with the Teacher tokenizer."
+                    )
+                teacher_prompt_ids = normalize_token_ids(sample_kwargs["teacher_prompt_ids"])
+                if not teacher_prompt_ids:
+                    raise ValueError(f"{algorithm_name} teacher_prompt_ids must not be empty")
             else:
                 teacher_prompt_ids = await self.tokenize_preformatted_prompt(
                     str(teacher_prompt_text)
@@ -1609,14 +1621,13 @@ class AgentLoopWorker:
                 answer = str(
                     _python_scalar(sample_kwargs.get("oa_ground_truth_answer", ""))
                 )
-                if teacher_prompt_ids != prompt_ids:
-                    raise RuntimeError(
-                        "R²OPL-base requires identical Student/Teacher "
-                        "prompt token IDs so every probe preserves the original rollout prefix."
-                    )
                 from utils.r2opl_v2 import compute_r2opl_v2_probe
 
                 with simple_timer("r2opl_answer_probe_s", timing):
+                    # The truncation probe runs on the Student policy and must
+                    # preserve its original rollout prefix.  Teacher scoring
+                    # above can therefore use its own independently rendered
+                    # chat template without changing this probe.
                     probe_result = await compute_r2opl_v2_probe(
                         tokenizer=self.tokenizer,
                         student_probe=self._compute_student_answer_probe_mean_logprob,

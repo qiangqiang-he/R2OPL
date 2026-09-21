@@ -122,6 +122,8 @@ def validate_opdvr_config(config) -> None:
 class OPDVRTrainer(BasePGOPDTrainer):
     """Trainer for correctness-gated OPDVR (optional GRPD scaling)."""
 
+    expected_loss_mode = OPDVR_LOSS_MODE
+
     def __init__(self, *args, **kwargs):
         config = kwargs.get("config") if kwargs else None
         if config is None and args:

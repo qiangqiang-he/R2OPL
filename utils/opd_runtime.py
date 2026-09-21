@@ -27,6 +27,30 @@ from verl.trainer import main_ppo_sync as verl_sync
 TOKEN_SELECTION_METHODS = {"random", "topgap", "bottomgap"}
 
 
+def configure_native_teacher_prompt(config, teacher_family: str) -> None:
+    """Pass the Teacher's independent native-prompt contract to the dataset.
+
+    A response sampled by the Student can be scored by a larger Teacher only
+    when the two tokenizers have identical token-to-ID mappings.  That does
+    *not* make their chat templates interchangeable: the dataset must render
+    each template itself and preserve the Teacher's encoded prefix.
+    """
+    teachers = config.distillation.teacher_models
+    if set(teachers) != {"teacher_model"}:
+        raise ValueError("Native Teacher prompts currently require exactly one Teacher")
+    teacher = teachers.teacher_model
+    spec = {
+        "model_path": str(teacher.model_path),
+        "model_family": str(teacher_family),
+        "max_prompt_length": int(teacher.inference.prompt_length),
+        "prompt_name": str(config.prompt_template),
+    }
+    OmegaConf.update(config, "data.native_teacher", spec, force_add=True)
+    # Retain the provisional PG-OPD key for already composed configurations
+    # and local test tooling while all consumers move to ``native_teacher``.
+    OmegaConf.update(config, "data.pg_opd_teacher", spec, force_add=True)
+
+
 def validate_verl_pg_opd_support() -> None:
     """Fail early when the active VERL lacks the required PG-OPD kernel."""
 
@@ -172,6 +196,7 @@ def configure_pg_opd_defaults(config) -> str:
         str(config.prompt_template),
         force_add=True,
     )
+    configure_native_teacher_prompt(config, teacher_family)
     return student_family
 
 
@@ -512,11 +537,13 @@ class BaseR2OPLTrainer(verl_sync.PPOTrainer):
 class BasePGOPDTrainer(BaseR2OPLTrainer):
     """Shared validation plus PG-OPD Teacher-replacement ERSR."""
 
+    expected_loss_mode = "reverse_kl"
+
     def __init__(self, *args, **kwargs):
         config = kwargs.get("config") if kwargs else None
         if config is None and args:
             config = args[0]
-        validate_pg_opd_runtime_config(config)
+        validate_pg_opd_runtime_config(config, expected_loss_mode=self.expected_loss_mode)
         super().__init__(*args, **kwargs)
 
     def _additional_validation_metrics(

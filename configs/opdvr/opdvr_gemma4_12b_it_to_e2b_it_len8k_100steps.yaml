@@ -1,13 +1,13 @@
 # @package _global_
 
-# OPDVR: Gemma-4-31B-it Teacher -> Gemma-4-E2B-it Student, 200 steps.
+# OPDVR: gemma-4-12B-it Teacher -> Gemma-4-E2B-it Student, 200 steps.
 
 defaults:
   - /opdvr
   - _self_
 
-run_name: opdvr_gemma4_31b_it_to_e2b_it_len8k_100steps
-run_name_prefix: opdvr_gemma4_31b_it_to_e2b_it_len8k_100steps
+run_name: opdvr_gemma4_12b_it_to_e2b_it_len8k_100steps
+run_name_prefix: opdvr_gemma4_12b_it_to_e2b_it_len8k_100steps
 
 student_model_family: gemini4
 teacher_model_family: gemini4
@@ -48,12 +48,14 @@ distillation:
   teacher_chunk_size: 128
   teacher_models:
     teacher_model:
-      model_path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-31B
+      model_path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-12B-it
       inference:
         enable_sleep_mode: false
         free_cache_engine: false
         response_length: 8192
+        # One complete 12B BF16 Teacher replica on each dedicated GPU.
         tensor_model_parallel_size: 1
+        gpu_memory_utilization: 0.85
         max_model_len: 22528
         engine_kwargs:
           vllm:

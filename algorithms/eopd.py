@@ -260,6 +260,25 @@ def _configure_run_metadata(config) -> tuple[str, str]:
     return run_name, group_name
 
 
+def _configure_native_teacher_prompt(config, teacher_family: str) -> None:
+    """Give the shared dataset the one Teacher's own tokenizer contract."""
+    teachers = config.distillation.teacher_models
+    if set(teachers) != {"teacher_model"}:
+        raise ValueError("EOPD native prompts currently require exactly one Teacher")
+    teacher = teachers.teacher_model
+    OmegaConf.update(
+        config,
+        "data.native_teacher",
+        {
+            "model_path": str(teacher.model_path),
+            "model_family": str(teacher_family),
+            "max_prompt_length": int(teacher.inference.prompt_length),
+            "prompt_name": str(config.prompt_template),
+        },
+        force_add=True,
+    )
+
+
 def configure_eopd_defaults(config) -> str:
     """Install EOPD's dataset/prompt defaults before VERL starts."""
 
@@ -289,6 +308,7 @@ def configure_eopd_defaults(config) -> str:
     OmegaConf.update(config, "data.model_family", student_family, force_add=True)
     OmegaConf.update(config, "student_prompt", prompt_name, force_add=True)
     OmegaConf.update(config, "teacher_prompt", prompt_name, force_add=True)
+    _configure_native_teacher_prompt(config, teacher_family)
     _configure_run_metadata(config)
     return student_family
 

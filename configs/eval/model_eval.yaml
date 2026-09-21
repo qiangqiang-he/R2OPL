@@ -6,7 +6,7 @@
 # exist under the local WSL ./models directory.  On the server, either place
 # the models under ./models or replace the paths with the absolute
 # /mnt/cephfs/LLM_MODEL_HUB locations (known: qwen/Qwen3-1.7B, qwen/Qwen3-4B,
-# gemma/gemma-4-E2B-it, gemma/gemma-4-31B).
+# gemma/gemma-4-E2B-it, gemma/gemma-4-12B-it).
 run_name: model_eval
 
 model_source:
@@ -20,8 +20,8 @@ model_source:
       path: ./models/Qwen3-4B-Instruct-2507
     - name: gemma-4-E2B-it
       path: ./models/gemma-4-E2B-it
-    - name: gemma-4-31B-it
-      path: ./models/gemma-4-31B-it
+    - name: gemma-4-12B-it
+      path: ./models/gemma-4-12B-it
       # The family is derived automatically (qwen3 / gemini4); add an explicit
       # `family:` field only if autodetection ever fails.
 
@@ -56,7 +56,7 @@ length_control: [8192, 16384, 20480]
 runtime:
   # Eight independent workers; every GPU loads one complete model replica.
   # Models run strictly sequentially; a model's workers exit before the next
-  # model loads.  gemma-4-31B-it needs one full replica per H100 (bf16).
+  # model loads.  gemma-4-12B-it needs one full replica per H100 (bf16).
   gpus: [0, 1, 2, 3, 4, 5, 6, 7]
   tensor_parallel_size: 1
   # Exactly 256 rollouts per GPU generate call (16 questions x n=16).
@@ -77,7 +77,7 @@ ersr:
   # valid for both model families in this shared config.  teacher_replace
   # (incorrect trajectories) requires a same-tokenizer-family Teacher and
   # therefore belongs in per-family configs: Qwen3-4B-Instruct-2507 for the
-  # qwen3 models, gemma-4-31B-it for the gemma models.
+  # qwen3 models, gemma-4-12B-it for the gemma models.
   enabled: true
   actions: [student_action]
   datasets: [AMC23, AIME24, SciBench, LogicBench]

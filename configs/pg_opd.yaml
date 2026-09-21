@@ -33,7 +33,7 @@ distillation:
         tensor_model_parallel_size: 1
         data_parallel_size: 1
         pipeline_model_parallel_size: 1
-        gpu_memory_utilization: 0.55
+        gpu_memory_utilization: 0.85
         prompt_length: 2048
         response_length: 8192
         # ERSR reuses this Teacher server for validation prefixes as long as

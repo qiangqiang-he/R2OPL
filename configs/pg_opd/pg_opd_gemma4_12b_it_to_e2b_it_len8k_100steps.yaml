@@ -1,13 +1,13 @@
 # @package _global_
 
-# EOPD: Gemma-4-31B-it Teacher -> Gemma-4-E2B-it Student.
+# PG-OPD: gemma-4-12B-it Teacher -> Gemma-4-E2B-it Student.
 
 defaults:
-  - /eopd
+  - /pg_opd
   - _self_
 
-run_name: eopd_gemma4_31b_it_to_e2b_it_len8k_100steps
-run_name_prefix: eopd_gemma4_31b_it_to_e2b_it_len8k_100steps
+run_name: pg_opd_gemma4_12b_it_to_e2b_it_len8k_100steps
+run_name_prefix: pg_opd_gemma4_12b_it_to_e2b_it_len8k_100steps
 
 student_model_family: gemini4
 teacher_model_family: gemini4
@@ -48,22 +48,20 @@ distillation:
   teacher_chunk_size: 128
   teacher_models:
     teacher_model:
-      model_path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-31B
+      model_path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-12B-it
       inference:
         enable_sleep_mode: false
         free_cache_engine: false
         response_length: 8192
+        # One complete 12B BF16 Teacher replica on each dedicated GPU.
         tensor_model_parallel_size: 1
+        gpu_memory_utilization: 0.85
         max_model_len: 22528
         engine_kwargs:
           vllm:
-            max_logprobs: 17
-            eopd_entropy_topk: 16
+            max_logprobs: 16
   distillation_loss:
-    loss_mode: eopd
-    topk: 16
-    eopd_entropy_threshold: 0.8
-    eopd_alpha: 1.0
+    loss_mode: reverse_kl
     selection_ratio: 1.0
     selection_method: random
     loss_max_clamp: 20.0
@@ -74,6 +72,6 @@ trainer:
   experiment_name: ${run_name}
   total_training_steps: 100
   default_local_dir: ./outputs/${run_name}
-  val_before_train: false
+  val_before_train: true
   test_freq: 20
   save_freq: 20

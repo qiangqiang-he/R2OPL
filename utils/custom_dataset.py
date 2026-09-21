@@ -9,7 +9,7 @@ from typing import Any
 import datasets
 import numpy as np
 
-from utils.prompts import normalize_model_family, render_chat_prompt
+from utils.prompts import PROMPT_NAME, normalize_model_family, render_chat_prompt
 from verl.utils.dataset.rl_dataset import RLHFDataset
 
 
@@ -200,6 +200,61 @@ def render_length_limited_chat_prompt(
     return best_prompt, True
 
 
+def render_distillation_prompt_pair(
+    student_tokenizer: Any,
+    teacher_tokenizer: Any,
+    *,
+    question: str,
+    student_family: str,
+    teacher_family: str,
+    student_limit: int,
+    teacher_limit: int,
+    prompt_name: str = PROMPT_NAME,
+) -> tuple[str, str, list[int], bool]:
+    """Render native prompts around the same question prefix, within both limits.
+
+    Teacher IDs are encoded by its own tokenizer once and transported verbatim.
+    Only the question may be shortened; neither model's template may be sliced.
+    """
+    if min(student_limit, teacher_limit) <= 0:
+        raise ValueError("Student and Teacher prompt limits must be positive")
+    question = str(question).strip()
+
+    def render(candidate: str):
+        student_text = render_chat_prompt(
+            student_tokenizer, question=candidate, model_family=student_family,
+            prompt_name=prompt_name,
+        )
+        teacher_text = render_chat_prompt(
+            teacher_tokenizer, question=candidate, model_family=teacher_family,
+            prompt_name=prompt_name,
+        )
+        student_ids = student_tokenizer.encode(student_text, add_special_tokens=False)
+        teacher_ids = teacher_tokenizer.encode(teacher_text, add_special_tokens=False)
+        fits = len(student_ids) <= student_limit and len(teacher_ids) <= teacher_limit
+        return (student_text, teacher_text, teacher_ids), fits
+
+    full, fits = render(question)
+    if fits:
+        return (*full, False)
+    best, fits = render(question[:1])
+    if not fits:
+        raise ValueError(
+            "PG-OPD prompt budget cannot fit both native chat templates and one "
+            "question character; increase the Student/Teacher prompt limits."
+        )
+    low, high = 1, len(question)
+    while low <= high:
+        middle = (low + high) // 2
+        candidate, fits = render(question[:middle])
+        if fits:
+            best = candidate
+            low = middle + 1
+        else:
+            high = middle - 1
+    return (*best, True)
+
+
 class CustomDataset(RLHFDataset):
     """Render native chat prompts without changing source JSON."""
 
@@ -246,21 +301,55 @@ class CustomDataset(RLHFDataset):
 
         dataframe = datasets.Dataset.from_list(records)
         model_family = normalize_model_family(str(self.config.model_family))
+        teacher_spec = self.config.get("native_teacher") or self.config.get("pg_opd_teacher")
+        teacher_tokenizer = None
+        # Validation generates with the Student only. Do not constrain its
+        # prompt to the Teacher capacity or load a Teacher tokenizer there.
+        if teacher_spec is not None and validation_dataset_names is None:
+            from verl.utils import hf_tokenizer
+            from verl.utils.fs import copy_to_local
+
+            teacher_tokenizer = hf_tokenizer(
+                copy_to_local(str(teacher_spec.model_path)), trust_remote_code=False
+            )
+            if not getattr(teacher_tokenizer, "chat_template", None):
+                raise ValueError(
+                    f"Teacher {teacher_spec.model_path!r} has no chat template"
+                )
+            if self.tokenizer.get_vocab() != teacher_tokenizer.get_vocab():
+                raise ValueError(
+                    "Native Teacher scoring requires identical Student/Teacher token-to-ID mappings "
+                    "to score the original Student response IDs."
+                )
 
         def adapt(example: dict, index: int) -> dict:
             question = str(example["question"])
             answer = str(example["answer"])
-            prompt, prompt_truncated = render_length_limited_chat_prompt(
-                self.tokenizer,
-                question=question,
-                model_family=model_family,
-                max_prompt_length=self.max_prompt_length,
-            )
+            teacher_fields = {}
+            if teacher_tokenizer is not None:
+                prompt, teacher_prompt, teacher_ids, prompt_truncated = render_distillation_prompt_pair(
+                    self.tokenizer,
+                    teacher_tokenizer,
+                    question=question,
+                    student_family=model_family,
+                    teacher_family=str(teacher_spec.model_family),
+                    student_limit=self.max_prompt_length,
+                    teacher_limit=int(teacher_spec.max_prompt_length),
+                    prompt_name=str(teacher_spec.prompt_name),
+                )
+                teacher_fields["teacher_prompt_ids"] = teacher_ids
+            else:
+                prompt, prompt_truncated = render_length_limited_chat_prompt(
+                    self.tokenizer,
+                    question=question,
+                    model_family=model_family,
+                    max_prompt_length=self.max_prompt_length,
+                )
+                teacher_prompt = prompt
             return {
-                # PG-OPD requires Student and Teacher to share a tokenizer
-                # family so the sampled response token IDs keep their meaning.
                 "prompt": prompt,
-                "teacher_prompt_text": prompt,
+                "teacher_prompt_text": teacher_prompt,
+                **teacher_fields,
                 "oa_ground_truth_answer": answer,
                 "data_source": str(example["data_source"]),
                 "reward_model": {"style": "rule", "ground_truth": answer},
@@ -302,4 +391,5 @@ __all__ = [
     "CustomDataset",
     "load_question_answer_records",
     "render_length_limited_chat_prompt",
+    "render_distillation_prompt_pair",
 ]
