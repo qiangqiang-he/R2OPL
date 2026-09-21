@@ -113,13 +113,7 @@ def apply_greedy_sampling_params(params: dict[str, Any]) -> None:
 
 
 def should_track_opd_reward_metrics(config) -> bool:
-    """Enable training grading when an OPD algorithm consumes outcomes.
-
-    Standard OPD uses training rewards only for no-thinking diagnostics.
-    R2OPL-base and OPDVR require verifier outcomes for their objective's
-    correct/incorrect branches, regardless of the prompt template. Uni-OPD
-    likewise requires outcomes for correctness balancing and calibration.
-    """
+    """Report real task rewards for every OPD algorithm and prompt template."""
 
     if config is None:
         return False
@@ -128,18 +122,21 @@ def should_track_opd_reward_metrics(config) -> bool:
         if hasattr(config, "get")
         else lambda key, default: getattr(config, key, default)
     )
+    distillation = get_value("distillation", {})
+    enabled = (
+        distillation.get("enabled", False)
+        if hasattr(distillation, "get")
+        else getattr(distillation, "enabled", False)
+    )
+    if enabled:
+        return True
     algorithm = get_value("algorithm", {})
     algorithm_name = (
         algorithm.get("name", "")
         if hasattr(algorithm, "get")
         else getattr(algorithm, "name", "")
     )
-    if str(algorithm_name) in {"r2opl_base", "opdvr", "uni_opd"}:
-        return True
-    return (
-        str(get_value("student_prompt", "")) == "qwen3_no_thinking_prompt"
-        and str(get_value("teacher_prompt", "")) == "qwen3_no_thinking_prompt"
-    )
+    return str(algorithm_name) in {"pg_opd", "eopd", "r2opl_base", "opdvr", "uni_opd"}
 
 
 def select_validation_generation_demos(
@@ -559,18 +556,11 @@ class AgentLoopWorkerTQ(AgentLoopWorker):
             logger.warning(f"Empty output for prompt {uid}_{session_id}")
             return
 
-        # Always grade validation and objectives that use verifier outcomes.
-        # For other OPD objectives, grading remains an optional no-thinking
-        # diagnostic; those objectives can use placeholder training scores.
-        is_opd_training = self.distillation_enabled and not validate
-        track_training_reward = should_track_opd_reward_metrics(self.config)
-        if not is_opd_training or track_training_reward:
-            await self._compute_score(outputs, kwargs=kwargs)
+        # Always retain real task rewards for training and validation metrics.
+        # use_task_rewards controls their contribution to the actor loss;
+        # disabling that loss term must not replace observed rewards with zero.
+        await self._compute_score(outputs, kwargs=kwargs)
         final_output = outputs[-1]
-        if is_opd_training and not track_training_reward:
-            # The shared GRPO-shaped pipeline requires rm_scores even though
-            # distillation-only OPD never consumes task reward in its loss.
-            final_output.reward_score = 0.0
         # TODO: Support output:list[AgentLoopOutput]
         await self._compute_teacher_logprobs(
             final_output,
