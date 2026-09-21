@@ -13,15 +13,15 @@ model_source:
   type: hf_models
   models:
     - name: Qwen3-1.7B
-      path: ./models/Qwen3-1.7B
+      path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-1.7B
     - name: Qwen3-4B
-      path: ./models/Qwen3-4B
+      path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
     - name: Qwen3-4B-Instruct-2507
-      path: ./models/Qwen3-4B-Instruct-2507
+      path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B-Instruct-2507
     - name: gemma-4-E2B-it
-      path: ./models/gemma-4-E2B-it
+      path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-E2B-it
     - name: gemma-4-12B-it
-      path: ./models/gemma-4-12B-it
+      path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-12B-it
       # The family is derived automatically (qwen3 / gemini4); add an explicit
       # `family:` field only if autodetection ever fails.
 
