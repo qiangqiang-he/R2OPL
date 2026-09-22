@@ -35,7 +35,7 @@ actor_rollout_ref:
     top_p: 1.0
     top_k: -1
     max_model_len: 22528
-    max_num_batched_tokens: 22528
+    max_num_batched_tokens: 18432
     log_prob_max_token_len_per_gpu: 14337
     val_kwargs:
       temperature: 0.6

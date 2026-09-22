@@ -13,6 +13,8 @@ teacher_model_family: qwen3
 actor_rollout_ref:
   rollout:
     data_parallel_size: 4
+    # Leave headroom for R²OPL's two-branch backward pass.
+    gpu_memory_utilization: 0.35
 
 algorithm:
   name: r2opl_base
