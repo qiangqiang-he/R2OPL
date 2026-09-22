@@ -64,7 +64,7 @@ The three 8K-train / 20K-eval, 100-step experiment configurations are:
 ```bash
 bash scripts/start_train.sh configs/pg_opd/pg_opd_qwen3_4b_instruct_2507_to_1p7b_len8k_100steps.yaml
 bash scripts/start_train.sh configs/pg_opd/pg_opd_qwen3_4b_instruct_2507_to_4b_len8k_100steps.yaml
-bash scripts/start_train.sh configs/pg_opd/pg_opd_gemma4_12b_it_to_e2b_it_len8k_100steps.yaml
+bash scripts/start_train.sh configs/pg_opd/pg_opd_gemma4_26b_a4b_it_to_e2b_it_len8k_100steps.yaml
 ```
 
 Formal configs use the server checkpoints under
