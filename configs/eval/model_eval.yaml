@@ -59,12 +59,12 @@ runtime:
   # Up to 256 rollouts per GPU call; smaller batches also spread across GPUs.
   rollouts_per_gpu_batch: 256
   # Refuse to load when less than this much GPU memory would stay free.
-  min_free_gib: 5.0
+  min_free_gib: 2.0
 
 engine:
   dtype: bfloat16
   trust_remote_code: true
-  gpu_memory_utilization: 0.90
+  gpu_memory_utilization: 0.8
   # 2048-token prompt budget + 20480 generated tokens.
   max_model_len: 22528
   enable_prefix_caching: true
@@ -73,7 +73,7 @@ ersr:
   # Each model completes base metrics, Teacher replacement, and Student MC
   # before the next model starts. Token-exact replacement needs a compatible
   # Teacher vocabulary, so mixed families specify their Teachers separately.
-  enabled: true
+  enabled: false
   # Teachers run in their own vLLM phase; Student engine memory stays unchanged.
   gpu_memory_utilization: 0.85
   actions: [student_action, teacher_replace]
