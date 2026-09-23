@@ -27,17 +27,23 @@ actor_rollout_ref:
   model:
     path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-E2B-it
   actor:
+    # Keep each backward micro-batch to one trajectory, including long ones.
+    use_dynamic_bsz: false
+    ppo_micro_batch_size_per_gpu: 1
     ppo_max_token_len_per_gpu: 14337
+    fsdp_config:
+      use_no_sync_for_gradient_accumulation: false
     optim:
       lr: 1.0e-6
   rollout:
     temperature: 1.0
     top_p: 1.0
     top_k: -1
-    # Leave 60% of each Student GPU for FSDP training and R²OPL backward peaks.
-    gpu_memory_utilization: 0.40
+    # Budget 30% for the resident rollout engine to leave room for FSDP backward.
+    gpu_memory_utilization: 0.30
     max_model_len: 22528
-    max_num_batched_tokens: 18432
+    max_num_seqs: 64
+    max_num_batched_tokens: 4096
     log_prob_max_token_len_per_gpu: 14337
     val_kwargs:
       temperature: 0.6
