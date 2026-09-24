@@ -1,0 +1,65 @@
+# PG-OPD Qwen3-4B checkpoint evaluation: error trajectories only.
+# This configuration computes Avg@16 plus ERSR_Adv_TR; it never evaluates
+# ERSR_Adv / student_action cases.
+
+run_name: ersr_eval_pg_opd_qwen3_4b_adv_tr
+training_output: ./outputs/pg_opd_qwen3_4b_instruct_2507_to_4b_len8k_100steps
+
+# Tokenizer and Hugging Face metadata source for FSDP shard-only checkpoints.
+base_model:
+  name: Qwen3-4B
+  path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
+
+data:
+  val_files: ["./data/MSL_Eval.json"]
+  val_datasets:
+    - AMC23
+    - AIME24
+
+prompt_template: explicit_step_prompt
+seed: 42
+
+sampling:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  n: 16
+  max_new_tokens: 20480
+
+length_control: [8192, 16384, 20480]
+
+runtime:
+  gpus: [0, 1, 2, 3, 4, 5, 6, 7]
+  tensor_parallel_size: 1
+  rollouts_per_gpu_batch: 64
+  min_free_gib: 5.0
+
+engine:
+  dtype: bfloat16
+  trust_remote_code: true
+  gpu_memory_utilization: 0.90
+  max_model_len: 22528
+  enable_prefix_caching: true
+
+ersr:
+  enabled: true
+  checkpoint_schedule: per_checkpoint
+  gpu_memory_utilization: 0.85
+  # Incorrect base trajectories only: ERSR_Adv_TR.
+  actions: [teacher_replace]
+  datasets: [AMC23, AIME24]
+  max_steps_per_dataset: 500
+  mc_k: 2
+  max_teacher_step_tokens: 2048
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  seed: 42
+  teacher:
+    name: Qwen3-4B-Instruct-2507
+    path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B-Instruct-2507
+
+report:
+  save_rollouts: true
+
+result_dir: ./ersr_eval_results/pg_opd_qwen3_4b_adv_tr

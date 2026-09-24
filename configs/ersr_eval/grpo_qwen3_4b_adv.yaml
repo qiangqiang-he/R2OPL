@@ -1,0 +1,60 @@
+# GRPO Qwen3-4B checkpoint evaluation: correct trajectories only.
+# This configuration computes Avg@16 plus ERSR_Adv; no Teacher is loaded and
+# ERSR_Adv_TR is intentionally absent.
+
+run_name: ersr_eval_grpo_qwen3_4b_adv
+training_output: ./outputs/grpo_qwen3_4b_len12k_500steps
+
+# Tokenizer and Hugging Face metadata source for FSDP shard-only checkpoints.
+base_model:
+  name: Qwen3-4B
+  path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
+
+data:
+  val_files: ["./data/MSL_Eval.json"]
+  val_datasets:
+    - AMC23
+    - AIME24
+
+prompt_template: explicit_step_prompt
+seed: 42
+
+sampling:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  n: 16
+  max_new_tokens: 20480
+
+length_control: [8192, 16384, 20480]
+
+runtime:
+  gpus: [0, 1, 2, 3, 4, 5, 6, 7]
+  tensor_parallel_size: 1
+  rollouts_per_gpu_batch: 64
+  min_free_gib: 5.0
+
+engine:
+  dtype: bfloat16
+  trust_remote_code: true
+  gpu_memory_utilization: 0.90
+  max_model_len: 22528
+  enable_prefix_caching: true
+
+ersr:
+  enabled: true
+  checkpoint_schedule: per_checkpoint
+  # Correct base trajectories only: ERSR_Adv. No Teacher config is needed.
+  actions: [student_action]
+  datasets: [AMC23, AIME24]
+  max_steps_per_dataset: 500
+  mc_k: 2
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  seed: 42
+
+report:
+  save_rollouts: true
+
+result_dir: ./ersr_eval_results/grpo_qwen3_4b_adv
