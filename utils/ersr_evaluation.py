@@ -2709,6 +2709,31 @@ def _tokenizer_identity(
     return vocabulary, special_ids, boundary_ids
 
 
+def _checkpoint_metadata_matches_base_tokenizer(
+    base_identity: tuple[dict[str, int], tuple[int, ...], tuple[Any, Any, Any]],
+    checkpoint_identity: tuple[
+        dict[str, int], tuple[int, ...], tuple[Any, Any, Any]
+    ],
+) -> bool:
+    """Accept checkpoint metadata that omits canonical special-token markers."""
+
+    # VERL actor exports can retain the full vocabulary while dropping entries
+    # from all_special_ids. The configured base tokenizer is the canonical
+    # source for rendering and decoding, so a checkpoint may omit its markers.
+    # It must never introduce an unknown special ID, and its vocabulary plus
+    # BOS/EOS/PAD IDs must still match exactly. Teacher/student validation
+    # deliberately remains strict for token-exact replacement.
+    base_vocab, base_special_ids, base_boundary_ids = base_identity
+    checkpoint_vocab, checkpoint_special_ids, checkpoint_boundary_ids = (
+        checkpoint_identity
+    )
+    return (
+        checkpoint_vocab == base_vocab
+        and checkpoint_boundary_ids == base_boundary_ids
+        and set(checkpoint_special_ids).issubset(set(base_special_ids))
+    )
+
+
 def load_prompt_tokenizer(config: EvaluationConfig, model: ModelSpec) -> Any:
     """Use model-native tokenization/decoding; optionally override only Jinja."""
     tokenizer = _load_driver_tokenizer(config, model.tokenizer_path or model.path)
@@ -2789,11 +2814,15 @@ def validate_checkpoint_base_model(
             checkpoint_tokenizer_identity = _tokenizer_identity(
                 _load_driver_tokenizer(config, metadata_dir)
             )
-            if checkpoint_tokenizer_identity != base_tokenizer_identity:
+            if not _checkpoint_metadata_matches_base_tokenizer(
+                base_tokenizer_identity, checkpoint_tokenizer_identity
+            ):
                 raise ValueError(
                     f"base_model {base_model.name} and checkpoint "
                     f"{checkpoint.checkpoint_dir} must have identical token-to-ID "
-                    "vocabularies, special-token IDs, and BOS/EOS/PAD IDs."
+                    "vocabularies and BOS/EOS/PAD IDs. Checkpoint special IDs "
+                    "may be a subset of, but may not add IDs beyond, the "
+                    "configured base tokenizer."
                 )
 
 
