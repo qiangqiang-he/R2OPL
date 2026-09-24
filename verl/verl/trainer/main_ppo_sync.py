@@ -1403,7 +1403,10 @@ class PPOTrainer:
         with marked_timer("dump_rollout_generations", timing_raw, color="green"):
             fields = ["uid", "prompts", "responses", "rm_scores", "reward_model"]
             probe_fields = []
-            if str(self.config.algorithm.get("name", "")) == "r2opl_base":
+            if str(self.config.algorithm.get("name", "")) in {
+                "r2opl_base",
+                "correct_r2opl",
+            }:
                 probe_fields = ["r2opl_v2_truncated", "r2opl_v2_probe_correct", "r2opl_v2_probe_attempted"]
                 fields.extend(probe_fields)
             data = tq.kv_batch_get(keys=batch.keys, partition_id=batch.partition_id, select_fields=fields)

@@ -1,0 +1,37 @@
+# Correct-R2OPL: Student-only, difficulty-aware self-reinforcement on all 8 GPUs.
+
+defaults:
+  - /base
+  - _self_
+
+run_name: correct_r2opl_qwen3
+run_name_prefix: correct_r2opl_qwen3
+group_name: Correct-R2OPL
+
+actor_rollout_ref:
+  actor:
+    # Correct-R2OPL is the direct REINFORCE form of the R²OPL correct branch;
+    # its zeroed incorrect advantages remain in the complete-batch denominator.
+    policy_loss:
+      loss_mode: reinforce
+  rollout:
+    # There is no Teacher resource pool. All eight GPUs are Student actor/rollout
+    # replicas and therefore this must equal trainer.n_gpus_per_node.
+    data_parallel_size: 8
+    gpu_memory_utilization: 0.40
+
+algorithm:
+  name: correct_r2opl
+  correct_r2opl:
+    miu: 16
+
+# Keep the inherited distillation block explicitly disabled. The Student answer
+# probe used for truncated rollouts is served by the Student rollout replicas,
+# not by a Teacher model.
+distillation:
+  enabled: false
+
+trainer:
+  n_gpus_per_node: 8
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}

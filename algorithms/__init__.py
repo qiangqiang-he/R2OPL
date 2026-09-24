@@ -11,6 +11,12 @@ from algorithms.eopd import (
     configure_eopd_defaults,
     validate_eopd_config,
 )
+from algorithms.correct_r2opl import (
+    CorrectR2OPLTrainer,
+    configure_correct_r2opl_batch,
+    configure_correct_r2opl_defaults,
+    validate_correct_r2opl_config,
+)
 from algorithms.grpo import (
     GRPOTrainer,
     configure_grpo_batch,
@@ -47,6 +53,13 @@ class AlgorithmSpec:
 
 
 ALGORITHM_REGISTRY = {
+    "correct_r2opl": AlgorithmSpec(
+        name="correct_r2opl",
+        trainer_class=CorrectR2OPLTrainer,
+        validate=validate_correct_r2opl_config,
+        configure_defaults=configure_correct_r2opl_defaults,
+        configure_batch=configure_correct_r2opl_batch,
+    ),
     "pg_opd": AlgorithmSpec(
         name="pg_opd",
         trainer_class=PGOPDTrainer,

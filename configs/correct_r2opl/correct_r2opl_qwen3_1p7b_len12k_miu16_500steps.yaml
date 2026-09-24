@@ -1,0 +1,56 @@
+# @package _global_
+
+# Correct-R2OPL: Qwen3-1.7B Student, no Teacher.
+
+defaults:
+  - /correct_r2opl
+  - _self_
+
+run_name: correct_r2opl_qwen3_1p7b_len12k_miu16_500steps
+run_name_prefix: correct_r2opl_qwen3_1p7b_len12k_miu16_500steps
+
+student_model_family: qwen3
+
+algorithm:
+  name: correct_r2opl
+  correct_r2opl:
+    miu: 16
+
+data:
+  max_prompt_length: 2048
+  max_response_length: 20480
+
+actor_rollout_ref:
+  model:
+    path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-1.7B
+  actor:
+    ppo_max_token_len_per_gpu: 14337
+    optim:
+      lr: 1.0e-6
+  rollout:
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    # Reserve context for Student-only head/tail answer probes on truncation.
+    max_model_len: 22528
+    max_num_batched_tokens: 18432
+    log_prob_max_token_len_per_gpu: 14337
+    val_kwargs:
+      temperature: 0.6
+      top_p: 0.95
+      top_k: -1
+      do_sample: true
+  ref:
+    log_prob_max_token_len_per_gpu: 14337
+
+rlvr_generation:
+  train_max_new_tokens: 12288
+  val_max_new_tokens: 20480
+
+trainer:
+  experiment_name: ${run_name}
+  total_training_steps: 500
+  default_local_dir: ./outputs/${run_name}
+  val_before_train: false
+  test_freq: 25
+  save_freq: 25

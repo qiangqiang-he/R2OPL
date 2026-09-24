@@ -1378,6 +1378,48 @@ class AgentLoopWorker:
             max_model_len=self.config.actor_rollout_ref.rollout.max_model_len,
         )
 
+    async def _compute_r2opl_v2_probe_fields(
+        self,
+        output: AgentLoopOutput,
+        *,
+        prompt_ids: list[int],
+        response_ids: list[int],
+        sample_kwargs: Optional[dict[str, Any]],
+        routing_key: Optional[str],
+    ) -> None:
+        """Attach R²OPL's Student-only truncated-rollout probe fields.
+
+        This deliberately has no Teacher dependency: Correct-R2OPL uses the
+        same probe as R²OPL-base while running with distillation disabled.
+        """
+
+        if sample_kwargs is None:
+            raise RuntimeError("R²OPL v2 requires rollout answer metadata.")
+
+        def _python_scalar(value):
+            return value.item() if hasattr(value, "item") else value
+
+        answer = str(_python_scalar(sample_kwargs.get("oa_ground_truth_answer", "")))
+        from utils.r2opl_v2 import compute_r2opl_v2_probe
+
+        timing = {}
+        with simple_timer("r2opl_answer_probe_s", timing):
+            probe_result = await compute_r2opl_v2_probe(
+                tokenizer=self.tokenizer,
+                student_probe=self._compute_student_answer_probe_mean_logprob,
+                prompt_ids=prompt_ids,
+                response_ids=response_ids,
+                answer=answer,
+                max_new_tokens=int(self.config.rlvr_generation.train_max_new_tokens),
+                routing_key=routing_key,
+            )
+        output.extra_fields["r2opl_v2_truncated"] = float(probe_result.truncated)
+        output.extra_fields["r2opl_v2_probe_correct"] = float(probe_result.probe_correct)
+        output.extra_fields["r2opl_v2_probe_attempted"] = float(
+            probe_result.head_mean_logprob is not None
+        )
+        output.extra_fields["r2opl_answer_probe_s"] = timing["r2opl_answer_probe_s"]
+
     async def _compute_teacher_logprobs(
         self,
         output: AgentLoopOutput,
@@ -1387,6 +1429,7 @@ class AgentLoopWorker:
         sample_kwargs: Optional[dict[str, Any]] = None,
     ) -> None:
         """Compute teacher logprobs for single sample."""
+        algorithm_name = str(self.config.algorithm.get("name", ""))
         if self.distillation_enabled and not validate:
             routing_key = None
             if sample_kwargs is not None:
@@ -1400,7 +1443,6 @@ class AgentLoopWorker:
             if hasattr(teacher_prompt_text, "item"):
                 teacher_prompt_text = teacher_prompt_text.item()
 
-            algorithm_name = str(self.config.algorithm.get("name", ""))
             is_sol_opd = algorithm_name == "sol_opd"
             is_ps_opd = algorithm_name == "ps_opd"
             is_cal_opd = algorithm_name == "cal_opd"
@@ -1609,42 +1651,13 @@ class AgentLoopWorker:
                     output.extra_fields["oa_opd_active_steps"] = 0.0
                     output.extra_fields["oa_opd_probe_failures"] = 1.0
             if is_r2opl_v2:
-                # Only truncated training trajectories are probed.  A passing
-                # head/tail answer probe rescues the rollout into the
-                # self-reinforcement branch. Infrastructure failures must surface.
-                if sample_kwargs is None:
-                    raise RuntimeError("R²OPL-base v2 requires rollout answer metadata.")
-
-                def _python_scalar(value):
-                    return value.item() if hasattr(value, "item") else value
-
-                answer = str(
-                    _python_scalar(sample_kwargs.get("oa_ground_truth_answer", ""))
+                await self._compute_r2opl_v2_probe_fields(
+                    output,
+                    prompt_ids=prompt_ids,
+                    response_ids=response_ids,
+                    sample_kwargs=sample_kwargs,
+                    routing_key=routing_key,
                 )
-                from utils.r2opl_v2 import compute_r2opl_v2_probe
-
-                with simple_timer("r2opl_answer_probe_s", timing):
-                    # The truncation probe runs on the Student policy and must
-                    # preserve its original rollout prefix.  Teacher scoring
-                    # above can therefore use its own independently rendered
-                    # chat template without changing this probe.
-                    probe_result = await compute_r2opl_v2_probe(
-                        tokenizer=self.tokenizer,
-                        student_probe=self._compute_student_answer_probe_mean_logprob,
-                        prompt_ids=prompt_ids,
-                        response_ids=response_ids,
-                        answer=answer,
-                        max_new_tokens=int(
-                            self.config.rlvr_generation.train_max_new_tokens
-                        ),
-                        routing_key=routing_key,
-                    )
-                output.extra_fields["r2opl_v2_truncated"] = float(probe_result.truncated)
-                output.extra_fields["r2opl_v2_probe_correct"] = float(probe_result.probe_correct)
-                output.extra_fields["r2opl_v2_probe_attempted"] = float(
-                    probe_result.head_mean_logprob is not None
-                )
-                output.extra_fields["r2opl_answer_probe_s"] = timing["r2opl_answer_probe_s"]
             if is_ps_opd:
                 if sample_kwargs is None:
                     raise RuntimeError("PS-OPD requires rollout question and answer metadata.")
@@ -1870,6 +1883,14 @@ class AgentLoopWorker:
                 timing["teacher_forward_s"]
                 - teacher_timing["teacher_engine_s"]
                 - teacher_timing["teacher_logprob_extract_s"],
+            )
+        elif algorithm_name == "correct_r2opl" and not validate:
+            await self._compute_r2opl_v2_probe_fields(
+                output,
+                prompt_ids=prompt_ids,
+                response_ids=response_ids,
+                sample_kwargs=sample_kwargs,
+                routing_key=None,
             )
 
     def _postprocess(
