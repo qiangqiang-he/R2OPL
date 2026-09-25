@@ -1,16 +1,16 @@
-# R2OPL-base Qwen3-4B checkpoint evaluation (lambda=0.1, miu=16).
+# R2OPL-base Qwen3-1.7B checkpoint evaluation (lambda=0.1, miu=16).
 # Compute Avg@16 and both ERSR_Adv (correct trajectories) and ERSR_Adv_TR
 # (incorrect trajectories with Qwen3-4B-Instruct-2507 replacement).
 
-run_name: ersr_eval_r2opl_qwen3_4b_lambda0p1_adv_and_adv_tr
-training_output: ./outputs/r2opl_base_qwen3_4b_instruct_2507_to_4b_len12k_lambda0p1_miu16_500steps
+run_name: ersr_eval_r2opl_qwen3_1p7b_lambda0p1_adv_and_adv_tr
+training_output: ./outputs/r2opl_base_qwen3_4b_instruct_2507_to_1p7b_len12k_lambda0p1_miu16_500steps
 
 # Canonical tokenizer and metadata source for FSDP shard-only checkpoints.
 base_model:
-  name: Qwen3-4B
-  path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
+  name: Qwen3-1.7B
+  path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-1.7B
 
-# Score the untrained Qwen3-4B first, then every discovered training
+# Score the untrained Qwen3-1.7B first, then every discovered training
 # checkpoint.  Its result is stored as the top-level `initial_base` record.
 initial_base_evaluation:
   enabled: true
@@ -65,4 +65,4 @@ ersr:
 report:
   save_rollouts: true
 
-result_dir: ./ersr_eval_results/r2opl_qwen3_4b_lambda0p1_adv_and_adv_tr
+result_dir: ./ersr_eval_results/r2opl_qwen3_1p7b_lambda0p1_adv_and_adv_tr
