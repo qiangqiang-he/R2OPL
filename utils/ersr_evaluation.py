@@ -253,6 +253,10 @@ class EvaluationConfig:
     # shards do not retain ``actor/huggingface``.
     base_model: ModelSpec | None = None
     model_family: str | None = None
+    # When checkpoint evaluation has an explicit ``base_model``, optionally
+    # score that untrained model first and store it in the result document's
+    # independent ``initial_base`` field.
+    initial_base_evaluation: bool = False
 
     @property
     def questions_per_gpu_batch(self) -> int:
@@ -535,6 +539,27 @@ def load_evaluation_config(
     if default_family is not None:
         default_family = normalize_model_family(default_family)
     base_model: ModelSpec | None = None
+    raw_initial_base_evaluation = raw.get("initial_base_evaluation", False)
+    if isinstance(raw_initial_base_evaluation, Mapping):
+        unknown_initial_base_keys = set(raw_initial_base_evaluation) - {"enabled"}
+        if unknown_initial_base_keys:
+            raise ValueError(
+                "initial_base_evaluation only supports the 'enabled' key; got: "
+                + ", ".join(sorted(map(str, unknown_initial_base_keys)))
+            )
+        initial_base_evaluation = _boolean(
+            raw_initial_base_evaluation.get("enabled", False),
+            "initial_base_evaluation.enabled",
+        )
+    elif isinstance(raw_initial_base_evaluation, bool):
+        # Keep early, already-written configs usable while making the mapping
+        # form the documented contract for future optional settings.
+        initial_base_evaluation = raw_initial_base_evaluation
+    else:
+        raise ValueError(
+            "initial_base_evaluation must be a boolean or a mapping with an "
+            "enabled boolean."
+        )
 
     if "training_output" in raw:
         source_type = "checkpoints"
@@ -571,8 +596,18 @@ def load_evaluation_config(
                 raise ValueError(
                     "base_model.family must match model_family when both are set."
                 )
+        if initial_base_evaluation and base_model is None:
+            raise ValueError(
+                "initial_base_evaluation=true requires a checkpoint-mode "
+                "base_model."
+            )
     elif "model_source" in raw:
         source_type = "models"
+        if initial_base_evaluation:
+            raise ValueError(
+                "initial_base_evaluation is only valid with training_output "
+                "checkpoint evaluation."
+            )
         if "base_model" in raw:
             raise ValueError(
                 "base_model is only valid with training_output checkpoint evaluation."
@@ -801,6 +836,7 @@ def load_evaluation_config(
         ersr=ersr,
         base_model=base_model,
         model_family=default_family,
+        initial_base_evaluation=initial_base_evaluation,
     )
 
 
@@ -2513,6 +2549,7 @@ def _evaluation_metadata(config: EvaluationConfig) -> dict[str, Any]:
         "config": str(config.config_path),
         "prompt_template": config.prompt_name,
         "model_family": config.model_family,
+        "initial_base_evaluation": {"enabled": config.initial_base_evaluation},
         "base_model": (
             None
             if config.base_model is None
@@ -2644,6 +2681,20 @@ def build_validation_plan(
     }
     if config.source_type == "checkpoints":
         plan["training_output"] = str(config.training_output)
+        plan["initial_base_evaluation"] = {
+            "enabled": config.initial_base_evaluation,
+            **(
+                {}
+                if not config.initial_base_evaluation
+                else {
+                    "model": {
+                        "name": config.base_model.name,
+                        "path": str(config.base_model.path),
+                        "family": config.base_model.family,
+                    },
+                }
+            ),
+        }
         plan["checkpoints"] = [
             {
                 "step_num": checkpoint.step_num,
@@ -2779,6 +2830,11 @@ def validate_checkpoint_base_model(
     """
 
     base_model = config.base_model
+    if config.initial_base_evaluation:
+        if base_model is None:
+            raise ValueError(
+                "initial_base_evaluation requires a checkpoint-mode base_model."
+            )
     expected_family = (
         base_model.family if base_model is not None else config.model_family
     )
@@ -2930,6 +2986,29 @@ def _annotate_checkpoint_result(
         result["model_path_kind"] = "checkpoint_huggingface"
 
 
+def _annotate_initial_base_result(
+    result: dict[str, Any], config: EvaluationConfig
+) -> None:
+    """Give the configured pre-training base model durable provenance."""
+
+    base_model = config.base_model
+    if base_model is None:
+        raise RuntimeError(
+            "initial_base_evaluation was requested without a configured base_model."
+        )
+    result.update(
+        is_initial_base=True,
+        result_kind="initial_base",
+        checkpoint_dir=None,
+        source_kind="initial_base_model",
+        source_dir=str(base_model.path),
+        model_path=str(base_model.path),
+        model_path_kind="configured_base_model",
+        tokenizer_path=str(base_model.tokenizer_path or base_model.path),
+        checkpoint_metadata_source="base_model",
+    )
+
+
 def _checkpoint_model_for_directory(
     config: EvaluationConfig, checkpoint: CheckpointSpec, model_dir: Path
 ) -> ModelSpec:
@@ -2951,6 +3030,7 @@ def _checkpoint_run_signature(config: EvaluationConfig) -> dict[str, Any]:
         "prompt_template": metadata["prompt_template"],
         "model_family": metadata["model_family"],
         "base_model": metadata["base_model"],
+        "initial_base_evaluation": metadata["initial_base_evaluation"],
         "seed": metadata["seed"],
         "data": metadata["data"],
         "sampling": metadata["sampling"],
@@ -2983,6 +3063,7 @@ def _load_checkpoint_document(
             "phase": "base",
             "started_at": utc_now(),
             "steps": [],
+            **({"initial_base": None} if config.initial_base_evaluation else {}),
         }, False
 
     if not resume:
@@ -3026,11 +3107,103 @@ def _load_checkpoint_document(
                 "The completed result file does not cover exactly the currently "
                 "discovered checkpoints. Use a new run_name for a new checkpoint set."
             )
+        if config.initial_base_evaluation:
+            initial_base = document.get("initial_base")
+            if (
+                not isinstance(initial_base, Mapping)
+                or initial_base.get("status") != "completed"
+            ):
+                raise ValueError(
+                    "The completed result file is missing a completed initial_base "
+                    "evaluation. Use a new run_name for this configuration."
+                )
         return document, True
     document.pop("error", None)
     document.pop("completed_at", None)
     document.update(status="running", phase="resuming", resumed_at=utc_now())
     return document, True
+
+
+def _run_initial_base_evaluation(
+    *,
+    config: EvaluationConfig,
+    questions: Sequence[Mapping[str, Any]],
+    question_counts: Mapping[str, int],
+    document: dict[str, Any],
+) -> None:
+    """Evaluate the configured base model before training checkpoints.
+
+    The base model is a direct Hugging Face source, so unlike a training
+    checkpoint it needs neither FSDP merging nor temporary-disk cleanup.  Its
+    durable result lives in the document's independent ``initial_base`` field:
+    a real ``global_step_0`` therefore remains a valid training checkpoint.
+    """
+
+    if not config.initial_base_evaluation:
+        return
+    base_model = config.base_model
+    if base_model is None:
+        raise RuntimeError(
+            "initial_base_evaluation was requested without a configured base_model."
+        )
+
+    previous = document.get("initial_base")
+    if isinstance(previous, Mapping) and previous.get("status") == "completed":
+        print("INITIAL_BASE_SKIP_COMPLETED", flush=True)
+        return
+
+    # A partial base run cannot safely reuse its rollout records.  Drop it and
+    # regenerate exactly as per-checkpoint resume does for an incomplete FSDP
+    # checkpoint, without touching the independent checkpoint ``steps`` list.
+    document["initial_base"] = None
+    document["phase"] = "initial_base:base"
+    atomic_write_json(config.result_path, document)
+    print(
+        f"INITIAL_BASE_START model={base_model.name} source={base_model.path}",
+        flush=True,
+    )
+    result, tokenizer, records = _evaluate_base_model(
+        config=config,
+        model=base_model,
+        questions=questions,
+        question_counts=question_counts,
+    )
+    _annotate_initial_base_result(result, config)
+    document["initial_base"] = result
+    atomic_write_json(config.result_path, document)
+    print("INITIAL_BASE_DONE phase=base", flush=True)
+
+    if config.ersr is not None:
+        work = prepare_ersr(
+            config=config, model=base_model, records=records, tokenizer=tokenizer
+        )
+        document["phase"] = "initial_base:teacher"
+        atomic_write_json(config.result_path, document)
+        generate_ersr_replacements(config, [work])
+        # As with checkpoints, leave the Teacher's proposals in the result if
+        # a later Student-MC phase fails; resume will restart the entire
+        # incomplete initial-base row rather than mix rollout attempts.
+        result["ersr"] = {
+            **work.document,
+            "status": "teacher_completed",
+            "replacements": work.replacements,
+            "invalid": list(work.invalid.values()),
+        }
+        document["phase"] = "initial_base:student"
+        atomic_write_json(config.result_path, document)
+        print(
+            f"ERSR_STUDENT_START model={work.model.name} "
+            f"gpus={list(config.gpus)}",
+            flush=True,
+        )
+        result["ersr"] = evaluate_ersr_student(config, work)
+
+    result.update(status="completed", completed_at=utc_now())
+    atomic_write_json(config.result_path, document)
+    print("INITIAL_BASE_DONE phase=completed", flush=True)
+    del records, tokenizer
+    if config.ersr is not None:
+        del work
 
 
 def _run_checkpoint_per_checkpoint(
@@ -3043,6 +3216,12 @@ def _run_checkpoint_per_checkpoint(
 ) -> None:
     """Bounded-memory checkpoint schedule: Base -> ERSR -> cleanup -> next."""
 
+    _run_initial_base_evaluation(
+        config=config,
+        questions=questions,
+        question_counts=question_counts,
+        document=document,
+    )
     completed_steps = {
         int(result["step_num"])
         for result in document["steps"]
@@ -3130,12 +3309,23 @@ def _run_checkpoint_shared_teacher(
     """Optional throughput schedule that keeps merged checkpoints for one Teacher pass."""
 
     assert config.ersr is not None
+    # The initial base is deliberately completed on its own before this
+    # memory-heavy shared-Teacher schedule begins.  It is not one of the
+    # retained merged checkpoint models.
+    _run_initial_base_evaluation(
+        config=config,
+        questions=questions,
+        question_counts=question_counts,
+        document=document,
+    )
     works: list[ERSRWork] = []
+    work_results: list[dict[str, Any]] = []
     # Retain merged weights on disk until their Student phase finishes: each
     # checkpoint is merged once, but this schedule trades disk/RAM for one
     # shared Teacher load.  The formal config defaults to per_checkpoint.
     with ExitStack() as merged_models:
         cleanups: list[ExitStack] = []
+
         for checkpoint in checkpoints:
             cleanup = merged_models.enter_context(ExitStack())
             model_dir = cleanup.enter_context(prepare_model(config, checkpoint))
@@ -3153,20 +3343,21 @@ def _run_checkpoint_shared_teacher(
             )
             _annotate_checkpoint_result(result, checkpoint)
             document["steps"].append(result)
+            document["steps"].sort(key=lambda row: int(row["step_num"]))
             atomic_write_json(config.result_path, document)
-            works.append(
-                prepare_ersr(
-                    config=config, model=model, records=records, tokenizer=tokenizer
-                )
+            work = prepare_ersr(
+                config=config, model=model, records=records, tokenizer=tokenizer
             )
+            works.append(work)
+            work_results.append(result)
             cleanups.append(cleanup)
-            del records
+            del records, tokenizer
             print(f"STEP_BASE_DONE step={checkpoint.step_num}", flush=True)
 
         document["phase"] = "teacher"
         atomic_write_json(config.result_path, document)
         generate_ersr_replacements(config, works)
-        for result, work in zip(document["steps"], works, strict=True):
+        for result, work in zip(work_results, works, strict=True):
             result["ersr"] = {
                 **work.document,
                 "status": "teacher_completed",
@@ -3176,7 +3367,7 @@ def _run_checkpoint_shared_teacher(
         document["phase"] = "student"
         atomic_write_json(config.result_path, document)
         for result, work, cleanup in zip(
-            document["steps"], works, cleanups, strict=True
+            work_results, works, cleanups, strict=True
         ):
             print(
                 f"ERSR_STUDENT_START model={work.model.name} "

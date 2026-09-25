@@ -10,6 +10,11 @@ base_model:
   name: Qwen3-4B
   path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
 
+# Score the untrained Qwen3-4B first, then every discovered training
+# checkpoint.  Its result is stored as the top-level `initial_base` record.
+initial_base_evaluation:
+  enabled: true
+
 data:
   val_files: ["./data/MSL_Eval.json"]
   val_datasets: [AMC23, AIME24]
