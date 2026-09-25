@@ -680,6 +680,144 @@ def is_huggingface_model_dir(path: Path) -> bool:
     )
 
 
+def _materialize_gemma4_vllm_compat_weights(model_dir: Path) -> int:
+    """Add the unused Gemma4 shared-KV ``k_norm`` tensors for native vLLM.
+
+    A current Transformers Gemma4 model omits ``k_norm`` from its shared-KV
+    tail layers.  Some native vLLM EngineCore instances are spawned in a fresh
+    interpreter, so they cannot inherit the in-worker compatibility patch and
+    still require those tensors.  This writes a tiny extra safetensors shard
+    plus an index alongside the *temporary merged model*; it never alters the
+    FSDP checkpoint or any trainable tensor.  The weights are all ones because
+    the shared-KV forward branch does not read them.
+    """
+
+    model_config = _read_model_config(model_dir)
+    if model_config.get("model_type") != "gemma4":
+        return 0
+    text_config = model_config.get("text_config")
+    if not isinstance(text_config, Mapping):
+        return 0
+    try:
+        num_layers = int(text_config["num_hidden_layers"])
+        num_kv_shared_layers = int(text_config.get("num_kv_shared_layers", 0))
+    except (KeyError, TypeError, ValueError):
+        return 0
+    first_shared_layer = max(num_layers - num_kv_shared_layers, 0)
+    if num_layers <= 0 or first_shared_layer >= num_layers:
+        return 0
+
+    try:
+        import torch
+        from safetensors import safe_open
+        from safetensors.torch import save_file
+    except ImportError as exc:
+        raise RuntimeError(
+            "Gemma4 checkpoint evaluation requires safetensors to build the "
+            "native-vLLM compatibility shard."
+        ) from exc
+
+    index_path = model_dir / "model.safetensors.index.json"
+    index_payload: dict[str, Any] = {}
+    weight_map: dict[str, str] = {}
+    if index_path.is_file():
+        try:
+            with index_path.open(encoding="utf-8") as handle:
+                index_payload = json.load(handle)
+            raw_weight_map = index_payload["weight_map"]
+            if not isinstance(raw_weight_map, Mapping):
+                raise TypeError("weight_map is not a mapping")
+            weight_map = {
+                str(name): str(shard) for name, shard in raw_weight_map.items()
+            }
+        except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+            raise RuntimeError(
+                f"Cannot read Gemma4 safetensors index {index_path}: {exc}"
+            ) from exc
+    else:
+        for shard_path in sorted(model_dir.glob("*.safetensors")):
+            with safe_open(
+                str(shard_path), framework="pt", device="cpu"
+            ) as handle:
+                for weight_name in handle.keys():
+                    if weight_name in weight_map:
+                        raise RuntimeError(
+                            "Duplicate tensor name while indexing Gemma4 model: "
+                            f"{weight_name}"
+                        )
+                    weight_map[weight_name] = shard_path.name
+    if not weight_map:
+        raise RuntimeError(
+            f"No safetensors weights found in Gemma4 model: {model_dir}"
+        )
+
+    prefixes = (
+        "model.language_model.layers.",
+        "language_model.model.layers.",
+        "model.layers.",
+        "language_model.layers.",
+    )
+    prefix = next(
+        (
+            candidate
+            for candidate in prefixes
+            if f"{candidate}0.self_attn.k_norm.weight" in weight_map
+        ),
+        None,
+    )
+    if prefix is None:
+        return 0
+
+    missing_names = [
+        f"{prefix}{layer}.self_attn.k_norm.weight"
+        for layer in range(first_shared_layer, num_layers)
+        if f"{prefix}{layer}.self_attn.k_norm.weight" not in weight_map
+    ]
+    if not missing_names:
+        return 0
+
+    compatibility_weights: dict[str, Any] = {}
+    for weight_name in missing_names:
+        layer_prefix, _, _ = weight_name.rpartition(".self_attn.k_norm.weight")
+        reference_name = f"{layer_prefix}.self_attn.q_norm.weight"
+        reference_shard = weight_map.get(reference_name)
+        if reference_shard is None:
+            raise RuntimeError(
+                "Cannot derive Gemma4 shared-KV k_norm shape; missing "
+                f"reference tensor {reference_name}."
+            )
+        reference_path = model_dir / reference_shard
+        with safe_open(
+            str(reference_path), framework="pt", device="cpu"
+        ) as handle:
+            reference_tensor = handle.get_tensor(reference_name)
+        compatibility_weights[weight_name] = torch.ones_like(reference_tensor)
+
+    compatibility_shard = "r2opl_gemma4_shared_kv_compat.safetensors"
+    save_file(
+        compatibility_weights,
+        str(model_dir / compatibility_shard),
+        metadata={"format": "pt"},
+    )
+    weight_map.update({name: compatibility_shard for name in compatibility_weights})
+    metadata = index_payload.get("metadata")
+    if not isinstance(metadata, Mapping):
+        metadata = {}
+    index_payload["metadata"] = {
+        **metadata,
+        "total_size": sum(
+            (model_dir / shard).stat().st_size for shard in set(weight_map.values())
+        ),
+    }
+    index_payload["weight_map"] = weight_map
+    index_path.write_text(
+        json.dumps(index_payload, ensure_ascii=False, indent=2, sort_keys=True)
+        + "\n",
+        encoding="utf-8",
+    )
+    return len(compatibility_weights)
+
+
 def _validate_fsdp_source(path: Path) -> None:
     config_path = path / "fsdp_config.json"
     metadata_dir = path / "huggingface"
@@ -851,6 +989,15 @@ def prepare_model(
             raise RuntimeError(
                 "Model merger finished but did not create complete HF weights: "
                 f"{merged_model_dir}"
+            )
+        added_compat_weights = _materialize_gemma4_vllm_compat_weights(
+            merged_model_dir
+        )
+        if added_compat_weights:
+            print(
+                "GEMMA4_VLLM_COMPAT_WEIGHTS "
+                f"step={checkpoint.step_num} count={added_compat_weights}",
+                flush=True,
             )
         yield merged_model_dir
     finally:
