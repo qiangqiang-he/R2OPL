@@ -1143,15 +1143,91 @@ def aggregate_question_results(
 # ---------------------------------------------------------------------------
 
 
-def _apply_gemma4_vllm_compatibility_patches() -> None:
-    """Legacy Gemma 4 loading patches; skipped when vLLM supports Gemma 4.
+def _apply_native_gemma4_vllm_kv_sharing_patch(
+    *,
+    attention_cls: type[Any] | None = None,
+    conditional_generation_cls: type[Any] | None = None,
+) -> bool:
+    """Make native vLLM accept Gemma4 FSDP-merged shared-KV checkpoints.
 
-    vLLM >= 0.22 ships a native ``Gemma4ForConditionalGeneration`` backend;
-    when the registry resolves that architecture the legacy patches below
-    (persistent clipping-limit buffers, KV-shared tail-layer tensors, and
-    skipping the unused multimodal towers) are not needed.
+    Transformers deliberately omits ``k_norm`` (and KV projections) from the
+    final ``num_kv_shared_layers`` Gemma4 layers: those layers reuse the KV
+    states from earlier layers and never execute those modules.  Current
+    native vLLM constructs ``k_norm`` for every layer, then its strict loader
+    rejects a valid merged checkpoint because the unused tail parameters have
+    no tensors.  Remove only those unused modules and ignore their optional
+    tensors when loading an older base checkpoint that still contains them.
+
+    Returns ``False`` when this vLLM build has no importable native Gemma4
+    implementation, allowing the older generic fallback below to handle it.
     """
 
+    if attention_cls is None or conditional_generation_cls is None:
+        try:
+            from vllm.model_executor.models.gemma4 import Gemma4Attention
+            from vllm.model_executor.models.gemma4_mm import (
+                Gemma4ForConditionalGeneration,
+            )
+        except (ImportError, ModuleNotFoundError):
+            return False
+        attention_cls = Gemma4Attention
+        conditional_generation_cls = Gemma4ForConditionalGeneration
+
+    original_attention_init = attention_cls.__init__
+    if not getattr(original_attention_init, "_r2opl_gemma4_shared_kv", False):
+
+        def init_without_unused_shared_k_norm(self, *args, **kwargs):
+            original_attention_init(self, *args, **kwargs)
+            if getattr(self, "is_kv_shared_layer", False):
+                # vLLM's shared-KV forward branch never reads k_norm.  Assign
+                # None rather than a dummy Parameter so strict loading cannot
+                # require a tensor that a merged Transformers model omits.
+                self.k_norm = None
+
+        init_without_unused_shared_k_norm._r2opl_gemma4_shared_kv = True
+        attention_cls.__init__ = init_without_unused_shared_k_norm
+
+    original_load_weights = conditional_generation_cls.load_weights
+    if not getattr(original_load_weights, "_r2opl_gemma4_shared_kv", False):
+
+        def load_weights_without_optional_shared_k_norm(self, weights):
+            config = getattr(self, "config", None)
+            text_config = getattr(config, "text_config", config)
+            try:
+                first_shared_layer = int(text_config.num_hidden_layers) - int(
+                    getattr(text_config, "num_kv_shared_layers", 0)
+                )
+            except (AttributeError, TypeError, ValueError):
+                return original_load_weights(self, weights)
+
+            # Accept both the ordinary HF conditional-generation names and
+            # the text-only/merged aliases handled by vLLM's weight mapper.
+            name_pattern = re.compile(
+                r"^(?:model\.language_model\.|language_model\.model\."
+                r"|model\.|language_model\.)layers\.(\d+)\.self_attn\."
+                r"k_norm\.weight$"
+            )
+
+            def relevant_weights():
+                for name, weight in weights:
+                    match = name_pattern.fullmatch(name)
+                    if match is not None and int(match.group(1)) >= first_shared_layer:
+                        continue
+                    yield name, weight
+
+            return original_load_weights(self, relevant_weights())
+
+        load_weights_without_optional_shared_k_norm._r2opl_gemma4_shared_kv = True
+        conditional_generation_cls.load_weights = (
+            load_weights_without_optional_shared_k_norm
+        )
+    return True
+
+
+def _apply_gemma4_vllm_compatibility_patches() -> None:
+    """Apply the appropriate Gemma4 loading compatibility patch for vLLM."""
+
+    native_gemma4_available = False
     try:
         import inspect
         from vllm.model_executor.models.registry import ModelRegistry
@@ -1159,12 +1235,22 @@ def _apply_gemma4_vllm_compatibility_patches() -> None:
         # New registries require a full ModelConfig to resolve a class. The
         # native registry is sufficient here; actual loading stays in LLM.
         if "model_config" in inspect.signature(ModelRegistry.resolve_model_cls).parameters:
-            if "Gemma4ForConditionalGeneration" in ModelRegistry.get_supported_archs():
-                return
-        ModelRegistry.resolve_model_cls(("Gemma4ForConditionalGeneration",))
-        return  # native Gemma 4 support present; no patches needed
+            native_gemma4_available = (
+                "Gemma4ForConditionalGeneration"
+                in ModelRegistry.get_supported_archs()
+            )
+        else:
+            ModelRegistry.resolve_model_cls(("Gemma4ForConditionalGeneration",))
+            native_gemma4_available = True
     except Exception:
         pass
+
+    if native_gemma4_available:
+        # Native Gemma4 still needs a narrow shared-KV fix.  Do not fall back
+        # to the generic Transformers implementation when it is unavailable:
+        # the registry has already selected the native model.
+        _apply_native_gemma4_vllm_kv_sharing_patch()
+        return
 
     from vllm.model_executor.models.utils import AutoWeightsLoader
 

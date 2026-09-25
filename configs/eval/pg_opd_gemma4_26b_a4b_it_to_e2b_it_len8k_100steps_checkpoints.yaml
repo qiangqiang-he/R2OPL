@@ -1,0 +1,70 @@
+# Evaluate every checkpoint of the Gemma4 PG-OPD run on the formal 8-GPU
+# server. FSDP actor shards are merged to a temporary Hugging Face model,
+# then one complete Student replica is loaded per GPU.
+#
+# Launch:
+#   bash scripts/start_eval.sh \
+#     configs/eval/pg_opd_gemma4_26b_a4b_it_to_e2b_it_len8k_100steps_checkpoints.yaml
+
+training_output: ./outputs/pg_opd_gemma4_26b_a4b_it_to_e2b_it_len8k_100steps
+
+data:
+  val_files: ["./data/MSL_Eval.json"]
+  val_datasets:
+    - AMC23
+    - AIME24
+    - AIME25
+    - MATH-500
+    - GPQA-D
+    - SciBench
+    - LogicBench
+    - LogiQA2.0
+
+prompt_template: explicit_step_prompt
+seed: 42
+
+sampling:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  n: 16
+  max_new_tokens: 20480
+
+length_control: [8192, 16384, 20480]
+
+runtime:
+  gpus: [0, 1, 2, 3, 4, 5, 6, 7]
+  tensor_parallel_size: 1
+  rollouts_per_gpu_batch: 256
+  # Do not start a replica unless this reserve will remain available.
+  min_free_gib: 5.0
+
+engine:
+  dtype: bfloat16
+  trust_remote_code: true
+  gpu_memory_utilization: 0.90
+  # 2048 prompt tokens plus 20480 generated tokens.
+  max_model_len: 22528
+  enable_prefix_caching: true
+
+ersr:
+  enabled: true
+  gpu_memory_utilization: 0.85
+  actions: [student_action, teacher_replace]
+  datasets: [AMC23, AIME24, SciBench, LogicBench]
+  max_steps_per_dataset: 200
+  mc_k: 2
+  max_teacher_step_tokens: 2048
+  temperature: 0.6
+  top_p: 0.95
+  top_k: -1
+  seed: 42
+  # Keep the Teacher tokenizer in the Gemma4 family for token-exact ERSR.
+  teacher:
+    name: gemma-4-12B-it
+    path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-12B-it
+
+report:
+  save_rollouts: true
+
+result_dir: ./eval_results
