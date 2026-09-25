@@ -150,6 +150,47 @@ def _coerce_token_ids(name: str, values: Sequence[int]) -> list[int]:
     return result
 
 
+def _r2opl_mm_token_type_ids_contain_media(value: Any) -> bool:
+    """Return whether processor type IDs mark an actual media token.
+
+    Gemma4's processor emits ``mm_token_type_ids`` for every request, including
+    an all-zero tensor for a text-only prompt. The zero tensor is bookkeeping,
+    not a visual/audio payload. Nested lists occur in a few processor paths,
+    so inspect them recursively rather than relying on tensor-only truthiness.
+    """
+
+    if isinstance(value, torch.Tensor):
+        if value.is_nested:
+            value = value.values()
+        return bool(value.ne(0).any().item())
+    if isinstance(value, (list, tuple)):
+        return any(_r2opl_mm_token_type_ids_contain_media(item) for item in value)
+    # ``extract_multi_modal_inputs`` normally returns tensors (or lists of
+    # tensors). Treat an unfamiliar truthy value conservatively as media so a
+    # new processor cannot silently bypass R²OPL's text-only restriction.
+    return bool(value)
+
+
+def r2opl_has_unsupported_multimodal_inputs(multi_modal_inputs: dict[str, Any]) -> bool:
+    """Identify real media payloads incompatible with packed R²OPL probes.
+
+    R²OPL's dense branch mask is text-only. A processor-only all-zero
+    ``mm_token_type_ids`` tensor (Gemma4's normal pure-text output) is safe to
+    ignore because no image, video, or audio token is present. Every other
+    populated processor field remains unsupported, as do nonzero type IDs.
+    """
+
+    for key, value in multi_modal_inputs.items():
+        if value is None:
+            continue
+        if key == "mm_token_type_ids":
+            if _r2opl_mm_token_type_ids_contain_media(value):
+                return True
+            continue
+        return True
+    return False
+
+
 def _step_range(step: TokenStep | Sequence[int], index: int) -> tuple[int, int]:
     """Accept a splitter ``TokenStep`` or a small ``(start, end)`` tuple."""
 
@@ -1363,6 +1404,7 @@ __all__ = [
     "compute_r2opl_token_modulation",
     "layout_rpc_payload",
     "r2opl_bool_mask_to_additive",
+    "r2opl_has_unsupported_multimodal_inputs",
     "r2opl_probe_metrics",
     "r2opl_reinforce_loss",
     "r2opl_token_advantage",

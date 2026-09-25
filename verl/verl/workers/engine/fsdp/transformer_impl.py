@@ -1357,6 +1357,7 @@ class FSDPEngineWithLMHead(FSDPEngine):
             build_r2opl_probe_batch,
             build_r2opl_probe_layout_from_step_ends,
             r2opl_bool_mask_to_additive,
+            r2opl_has_unsupported_multimodal_inputs,
         )
 
         if self.use_ulysses_sp:
@@ -1365,7 +1366,8 @@ class FSDPEngineWithLMHead(FSDPEngine):
             raise RuntimeError("R²OPL packed probes require use_remove_padding=false.")
         if tu.get_non_tensor_data(data=micro_batch, key="use_fused_kernels", default=False):
             raise RuntimeError("R²OPL packed probes require use_fused_kernels=false.")
-        if extract_multi_modal_inputs(micro_batch.get("multi_modal_inputs", [])):
+        multi_modal_inputs = extract_multi_modal_inputs(micro_batch.get("multi_modal_inputs", []))
+        if r2opl_has_unsupported_multimodal_inputs(multi_modal_inputs):
             raise RuntimeError("R²OPL packed answer probes currently support text-only language models.")
 
         required = (
