@@ -1,0 +1,95 @@
+# @package _global_
+
+# Formal 8-GPU R²OPL: Qwen3-4B-Instruct-2507 Teacher -> Qwen3-4B Student.
+
+defaults:
+  - /r2opl
+  - _self_
+
+run_name: r2opl_qwen3_4b_instruct_2507_to_4b_len8k_miu16_lambda0p1_alpha_r0p25_alpha_d0p5_epsilon0p8_10steps
+run_name_prefix: r2opl_qwen3_4b_instruct_2507_to_4b_len8k_miu16_lambda0p1_alpha_r0p25_alpha_d0p5_epsilon0p8_10steps
+
+student_model_family: qwen3
+teacher_model_family: qwen3
+
+algorithm:
+  name: r2opl
+  r2opl:
+    miu: 16
+    lambda: 0.1
+    alpha_R: 0.25
+    alpha_D: 0.5
+    epsilon: 0.8
+
+data:
+  max_prompt_length: 2048
+  max_response_length: 20480
+
+actor_rollout_ref:
+  model:
+    path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B
+  actor:
+    ppo_mini_batch_size: 64
+    # This is R²OPL's expanded packed-probe cap, not merely the original
+    # prompt/response length.  The latter is 2048 + 8192 + one predictor.
+    ppo_max_token_len_per_gpu: 24576
+    optim:
+      lr: 1.0e-6
+  rollout:
+    data_parallel_size: 4
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    max_model_len: 22528
+    max_num_batched_tokens: 18432
+    # Old-policy/ref scoring sees the unmodified rollout sequence only.
+    log_prob_max_token_len_per_gpu: 10241
+    val_kwargs:
+      temperature: 0.6
+      top_p: 0.95
+      top_k: -1
+      do_sample: true
+  ref:
+    log_prob_max_token_len_per_gpu: 10241
+
+rlvr_generation:
+  train_max_new_tokens: 8192
+  val_max_new_tokens: 20480
+
+distillation:
+  n_gpus_per_node: 4
+  nnodes: 1
+  teacher_chunk_size: 128
+  teacher_models:
+    teacher_model:
+      model_path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B-Instruct-2507
+      inference:
+        enable_sleep_mode: false
+        free_cache_engine: false
+        prompt_length: 2048
+        response_length: 8192
+        tensor_model_parallel_size: 1
+        max_model_len: 22528
+        engine_kwargs:
+          vllm:
+            max_logprobs: 16
+  distillation_loss:
+    loss_mode: r2opl
+    topk: null
+    selection_ratio: 1.0
+    selection_method: random
+    loss_max_clamp: null
+    log_prob_min_clamp: null
+    use_task_rewards: false
+    use_policy_gradient: true
+    policy_loss_mode: reinforce
+
+trainer:
+  n_gpus_per_node: 4
+  nnodes: 1
+  experiment_name: ${run_name}
+  total_training_steps: 10
+  default_local_dir: ./outputs/${run_name}
+  val_before_train: false
+  test_freq: 50
+  save_freq: 50

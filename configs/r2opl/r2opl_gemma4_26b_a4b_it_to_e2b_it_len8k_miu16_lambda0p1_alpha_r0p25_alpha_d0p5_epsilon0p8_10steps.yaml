@@ -1,0 +1,102 @@
+# @package _global_
+
+# Formal 8-GPU R²OPL: gemma-4-26B-A4B-it Teacher -> Gemma-4-E2B-it Student.
+
+defaults:
+  - /r2opl
+  - _self_
+
+run_name: r2opl_gemma4_26b_a4b_it_to_e2b_it_len8k_miu16_lambda0p1_alpha_r0p25_alpha_d0p5_epsilon0p8_10steps
+run_name_prefix: r2opl_gemma4_26b_a4b_it_to_e2b_it_len8k_miu16_lambda0p1_alpha_r0p25_alpha_d0p5_epsilon0p8_10steps
+
+student_model_family: gemini4
+teacher_model_family: gemini4
+
+algorithm:
+  name: r2opl
+  r2opl:
+    miu: 16
+    lambda: 0.1
+    alpha_R: 0.25
+    alpha_D: 0.5
+    epsilon: 0.8
+
+data:
+  max_prompt_length: 2048
+  max_response_length: 20480
+
+actor_rollout_ref:
+  model:
+    path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-E2B-it
+  actor:
+    ppo_mini_batch_size: 64
+    # This is R²OPL's expanded packed-probe cap, not merely the original
+    # prompt/response length.  The latter is 2048 + 8192 + one predictor.
+    ppo_max_token_len_per_gpu: 24576
+    fsdp_config:
+      use_no_sync_for_gradient_accumulation: false
+    optim:
+      lr: 1.0e-6
+  rollout:
+    data_parallel_size: 4
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    # Reserve enough Student memory for the dense packed-probe backward pass.
+    gpu_memory_utilization: 0.30
+    max_model_len: 22528
+    max_num_seqs: 64
+    max_num_batched_tokens: 4096
+    # Old-policy/ref scoring sees the unmodified rollout sequence only.
+    log_prob_max_token_len_per_gpu: 10241
+    val_kwargs:
+      temperature: 0.6
+      top_p: 0.95
+      top_k: -1
+      do_sample: true
+  ref:
+    log_prob_max_token_len_per_gpu: 10241
+
+rlvr_generation:
+  train_max_new_tokens: 8192
+  val_max_new_tokens: 20480
+
+distillation:
+  n_gpus_per_node: 4
+  nnodes: 1
+  teacher_chunk_size: 128
+  teacher_models:
+    teacher_model:
+      model_path: /mnt/cephfs/LLM_MODEL_HUB/gemma/gemma-4-26B-A4B-it
+      inference:
+        enable_sleep_mode: false
+        free_cache_engine: false
+        prompt_length: 2048
+        response_length: 8192
+        # One complete 26B-A4B bf16 Teacher replica on each dedicated GPU.
+        tensor_model_parallel_size: 1
+        gpu_memory_utilization: 0.85
+        max_model_len: 22528
+        engine_kwargs:
+          vllm:
+            max_logprobs: 16
+  distillation_loss:
+    loss_mode: r2opl
+    topk: null
+    selection_ratio: 1.0
+    selection_method: random
+    loss_max_clamp: null
+    log_prob_min_clamp: null
+    use_task_rewards: false
+    use_policy_gradient: true
+    policy_loss_mode: reinforce
+
+trainer:
+  n_gpus_per_node: 4
+  nnodes: 1
+  experiment_name: ${run_name}
+  total_training_steps: 10
+  default_local_dir: ./outputs/${run_name}
+  val_before_train: false
+  test_freq: 50
+  save_freq: 50

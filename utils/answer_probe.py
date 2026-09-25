@@ -59,14 +59,30 @@ def _probe_offsets_fallback(
     return list(zip(boundaries[:-1], boundaries[1:], strict=True))
 
 
-def build_answer_probe(tokenizer: Any, answer: str) -> AnswerProbe:
-    """Tokenize the complete appended probe once and mark answer-overlap tokens."""
+def build_answer_probe(
+    tokenizer: Any,
+    answer: str,
+    *,
+    prefix: str = PROBE_PREFIX,
+    suffix: str = PROBE_SUFFIX,
+    probe_name: str = "OA-OPD",
+) -> AnswerProbe:
+    """Tokenize one complete probe template and mark answer-overlap tokens.
+
+    ``OA-OPD`` keeps the historic template through the default arguments.
+    Callers whose method specifies a different fixed template (notably R²OPL)
+    can supply it explicitly without changing any existing OA-OPD tokenization.
+    """
 
     answer = str(answer)
+    if not isinstance(prefix, str) or not isinstance(suffix, str):
+        raise TypeError("Answer-probe prefix and suffix must be strings.")
+    if not isinstance(probe_name, str) or not probe_name.strip():
+        raise ValueError("Answer-probe probe_name must be a non-empty string.")
     if not answer:
-        raise ValueError("OA-OPD cannot construct an answer probe for an empty dataset answer.")
-    probe_text = f"{PROBE_PREFIX}{answer}{PROBE_SUFFIX}"
-    answer_char_start = len(PROBE_PREFIX)
+        raise ValueError(f"{probe_name} cannot construct an answer probe for an empty dataset answer.")
+    probe_text = f"{prefix}{answer}{suffix}"
+    answer_char_start = len(prefix)
     answer_char_end = answer_char_start + len(answer)
 
     encoded = tokenizer(
@@ -82,7 +98,9 @@ def build_answer_probe(tokenizer: Any, answer: str) -> AnswerProbe:
     if len(offsets) != len(probe_ids):
         raise ValueError("Probe offset mapping and token IDs have different lengths.")
     if _decode(tokenizer, probe_ids, skip_special_tokens=False) != probe_text:
-        raise ValueError("The complete OA-OPD answer probe does not round-trip through the tokenizer.")
+        raise ValueError(
+            f"The complete {probe_name} answer probe does not round-trip through the tokenizer."
+        )
 
     # Overlap, rather than containment, is intentional.  A token such as
     # ``{4`` overlaps answer character ``4`` and must be scored, whereas a
@@ -93,7 +111,9 @@ def build_answer_probe(tokenizer: Any, answer: str) -> AnswerProbe:
         if end > answer_char_start and start < answer_char_end
     ]
     if not answer_positions:
-        raise ValueError("OA-OPD probe tokenization produced no token overlapping the answer text.")
+        raise ValueError(
+            f"{probe_name} probe tokenization produced no token overlapping the answer text."
+        )
     return AnswerProbe(
         text=probe_text,
         token_ids=probe_ids,

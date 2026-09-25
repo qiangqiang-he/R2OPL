@@ -881,6 +881,195 @@ def compute_r2opl_base_sampled_token_loss(
     return distillation_losses, metrics
 
 
+@register_distillation_loss(
+    DistillationLossSettings(names=["r2opl"], use_estimator=True)
+)  # type: ignore[arg-type]
+def compute_r2opl_sampled_token_loss(
+    config: ActorConfig,
+    distillation_config: DistillationConfig,
+    model_output: dict,
+    data: TensorDict,
+) -> tuple[torch.Tensor, dict[str, Any]]:
+    """Return the paper R²OPL sampled-token policy-gradient signal.
+
+    The packed Student forward supplies answer-probe probabilities at ``P_0``
+    and after every non-final semantic step.  They are converted to detached
+    per-token gates here; successful rollouts use RL and failed rollouts use
+    sampled-token OPD.  This is one mixed loss tensor, so the engine performs
+    one normal backward pass (unlike the deliberately diagnostic-only
+    ``r2opl_base`` two-branch path).
+    """
+
+    del config
+    from utils.r2opl import (
+        compute_r2opl_token_modulation,
+        r2opl_probe_metrics,
+        r2opl_token_advantage,
+    )
+
+    student_log_probs = no_padding_2_padding(model_output["log_probs"], data)
+    teacher_log_probs = no_padding_2_padding(data["teacher_logprobs"], data).squeeze(-1)
+    response_mask = data["response_mask"]
+    if response_mask.is_nested:
+        response_mask = response_mask.bool().to_padded_tensor(False)
+    else:
+        response_mask = response_mask.bool()
+    if student_log_probs.shape != teacher_log_probs.shape or student_log_probs.shape != response_mask.shape:
+        raise ValueError(
+            "R²OPL Student/Teacher log-probabilities and response mask must share shape; "
+            f"got student={tuple(student_log_probs.shape)}, teacher={tuple(teacher_log_probs.shape)}, "
+            f"mask={tuple(response_mask.shape)}."
+        )
+    batch_size = response_mask.shape[0]
+
+    required_outputs = (
+        "r2opl_probe_probabilities",
+        "r2opl_probe_branch_mask",
+        "r2opl_semantic_step_ranges",
+        "r2opl_semantic_step_mask",
+    )
+    missing_outputs = [name for name in required_outputs if name not in model_output]
+    if missing_outputs:
+        raise RuntimeError(
+            "R²OPL actor output is missing packed Student probe values: "
+            + ", ".join(missing_outputs)
+        )
+
+    def _per_row_scalar(name: str, *, positive: bool | None = None) -> torch.Tensor:
+        value = data.get(name, None)
+        if value is None:
+            raise RuntimeError(f"R²OPL actor input is missing controller field {name!r}.")
+        value = tu.unwrap_non_tensor_data(value)
+        if not torch.is_tensor(value):
+            value = torch.tensor(value, device=student_log_probs.device)
+        if value.is_nested:
+            value = value.to_padded_tensor(0.0)
+        value = value.to(device=student_log_probs.device, dtype=torch.float32).reshape(-1)
+        if value.numel() == 1:
+            value = value.expand(batch_size)
+        elif value.numel() != batch_size:
+            raise ValueError(
+                f"R²OPL {name} must be scalar or have one value per rollout; "
+                f"got {value.numel()} for batch size {batch_size}."
+            )
+        if not bool(torch.isfinite(value).all()):
+            raise ValueError(f"R²OPL {name} must be finite.")
+        if positive is True and bool(value.le(0.0).any()):
+            raise ValueError(f"R²OPL {name} must be positive.")
+        if positive is False and bool(value.lt(0.0).any()):
+            raise ValueError(f"R²OPL {name} must be non-negative.")
+        return value
+
+    correctness_values = _per_row_scalar("r2opl_correctness")
+    if bool(((correctness_values != 0.0) & (correctness_values != 1.0)).any()):
+        raise ValueError("R²OPL controller correctness must be binary.")
+    correctness = correctness_values.bool()
+    difficulty = _per_row_scalar("r2opl_difficulty", positive=False)
+    lambda_values = _per_row_scalar("r2opl_lambda", positive=False)
+    miu_values = _per_row_scalar("r2opl_miu", positive=True)
+    alpha_r_values = _per_row_scalar("r2opl_alpha_r", positive=False)
+    alpha_d_values = _per_row_scalar("r2opl_alpha_d", positive=False)
+    epsilon_values = _per_row_scalar("r2opl_epsilon", positive=True)
+
+    def _shared_config_value(name: str, values: torch.Tensor) -> float:
+        if not bool(torch.allclose(values, values[:1])):
+            raise ValueError(f"R²OPL {name} must be shared by every rollout in one actor batch.")
+        return float(values[0].item())
+
+    lambda_ = _shared_config_value("lambda", lambda_values)
+    miu = _shared_config_value("miu", miu_values)
+    alpha_r = _shared_config_value("alpha_R", alpha_r_values)
+    alpha_d = _shared_config_value("alpha_D", alpha_d_values)
+    epsilon = _shared_config_value("epsilon", epsilon_values)
+
+    probe_probabilities = model_output["r2opl_probe_probabilities"].to(
+        device=student_log_probs.device, dtype=torch.float32
+    )
+    probe_branch_mask = model_output["r2opl_probe_branch_mask"].to(
+        device=student_log_probs.device, dtype=torch.bool
+    )
+    semantic_step_ranges = model_output["r2opl_semantic_step_ranges"].to(
+        device=student_log_probs.device, dtype=torch.long
+    )
+    semantic_step_mask = model_output["r2opl_semantic_step_mask"].to(
+        device=student_log_probs.device, dtype=torch.bool
+    )
+    modulation = compute_r2opl_token_modulation(
+        probe_probabilities,
+        response_mask=response_mask,
+        semantic_step_ranges=semantic_step_ranges,
+        semantic_step_mask=semantic_step_mask,
+        probe_branch_mask=probe_branch_mask,
+        alpha_r=alpha_r,
+        alpha_d=alpha_d,
+        epsilon=epsilon,
+    )
+    correct_mask = response_mask & correctness.unsqueeze(-1)
+    error_mask = response_mask & ~correctness.unsqueeze(-1)
+    advantage = r2opl_token_advantage(
+        student_log_probs=student_log_probs,
+        teacher_log_probs=teacher_log_probs,
+        correct_mask=correct_mask,
+        error_mask=error_mask,
+        difficulty=difficulty,
+        response_mask=response_mask,
+        correct_multiplier=modulation.correct_token_multiplier,
+        error_multiplier=modulation.error_token_multiplier,
+        lambda_=lambda_,
+        miu=miu,
+    )
+
+    raw_metrics = r2opl_probe_metrics(
+        modulation=modulation,
+        correctness=correctness,
+        response_mask=response_mask,
+        token_advantage=advantage,
+        student_log_probs=student_log_probs,
+        teacher_log_probs=teacher_log_probs,
+        alpha_r=alpha_r,
+        alpha_d=alpha_d,
+        epsilon=epsilon,
+        lambda_=lambda_,
+        miu=miu,
+    )
+    metrics: dict[str, Metric] = {}
+    for name, value in raw_metrics.items():
+        # R²OPL debug means are materialized only after all actor micro-batches
+        # and data-parallel ranks are reduced.  Keep their sufficient
+        # statistics as sums here so missing outcomes and variable step/token
+        # counts cannot bias the final correct/error conditional averages.
+        aggregation = (
+            AggregationType.SUM
+            if name.endswith(("_sum", "_count"))
+            else AggregationType.MEAN
+        )
+        metrics[name] = Metric(aggregation, value)
+    error_valid = error_mask & response_mask
+    zero = advantage.float().sum() * 0.0
+    raw_opd = teacher_log_probs.float() - student_log_probs.float()
+    metrics.update(
+        {
+            "distillation/reverse_kl_estimate": Metric(
+                AggregationType.MEAN,
+                raw_opd[error_valid].float().mean() if bool(error_valid.any()) else zero,
+            ),
+            "distillation/opd_advantage_mean": Metric(
+                AggregationType.MEAN,
+                raw_opd[error_valid].float().mean() if bool(error_valid.any()) else zero,
+            ),
+            "distillation/applied_advantage_mean": Metric(
+                AggregationType.MEAN,
+                advantage[response_mask].float().mean() if bool(response_mask.any()) else zero,
+            ),
+        }
+    )
+
+    # ``distillation_loss`` negates this tensor before passing it as the
+    # detached policy-gradient advantage.  Returning -A therefore realizes
+    # the paper objective ``-sg[A] log pi_theta``.
+    return -advantage, metrics
+
+
 def compute_opd_outcome_statistics(
     advantage: torch.Tensor,
     response_mask: torch.Tensor,

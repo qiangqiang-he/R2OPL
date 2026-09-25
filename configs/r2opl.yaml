@@ -1,0 +1,103 @@
+# Paper-faithful R²OPL: 4 Student + 4 Teacher GPUs on the 8-GPU server.
+#
+# Unlike r2opl_base, this configuration uses the packed Student answer probe
+# inside the optimisation forward.  Its custom branch visibility requires a
+# dense SDPA mask, so remove-padding and fused kernels must remain disabled.
+
+defaults:
+  - /base
+  - _self_
+
+run_name: r2opl_qwen3
+run_name_prefix: r2opl_qwen3
+group_name: R2OPL
+teacher_model_family: qwen3
+
+actor_rollout_ref:
+  model:
+    use_remove_padding: false
+    use_fused_kernels: false
+    override_config:
+      attn_implementation: sdpa
+  actor:
+    ulysses_sequence_parallel_size: 1
+    # One rollout per actor micro-batch is mandatory: the packed probe uses a
+    # dense [L,L] branch mask, and R²OPL treats ppo_max_token_len_per_gpu as
+    # a runtime hard cap on its expanded physical sequence length.
+    ppo_micro_batch_size_per_gpu: 1
+    use_dynamic_bsz: false
+    # Eq. (10) in the paper sums token contributions within each sampled
+    # rollout, then averages sampled rollouts.  Do not reweight trajectories
+    # by their response lengths with the repository-wide token-mean default.
+    loss_agg_mode: seq-mean-token-sum
+  rollout:
+    data_parallel_size: 4
+    gpu_memory_utilization: 0.35
+    # Actor and old-policy scoring must use the same fixed-batch mode.  VERL
+    # asserts this equality when it initializes the actor worker.
+    log_prob_use_dynamic_bsz: false
+    log_prob_micro_batch_size_per_gpu: 1
+  ref:
+    log_prob_use_dynamic_bsz: false
+    log_prob_micro_batch_size_per_gpu: 1
+
+algorithm:
+  name: r2opl
+  r2opl:
+    miu: 16
+    lambda: 0.1
+    alpha_R: 0.25
+    alpha_D: 0.5
+    epsilon: 0.8
+
+distillation:
+  enabled: true
+  student_chunk_size: 1024
+  teacher_chunk_size: 128
+  n_gpus_per_node: 4
+  nnodes: 1
+  teacher_models:
+    teacher_model:
+      model_path: /mnt/cephfs/LLM_MODEL_HUB/qwen/Qwen3-4B-Instruct-2507
+      inference:
+        name: vllm
+        dtype: bfloat16
+        enable_sleep_mode: false
+        free_cache_engine: false
+        tensor_model_parallel_size: 1
+        data_parallel_size: 1
+        pipeline_model_parallel_size: 1
+        gpu_memory_utilization: 0.85
+        prompt_length: 2048
+        # The base R²OPL schedule trains on at most 8K generated tokens.
+        response_length: 8192
+        max_model_len: 22528
+        max_num_seqs: 8
+        max_num_batched_tokens: ${distillation.teacher_chunk_size}
+        enable_chunked_prefill: true
+        enable_prefix_caching: true
+        engine_kwargs:
+          vllm:
+            max_logprobs: 16
+  distillation_loss:
+    loss_mode: r2opl
+    topk: null
+    diagnostic_topk: 16
+    selection_ratio: 1.0
+    selection_method: random
+    use_task_rewards: false
+    # R²OPL's sampled-token OPD signal is the paper equation itself; clipping
+    # it here would silently change that objective.
+    loss_max_clamp: null
+    log_prob_min_clamp: null
+    use_policy_gradient: true
+    policy_loss_mode: reinforce
+
+ersr:
+  enabled: false
+
+trainer:
+  n_gpus_per_node: 4
+  nnodes: 1
+  experiment_name: ${run_name}
+  default_local_dir: ./outputs/${run_name}

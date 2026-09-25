@@ -40,6 +40,12 @@ from algorithms.r2opl_base import (
     configure_r2opl_base_defaults,
     validate_r2opl_base_config,
 )
+from algorithms.r2opl import (
+    R2OPLTrainer,
+    configure_r2opl_batch,
+    configure_r2opl_defaults,
+    validate_r2opl_config,
+)
 from utils.opd_runtime import configure_pg_opd_batch, configure_pg_opd_defaults
 
 
@@ -94,6 +100,13 @@ ALGORITHM_REGISTRY = {
         validate=validate_r2opl_base_config,
         configure_defaults=configure_r2opl_base_defaults,
         configure_batch=configure_r2opl_base_batch,
+    ),
+    "r2opl": AlgorithmSpec(
+        name="r2opl",
+        trainer_class=R2OPLTrainer,
+        validate=validate_r2opl_config,
+        configure_defaults=configure_r2opl_defaults,
+        configure_batch=configure_r2opl_batch,
     ),
     "opdvr": AlgorithmSpec(
         name="opdvr",

@@ -1323,7 +1323,293 @@ class EngineTrainModeCtx(BaseEngineCtx):
 
 @EngineRegistry.register(model_type="language_model", backend=["fsdp", "fsdp2"], device=["cuda", "npu"])
 class FSDPEngineWithLMHead(FSDPEngine):
+    @staticmethod
+    def _r2opl_row_tensor(value: torch.Tensor, row: int, *, name: str) -> torch.Tensor:
+        """Select one variable-length R²OPL metadata row without padding it.
+
+        TransferQueue stores rollout metadata as jagged nested tensors whenever
+        responses have different numbers of steps or answer-probe tokens.  The
+        packed attention layout must see the original unpadded values, so do
+        not call ``to_padded_tensor`` here.
+        """
+
+        if not isinstance(value, torch.Tensor):
+            raise RuntimeError(f"R²OPL actor metadata {name!r} must be a tensor.")
+        if value.is_nested:
+            rows = value.unbind()
+            if not 0 <= row < len(rows):
+                raise RuntimeError(f"R²OPL metadata row {row} is out of range for {name!r}.")
+            return rows[row]
+        if value.ndim < 1 or not 0 <= row < value.shape[0]:
+            raise RuntimeError(f"R²OPL metadata {name!r} has no row {row}.")
+        return value[row]
+
+    def _prepare_r2opl_probe_model_inputs(self, micro_batch: TensorDict):
+        """Pack probe branches into the one Student forward used for the loss.
+
+        A 4-D additive mask is deliberately used instead of remove-padding
+        FlashAttention.  It is the only ordinary HF/FSDP path that can express
+        independent branches placed physically after the full response while
+        preserving each branch's logical prefix and RoPE positions.
+        """
+
+        from utils.r2opl import (
+            build_r2opl_probe_batch,
+            build_r2opl_probe_layout_from_step_ends,
+            r2opl_bool_mask_to_additive,
+        )
+
+        if self.use_ulysses_sp:
+            raise RuntimeError("R²OPL packed probes do not support Ulysses sequence parallelism.")
+        if tu.get_non_tensor_data(data=micro_batch, key="use_remove_padding", default=True):
+            raise RuntimeError("R²OPL packed probes require use_remove_padding=false.")
+        if tu.get_non_tensor_data(data=micro_batch, key="use_fused_kernels", default=False):
+            raise RuntimeError("R²OPL packed probes require use_fused_kernels=false.")
+        if extract_multi_modal_inputs(micro_batch.get("multi_modal_inputs", [])):
+            raise RuntimeError("R²OPL packed answer probes currently support text-only language models.")
+
+        required = (
+            "prompts",
+            "responses",
+            "position_ids",
+            "r2opl_probe_token_ids",
+            "r2opl_probe_answer_positions",
+            "r2opl_semantic_step_ends",
+        )
+        missing = [name for name in required if name not in micro_batch.keys()]
+        if missing:
+            raise RuntimeError(
+                "R²OPL actor input is missing packed-probe metadata: " + ", ".join(missing)
+            )
+
+        prompts = micro_batch["prompts"]
+        responses = micro_batch["responses"]
+        original_position_ids = micro_batch["position_ids"]
+        if not isinstance(prompts, torch.Tensor) or not isinstance(responses, torch.Tensor):
+            raise RuntimeError("R²OPL prompts and responses must be tensors.")
+        if prompts.ndim < 1 or responses.ndim < 1:
+            raise RuntimeError("R²OPL prompts and responses must carry a batch dimension.")
+        batch_size = int(micro_batch.batch_size[0])
+        if prompts.shape[0] != batch_size or responses.shape[0] != batch_size:
+            raise RuntimeError("R²OPL prompt/response batch sizes do not match the micro batch.")
+        configured_micro_batch_size = getattr(
+            self.engine_config, "micro_batch_size_per_gpu", None
+        )
+        if configured_micro_batch_size != 1 or batch_size != 1:
+            raise RuntimeError(
+                "R²OPL packed probes require exactly one rollout per actor "
+                "micro-batch because their dense 4-D attention mask is quadratic; "
+                f"configured={configured_micro_batch_size!r}, actual={batch_size}."
+            )
+        packed_token_cap = getattr(self.engine_config, "max_token_len_per_gpu", None)
+        if packed_token_cap is None or int(packed_token_cap) <= 0:
+            raise RuntimeError(
+                "R²OPL packed probes require a positive actor "
+                "max_token_len_per_gpu hard cap."
+            )
+        packed_token_cap = int(packed_token_cap)
+        hf_config = getattr(self.model_config, "hf_config", None)
+        max_position_embeddings = getattr(hf_config, "max_position_embeddings", None)
+        if max_position_embeddings is None or int(max_position_embeddings) <= 0:
+            raise RuntimeError(
+                "R²OPL packed probes require model_config.hf_config."
+                "max_position_embeddings for logical RoPE validation."
+            )
+        max_position_embeddings = int(max_position_embeddings)
+
+        layouts = []
+        for row in range(batch_size):
+            prompt_tensor = self._r2opl_row_tensor(prompts, row, name="prompts")
+            response_tensor = self._r2opl_row_tensor(responses, row, name="responses")
+            prompt_ids = [int(token) for token in prompt_tensor.detach().cpu().reshape(-1).tolist()]
+            response_ids = [int(token) for token in response_tensor.detach().cpu().reshape(-1).tolist()]
+            step_ends = self._r2opl_row_tensor(
+                micro_batch["r2opl_semantic_step_ends"], row, name="r2opl_semantic_step_ends"
+            )
+            probe_ids = self._r2opl_row_tensor(
+                micro_batch["r2opl_probe_token_ids"], row, name="r2opl_probe_token_ids"
+            )
+            answer_positions = self._r2opl_row_tensor(
+                micro_batch["r2opl_probe_answer_positions"],
+                row,
+                name="r2opl_probe_answer_positions",
+            )
+            layouts.append(
+                build_r2opl_probe_layout_from_step_ends(
+                    prompt_ids=prompt_ids,
+                    response_ids=response_ids,
+                    semantic_step_ends=step_ends,
+                    probe_token_ids=probe_ids,
+                    probe_answer_positions=answer_positions,
+                )
+            )
+
+            # The custom layout has no freedom to change original token
+            # positions.  Reject a multimodal/nonstandard position stream
+            # rather than returning probe values that merely look plausible.
+            position_row = self._r2opl_row_tensor(
+                original_position_ids, row, name="position_ids"
+            )
+            expected = torch.arange(
+                layouts[-1].original_sequence_length,
+                device=position_row.device,
+                dtype=position_row.dtype,
+            )
+            if position_row.ndim != 1 or not torch.equal(position_row.reshape(-1), expected):
+                raise RuntimeError(
+                    "R²OPL packed probes require ordinary one-dimensional sequential "
+                    "position IDs for the original text sequence."
+                )
+
+        # This check must precede build_r2opl_probe_batch(): that helper
+        # allocates a [B, L_pack, L_pack] boolean mask, followed by an equally
+        # large additive bf16/fp16 mask.  With fixed one-rollout micro-batches,
+        # the actor token cap becomes a reliable hard ceiling for those
+        # allocations even though ordinary fixed-size PPO batching would not
+        # otherwise consult it.
+        for row, layout in enumerate(layouts):
+            packed_length = len(layout.sequence_ids)
+            probe_length = len(layout.probe_token_ids)
+            semantic_steps = layout.num_semantic_steps
+            if packed_length > packed_token_cap:
+                raise RuntimeError(
+                    "R²OPL packed probe layout exceeds actor token hard cap before "
+                    "dense-mask allocation: "
+                    f"row={row}, original_length={layout.original_sequence_length}, "
+                    f"semantic_steps={semantic_steps}, probe_length={probe_length}, "
+                    f"packed_length={packed_length}, cap={packed_token_cap}."
+                )
+            logical_context = max(layout.position_ids) + 1
+            if logical_context > max_position_embeddings:
+                raise RuntimeError(
+                    "R²OPL packed probe layout exceeds the model's logical RoPE "
+                    "context before dense-mask allocation: "
+                    f"row={row}, original_length={layout.original_sequence_length}, "
+                    f"semantic_steps={semantic_steps}, probe_length={probe_length}, "
+                    f"packed_length={packed_length}, logical_context={logical_context}, "
+                    f"max_position_embeddings={max_position_embeddings}."
+                )
+
+        pad_token_id = int(tu.get_non_tensor_data(data=micro_batch, key="pad_token_id", default=0))
+        packed = build_r2opl_probe_batch(
+            layouts,
+            pad_token_id=pad_token_id,
+            device=get_device_id(),
+        )
+        attention_dtype = getattr(self, "_autocast_dtype", torch.bfloat16)
+        if attention_dtype is None:
+            attention_dtype = torch.bfloat16
+        additive_attention_mask = r2opl_bool_mask_to_additive(
+            packed.attention_mask,
+            dtype=attention_dtype,
+            add_head_dimension=True,
+        )
+
+        temperature = micro_batch["temperature"]
+        temperature_is_one = _is_scalar_unit_temperature(temperature)
+        if not isinstance(temperature, torch.Tensor):
+            temperature = torch.tensor(
+                [temperature] * batch_size,
+                dtype=torch.float32,
+                device=packed.input_ids.device,
+            )
+        temperature = temperature.to(device=packed.input_ids.device, dtype=torch.float32).reshape(-1)
+        if temperature.numel() != batch_size:
+            raise RuntimeError(
+                "R²OPL temperature must be scalar or contain one value per packed rollout."
+            )
+
+        model_inputs = {
+            "input_ids": packed.input_ids,
+            "attention_mask": additive_attention_mask,
+            "position_ids": packed.position_ids,
+        }
+        output_args = {
+            "r2opl_packed_probe": True,
+            "r2opl_probe_batch": packed,
+            "temperature": temperature,
+            "temperature_is_one": temperature_is_one,
+        }
+        return model_inputs, output_args
+
+    def _prepare_r2opl_probe_model_outputs(self, output, output_args, micro_batch: TensorDict):
+        """Extract normal rollout logprobs and detached probe probabilities.
+
+        Probe values use the same logits as the policy loss but remain
+        stop-gradient quantities, exactly as ``sg[Â]`` requires.  Original
+        logprob rows are rebuilt at their unmodified lengths so every existing
+        sampled-token distillation utility continues to see the normal layout.
+        """
+
+        from utils.r2opl import compute_r2opl_packed_probe_probabilities
+
+        packed = output_args["r2opl_probe_batch"]
+        logits = output.logits
+        if isinstance(logits, DTensor):
+            logits = logits.full_tensor()
+        if logits.ndim != 3 or logits.shape[0] != len(packed.layouts):
+            raise RuntimeError("R²OPL packed model logits have an unexpected shape.")
+
+        temperature = output_args["temperature"].to(device=logits.device, dtype=torch.float32)
+        scaled_logits = _scale_logits_by_temperature(
+            logits,
+            temperature.unsqueeze(-1).unsqueeze(-1),
+            is_unit_temperature=bool(output_args["temperature_is_one"]),
+        )
+
+        # Score answer probes before the optimised sampled-token logprob
+        # helper may recycle its logits buffer.  They are metrics/gates only;
+        # no gradient is allowed to flow through the advantage.
+        with torch.no_grad():
+            probe_probabilities, probe_branch_mask = compute_r2opl_packed_probe_probabilities(
+                scaled_logits.detach(), packed.layouts
+            )
+
+        log_prob_rows = []
+        entropy_rows = []
+        calculate_entropy = tu.get_non_tensor_data(
+            data=micro_batch, key="calculate_entropy", default=False
+        )
+        for row, layout in enumerate(packed.layouts):
+            original_length = int(layout.original_sequence_length)
+            if original_length < 2:
+                raise RuntimeError("R²OPL original sequences require at least two tokens.")
+            labels = torch.tensor(
+                layout.sequence_ids[1:original_length],
+                dtype=torch.long,
+                device=scaled_logits.device,
+            )
+            token_log_probs = logprobs_from_logits(
+                logits=scaled_logits[row, : original_length - 1], labels=labels
+            )
+            log_prob_rows.append(
+                torch.cat([token_log_probs, token_log_probs.new_zeros(1)], dim=0)
+            )
+            if calculate_entropy:
+                entropy_values = verl_F.entropy_from_logits(
+                    scaled_logits[row, : original_length - 1]
+                )
+                entropy_rows.append(
+                    torch.cat([entropy_values, entropy_values.new_zeros(1)], dim=0)
+                )
+
+        model_output = {
+            "log_probs": torch.nested.as_nested_tensor(log_prob_rows, layout=torch.jagged),
+            "r2opl_probe_probabilities": probe_probabilities,
+            "r2opl_probe_branch_mask": probe_branch_mask,
+            "r2opl_semantic_step_ranges": packed.semantic_step_ranges,
+            "r2opl_semantic_step_mask": packed.semantic_step_mask,
+        }
+        if calculate_entropy:
+            model_output["entropy"] = torch.nested.as_nested_tensor(
+                entropy_rows, layout=torch.jagged
+            )
+        return model_output
+
     def prepare_model_inputs(self, micro_batch: TensorDict):
+        if tu.get_non_tensor_data(data=micro_batch, key="r2opl_enable_probe", default=False):
+            return self._prepare_r2opl_probe_model_inputs(micro_batch)
+
         if self.pad_to_length and tu.get_non_tensor_data(data=micro_batch, key="distillation_use_topk", default=False):
             # Every top-K path re-derives the teacher tensors' layout from the *unpadded* packed
             # length and slices them with the Ulysses rule only, which does not know about the
@@ -1577,6 +1863,9 @@ class FSDPEngineWithLMHead(FSDPEngine):
         return model_inputs, output_args
 
     def prepare_model_outputs(self, output, output_args, micro_batch: TensorDict, logits_processor_func):
+        if output_args.get("r2opl_packed_probe", False):
+            return self._prepare_r2opl_probe_model_outputs(output, output_args, micro_batch)
+
         use_remove_padding = tu.get_non_tensor_data(data=micro_batch, key="use_remove_padding", default=True)
         pad_mode = tu.get_non_tensor_data(data=micro_batch, key="pad_mode", default=DatasetPadMode.NO_PADDING)
         use_fused_kernels = tu.get_non_tensor_data(data=micro_batch, key="use_fused_kernels", default=False)

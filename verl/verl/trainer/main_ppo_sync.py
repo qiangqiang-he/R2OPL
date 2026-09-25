@@ -136,7 +136,7 @@ def should_track_opd_reward_metrics(config) -> bool:
         if hasattr(algorithm, "get")
         else getattr(algorithm, "name", "")
     )
-    return str(algorithm_name) in {"pg_opd", "eopd", "r2opl_base", "opdvr", "uni_opd"}
+    return str(algorithm_name) in {"pg_opd", "eopd", "r2opl_base", "r2opl", "opdvr", "uni_opd"}
 
 
 def select_validation_generation_demos(

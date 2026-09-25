@@ -312,6 +312,19 @@ class AgentLoopOutput(BaseModel):
             value = output["extra_fields"].pop(field_name, None)
             if value is not None:
                 output[field_name] = torch.tensor(float(value), dtype=torch.float32)
+        # R²OPL's packed Student probe is constructed later, after the rollout
+        # enters the actor batch.  These sequences are intentionally ragged: the
+        # TransferQueue converts them to nested tensors rather than silently
+        # padding them as response tokens.  Positions are local to the reusable
+        # probe suffix, while semantic ends index the original response IDs.
+        for field_name in (
+            "r2opl_probe_token_ids",
+            "r2opl_probe_answer_positions",
+            "r2opl_semantic_step_ends",
+        ):
+            value = output["extra_fields"].pop(field_name, None)
+            if value is not None:
+                output[field_name] = torch.as_tensor(value, dtype=torch.int64).reshape(-1)
         for field_name in (
             "r2opl_v2_truncated",
             "r2opl_v2_probe_correct",
@@ -1420,6 +1433,36 @@ class AgentLoopWorker:
         )
         output.extra_fields["r2opl_answer_probe_s"] = timing["r2opl_answer_probe_s"]
 
+    def _attach_r2opl_probe_metadata_fields(
+        self,
+        output: AgentLoopOutput,
+        *,
+        response_ids: list[int],
+        sample_kwargs: Optional[dict[str, Any]],
+    ) -> None:
+        """Attach source-preserving R²OPL probe metadata to one rollout.
+
+        The actor later derives probe boundaries as ``[0] + ends[:-1]``.  That
+        is deliberately different from OA-OPD: the final semantic step is
+        retained under the ordinary RL/OPD signal and must never be probed.
+        """
+        from utils.r2opl_probe import build_r2opl_probe_metadata
+
+        def _python_scalar(value):
+            return value.item() if hasattr(value, "item") else value
+
+        answer_value = None
+        if sample_kwargs is not None:
+            answer_value = _python_scalar(sample_kwargs.get("oa_ground_truth_answer", ""))
+        metadata = build_r2opl_probe_metadata(
+            tokenizer=self.tokenizer,
+            response_ids=response_ids,
+            answer=None if answer_value is None else str(answer_value),
+        )
+        output.extra_fields["r2opl_probe_token_ids"] = metadata.probe_token_ids
+        output.extra_fields["r2opl_probe_answer_positions"] = metadata.probe_answer_positions
+        output.extra_fields["r2opl_semantic_step_ends"] = metadata.semantic_step_ends
+
     async def _compute_teacher_logprobs(
         self,
         output: AgentLoopOutput,
@@ -1430,6 +1473,12 @@ class AgentLoopWorker:
     ) -> None:
         """Compute teacher logprobs for single sample."""
         algorithm_name = str(self.config.algorithm.get("name", ""))
+        if algorithm_name == "r2opl" and not validate:
+            self._attach_r2opl_probe_metadata_fields(
+                output,
+                response_ids=response_ids,
+                sample_kwargs=sample_kwargs,
+            )
         if self.distillation_enabled and not validate:
             routing_key = None
             if sample_kwargs is not None:
@@ -1492,7 +1541,7 @@ class AgentLoopWorker:
                         f"prompt capacity: {len(sol_unprivileged_teacher_prompt_ids)} "
                         f"> {teacher_prompt_length}."
                     )
-            elif algorithm_name in {"pg_opd", "opdvr", "eopd", "r2opl_base"}:
+            elif algorithm_name in {"pg_opd", "opdvr", "eopd", "r2opl_base", "r2opl"}:
                 # The dataset renders and encodes the Teacher's native template
                 # independently. Never re-encode or truncate it with the
                 # Student tokenizer/prompt limit here.
